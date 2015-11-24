@@ -6,6 +6,7 @@
 #leaveregistration-request #edit-year, 
 #leaveregistration-edit #edit-year { width: 990px; }
 
+<<<<<<< HEAD
 #edit-dephead_col_links {display: inline-block; width: 990px;}
 #edit-dephead_col_links .item-list ul,
 #edit-dephead_col_links .item-list ul li { list-style-type: none; margin: 6px; padding: 0; display: inline-block; }
@@ -13,6 +14,15 @@
 #edit-admin_col_links {display: inline-block; width: 990px;}
 #edit-admin_col_links .item-list ul,
 #edit-admin_col_links .item-list ul li { list-style-type: none; margin: 6px; padding: 0; display: inline-block; }
+=======
+#edit-department_head_collids {display: inline-block; width: 990px;}
+#edit-department_head_collids .item-list ul,
+#edit-department_head_collids .item-list ul li { list-style-type: none; margin: 6px; padding: 0; display: inline-block; }
+
+#edit-administration_collids {display: inline-block; width: 990px;}
+#edit-administration_collids .item-list ul,
+#edit-administration_collids .item-list ul li { list-style-type: none; margin: 6px; padding: 0; display: inline-block; }
+>>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
 
 #edit-request_colleague_didh .item-list ul,
 #edit-request_colleague_didh .item-list ul li { list-style-type: none; margin: 2px; padding: 0; display: inline-block; }
@@ -86,7 +96,11 @@
 
 /* calendar year */
 #edit-calendar_year { position: relative;}
+<<<<<<< HEAD
 #edit-calendar_year a {color: #FFFFFF; text-decoration: none;}
+=======
+#edit-calendar_year a {color: #FFFFFF; text-decoration: underline;}
+>>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
 #edit-calendar_year th { font-size: 8px; }
 
 #edit-calendar_year td { font-size: 11px; background-color: #d7dadb; }
@@ -127,6 +141,7 @@
     background-color: #FFFFFF;
 }
 
+<<<<<<< HEAD
 /* months */
 #edit-dephead_months { display: inline-block; width: 100px; vertical-align: top; }
 #edit-dephead_show_colleagues { display: inline-block; width: 870px; }
@@ -178,6 +193,12 @@
 #Activiteiten #edit-year { width: 100%; }
 #Activiteiten #edit-legend { width: 60%; top: -5px; }
 #Activiteiten #edit-legend .legend { width: 125px; }
+=======
+/* CIVICRM */
+#Activiteiten #edit-year { width: 100%; }
+#Activiteiten #edit-legend { width: 60%; top: -5px; }
+#Activiteiten #edit-legend .legend_leave_type { width: 125px; }
+>>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
 #Activiteiten #edit-credit { width: 39%; }
 #Activiteiten #edit-credit_year { width: 39%; }
 #Activiteiten #edit-show_colleagues { width: 100%; }

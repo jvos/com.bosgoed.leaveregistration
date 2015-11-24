@@ -9,7 +9,11 @@
     <email>helpdesk@bosqom.nl</email>
   </maintainer>
   <releaseDate>2013-03-21</releaseDate>
+<<<<<<< HEAD
   <version>2.0</version>
+=======
+  <version>1.0</version>
+>>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
   <develStage>alpha</develStage>
   <compatibility>
     <ver>4.3</ver>
