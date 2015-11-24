@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CustomData>
+  <CustomGroups>
+    <CustomGroup>
+      <name>leave_overall_credit</name>
+      <title>Leave - Overall credit</title>
+      <extends>Organization</extends>
+      <extends_entity_column_value_option_group>contact_type</extends_entity_column_value_option_group>
+      <extends_entity_column_value>Department,Business</extends_entity_column_value>
+      <style>Tab</style>
+      <collapse_display>1</collapse_display>
+      <help_pre></help_pre>
+      <help_post></help_post>
+      <weight>5</weight>
+      <is_active>1</is_active>
+      <table_name>civicrm_leave_overall_credit</table_name>
+      <is_multiple>1</is_multiple>
+      <collapse_adv_display>0</collapse_adv_display>
+      <is_reserved>0</is_reserved>
+    </CustomGroup>
+  </CustomGroups>
+  <CustomFields>
+    <CustomField>
+      <name>leave_overall_credit_total_leave_per_year</name>
+      <label>Total leave per year</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <default_value>200:00</default_value>
+      <is_required>1</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>9</weight>
+      <help_pre>Total leave per year must be hours and minutes separated by :</help_pre>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <column_name>leave_overall_credit_total_leave</column_name>
+      <custom_group_name>leave_overall_credit</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>leave_overall_credit_from_year</name>
+      <label>From year</label>
+      <data_type>Date</data_type>
+      <html_type>Select Date</html_type>
+      <is_required>1</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>4</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <date_format>yy</date_format>
+      <column_name>leave_overall_credit_from_year</column_name>
+      <custom_group_name>leave_overall_credit</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>leave_overall_credit_to_year</name>
+      <label>To year</label>
+      <data_type>Date</data_type>
+      <html_type>Select Date</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>5</weight>
+      <help_pre>If you specify to year than the total leave is untill that year, even if you fill out infinite.</help_pre>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <date_format>yy</date_format>
+      <column_name>leave_overall_credit_to_year</column_name>
+      <custom_group_name>leave_overall_credit</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>leave_overall_credit_infinite</name>
+      <label>Infinite</label>
+      <data_type>Boolean</data_type>
+      <html_type>Radio</html_type>
+      <is_required>1</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>8</weight>
+      <help_pre>If it is infinite, it is the same for each year</help_pre>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <column_name>leave_overall_credit_infinite</column_name>
+      <custom_group_name>leave_overall_credit</custom_group_name>
+    </CustomField>
+  </CustomFields>
+</CustomData>

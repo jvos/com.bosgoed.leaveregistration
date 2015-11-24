@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CustomData>
+  <CustomGroups>
+    <CustomGroup>
+      <name>leave_credit</name>
+      <title>Leave - Credit</title>
+      <extends>Individual</extends>
+      <extends_entity_column_value_option_group>contact_type</extends_entity_column_value_option_group>
+      <extends_entity_column_value>Employee</extends_entity_column_value>
+      <style>Tab</style>
+      <collapse_display>1</collapse_display>
+      <help_pre></help_pre>
+      <help_post></help_post>
+      <weight>3</weight>
+      <is_active>1</is_active>
+      <table_name>civicrm_leave_credit</table_name>
+      <is_multiple>1</is_multiple>
+      <collapse_adv_display>0</collapse_adv_display>
+      <is_reserved>0</is_reserved>
+    </CustomGroup>
+  </CustomGroups>
+  <CustomFields>
+    <CustomField>
+      <name>leave_credit_from_year</name>
+      <label>From year</label>
+      <data_type>Date</data_type>
+      <html_type>Select Date</html_type>
+      <is_required>1</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>6</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <date_format>yy</date_format>
+      <column_name>leave_credit_from_year</column_name>
+      <custom_group_name>leave_credit</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>leave_credit_to_year</name>
+      <label>To year</label>
+      <data_type>Date</data_type>
+      <html_type>Select Date</html_type>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>7</weight>
+      <help_pre>If you specify to year than the total leave is untill that year, even if you fill out infinite.</help_pre>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <date_format>yy</date_format>
+      <column_name>leave_credit_to_year</column_name>
+      <custom_group_name>leave_credit</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>leave_credit_total_leave_per_year</name>
+      <label>Total leave per year</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <default_value>200:00</default_value>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>11</weight>
+      <help_pre>Total leave per year must be hours and minutes separated by :</help_pre>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <column_name>leave_credit_total_leave_per_year</column_name>
+      <custom_group_name>leave_credit</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>leave_credit_infinite</name>
+      <label>Infinite</label>
+      <data_type>Boolean</data_type>
+      <html_type>Radio</html_type>
+      <is_required>1</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>10</weight>
+      <help_pre>If it is infinite, it valid for any subsequent years</help_pre>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <column_name>leave_credit_infinite</column_name>
+      <custom_group_name>leave_credit</custom_group_name>
+    </CustomField>
+    <CustomField>
+      <name>leave_credit_total_leave_per_year_over</name>
+      <label>Total leave per year over</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <default_value>0:00</default_value>
+      <is_required>0</is_required>
+      <is_searchable>1</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>12</weight>
+      <help_pre>Total leave per year over must be hours and minutes separated by :, it can also be negative</help_pre>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <text_length>255</text_length>
+      <column_name>leave_credit_total_leave_per_year</column_name>
+      <custom_group_name>leave_credit</custom_group_name>
+    </CustomField>
+  </CustomFields>
+</CustomData>

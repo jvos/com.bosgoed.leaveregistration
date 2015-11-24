@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<extension key="com.bosgoed.leaveregistration" type="module">
+  <file>leaveregistration</file>
+  <name>Leave registration</name>
+  <description>Leave registration</description>
+  <license>Leave registration</license>
+  <maintainer>
+    <author>Bosqom</author>
+    <email>helpdesk@bosqom.nl</email>
+  </maintainer>
+  <releaseDate>2013-03-21</releaseDate>
+  <version>2.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.3</ver>
+  </compatibility>
+  <comments>This is a new, undeveloped module</comments>
+  <civix>
+    <namespace>CRM/Leaveregistration</namespace>
+  </civix>
+</extension>

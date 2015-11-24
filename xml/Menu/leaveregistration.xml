@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/leaveregistration</path>
+    <page_callback>CRM_Leaveregistration_Page_LeaveRegistration</page_callback>
+    <title>LeaveRegistration</title>
+    <access_arguments>view all activities</access_arguments>
+  </item>
+</menu>

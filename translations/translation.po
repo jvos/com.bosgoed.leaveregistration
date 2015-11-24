@@ -1,0 +1,221 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: CiviCRM"
+"POT-Creation-Date: 2013-10-08 08:14-0400"
+"PO-Revision-Date: 2013-11-04 11:51+0000"
+"Last-Translator: HanV <han.velthuis@home.nl>"
+"Language-Team: Dutch (http://www.transifex.com/projects/p/civicrm/language/"
+"nl/)"
+"MIME-Version: 1.0"
+"Content-Type: text/plain; charset=UTF-8"
+"Content-Transfer-Encoding: 8bit"
+"Language: nl"
+"Plural-Forms: nplurals=2; plural=(n != 1);"
+
+
+msgid "Error in get_dephead_admin_link, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_admin_link, no year !"
+msgstr ""
+
+msgid "Year"
+msgstr "Jaar"
+
+msgid "Error in get_year, no cid !"
+msgstr ""
+
+msgid "Error in get_year, no year !"
+msgstr ""
+
+msgid "Error in get_admin_col_links_form, no user_cid !"
+msgstr ""
+
+msgid "Colleagues"
+msgstr "Collega's"
+
+msgid "Error in get_admin_col_links, no user_cid !"
+msgstr ""
+
+msgid "Error in get_admin_col_links, no year !"
+msgstr ""
+
+msgid "Error in get_dephead_col_links_form, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_col_links, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_col_links, no year !"
+msgstr ""
+
+msgid "Error in get_dephead_request_form, no user_cid !"
+msgstr ""
+
+msgid "Request Colleague"
+msgstr "Aanvraag Collega"
+
+msgid "Error in get_dephead_request, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_request, no year !"
+msgstr ""
+
+msgid "Error in get_dephead_request, no user_id !"
+msgstr ""
+
+msgid "view"
+msgstr "toon"
+
+msgid "change"
+msgstr "verander"
+
+msgid "delete"
+msgstr "verwijder"
+
+msgid "iCal"
+msgstr "iCal"
+
+msgid "Error in get_display_name, no cid !"
+msgstr ""
+
+msgid "Request"
+msgstr "Aanvraag"
+
+msgid "Error in get_request, no user_id !"
+msgstr ""
+
+msgid "Error in get_request, no year !"
+msgstr ""
+
+msgid "Error in get_request, no cid !"
+msgstr ""
+
+msgid "Error in get_request, no user_cid !"
+msgstr ""
+
+msgid "Legend"
+msgstr "Legende"
+
+msgid "Day"
+msgstr "Dag"
+
+msgid "Weekend"
+msgstr "Weekend"
+
+msgid "Holiday"
+msgstr "Vakantie"
+
+msgid "Today"
+msgstr "Vandaag"
+
+msgid "Lattice free"
+msgstr "Vrijedag"
+
+msgid "Credit"
+msgstr "Tegoed"
+
+msgid "Error in get_credit, no year !"
+msgstr ""
+
+msgid "Error in get_credit, no cid !"
+msgstr ""
+
+msgid "Credit over"
+msgstr "Tegoed over"
+
+msgid "Used"
+msgstr "Gebruikt"
+
+msgid "Over"
+msgstr "Over"
+
+msgid "Months"
+msgstr "Maanden"
+
+msgid "Error in get_months, no month !"
+msgstr ""
+
+msgid "all"
+msgstr "alles"
+
+msgid "Error in get_dephead_months_form, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_months, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_months, no month !"
+msgstr ""
+
+msgid "Show colleagues"
+msgstr "Toon collega's"
+
+msgid "Calendar"
+msgstr "Kalender"
+
+msgid "Error in get_calendar_year, no cid !"
+msgstr ""
+
+msgid "Error in get_calendar_year, no user_cid !"
+msgstr ""
+
+msgid "Error in get_calendar_year, no year !"
+msgstr ""
+
+msgid "Error in get_calendar_year, no user_id !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no error_platform !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no years !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no months !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no year !"
+msgstr ""
+
+msgid "Error in get_calendar_month, no year !"
+msgstr ""
+
+msgid "Error in get_calendar_month, no month !"
+msgstr ""
+
+msgid "Error in get_calendar_month, no cid !"
+msgstr ""
+
+msgid "Error in get_calendar_month, no user_id !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month_form, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no error_platform !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no years !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no months !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no year !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no month !"
+msgstr ""
