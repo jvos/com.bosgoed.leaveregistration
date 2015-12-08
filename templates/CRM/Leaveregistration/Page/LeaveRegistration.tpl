@@ -1,11 +1,6 @@
 {* form *}
 {if $type eq 'form'}
-<<<<<<< HEAD
-    {foreach from=$form key=key item=item}       
-=======
     {foreach from=$form key=key item=item}
-       
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
         {assign var='form' value=$item}
         {assign var='key' value=$key}
         {assign var='type' value=$item.type}
@@ -74,27 +69,17 @@
             {/foreach} 
             
         </select>
-            
-<<<<<<< HEAD
+        
         {if $script eq 'year'}
-            <script type="text/javascript"> var select_year = '{$form.attributes.id}'; </script> 
-=======
-        {if $script eq 'redirect'}
-            <script type="text/javascript"> var select_redirect = '{$form.attributes.id}'; </script> 
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
-            
+            <script type="text/javascript"> var select_year = '{$form.attributes.id}'; </script>            
             {literal}
             <script type="text/javascript">          
 
                 (function($) {
 
                     $(document).ready(function() {
-                            
-<<<<<<< HEAD
+                        
                         $('#' + select_year + ' select').bind('change', function () {
-=======
-                        $('#' + select_redirect + ' select').bind('change', function () {
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
                             window.location = $(this).val();
                         });
                     });
@@ -103,7 +88,6 @@
            {/literal}
         {/if}
         
-<<<<<<< HEAD
         {if $script eq 'months'}           
             <script type="text/javascript">                
                 var select_months = '{$form.attributes.id}';
@@ -121,29 +105,6 @@
                  
                 var type = '{$type}'; 
                 var _return = '{$return}';
-=======
-        {if $script eq 'load'}           
-            <script type="text/javascript">
-                var select_load = '{$form.attributes.id}';
-                var base_url = '{$base_url}';
-                
-                var cids = '{$cids}'; 
-                var do_collids = '{$do_collids}'; 
-                var do_depheadids = '{$do_depheadids}'; 
-                var do_busids = '{$do_busids}'; 
-                var years = '{$years}'; 
-                var months = '{$months}'; 
-                var cid = '{$cid}'; 
-                var user_cid = '{$user_cid}'; 
-                var user_id = '{$user_id}'; 
-                var year = '{$year}'; 
-                var month = '{$month}'; 
-                var error_platform = '{$error_platform}'; 
-                var type = '{$type}'; 
-                var _return = '{$return}'; 
-                var elements = '{$elements}'; 
-                 
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
             </script> 
             
             {literal}
@@ -152,9 +113,10 @@
                 (function($) {
 
                     $(document).ready(function() {
-                            
-<<<<<<< HEAD
+                        
                         $('#' + select_months + ' select').bind('change', function () {
+                            $('#edit-calendar_year .fieldset-wrapper').append('<div class="loading"><span></span></div>');
+                            
                             month = $(this).val();
                             switch(month)
                             {
@@ -164,24 +126,11 @@
                                     
                                 default:
                                     element = 'get_calendar_month';
-=======
-                        $('#' + select_load + ' select').bind('change', function () {
-                                                        
-                            switch($(this).val())
-                            {
-                                case 'all':
-                                    elements = serialize(['calendar_year'])
-                                    break;
-                                    
-                                default:
-                                    elements = serialize(['calendar_month']);
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
                             }
         
                             $.post( 
                                 base_url + 'civicrm/leaveregistration',
                                 {
-<<<<<<< HEAD
                                     'error_id': error_id,
                                     'error_platform': error_platform,
                                     'cid': cid,
@@ -234,6 +183,8 @@
                     $(document).ready(function() {
                             
                         $('#' + select_dephead_months + ' select').bind('change', function () {
+                            $('#edit-dephead_calendar_year .fieldset-wrapper').append('<div class="loading"><span></span></div>');
+                            
                             month = $(this).val();
                             switch(month)
                             {
@@ -263,26 +214,6 @@
                                 },
                                 function(data) {
                                    $('#edit-dephead_calendar_year .fieldset-wrapper').html(data);
-=======
-                                    'cids': cids,
-                                    'do_collids': do_collids,
-                                    'do_depheadids': do_depheadids,
-                                    'do_busids': do_busids,
-                                    'years': years,
-                                    'months': months,
-                                    'cid': cid,
-                                    'user_cid': user_cid,
-                                    'user_id': user_id,
-                                    'year': year,
-                                    'month': $(this).val(),
-                                    'error_platform': error_platform,
-                                    'type': 'element',
-                                    'return': 'echo',
-                                    'elements': elements
-                                },
-                                function(data) {
-                                   $('#edit-calendar_year .fieldset-wrapper').html(data);
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
                                 }
                              );
                                  
@@ -292,10 +223,6 @@
             </script>
            {/literal}
         {/if}
-<<<<<<< HEAD
-=======
-        
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
     </div>
   
 {elseif $type eq 'checkbox'}
@@ -303,17 +230,10 @@
         <input id="edit-{$key}-checkbox" class="form-checkbox" type="checkbox" value="1" name="{$key}_select">
         <label class="option">{$form.title}</label>
     </div>
-<<<<<<< HEAD
-        
+    
     {if $script eq 'show_colleagues'}  
         <script type="text/javascript">
             var checkbox_show_colleagues = '{$form.attributes.id}';
-=======
-    
-    {if $script eq 'show'}           
-        <script type="text/javascript">
-            var checkbox_show = '{$form.attributes.id}';
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
         </script> 
 
         {literal}
@@ -323,11 +243,7 @@
 
                 $(document).ready(function() {
                     
-<<<<<<< HEAD
                     $('#' + checkbox_show_colleagues + ' input').click(function() {                      
-=======
-                    $('#' + checkbox_show + ' input').click(function() {                      
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
                         if ($(this).is(':checked')) {
                             $('#edit-calendar_year').addClass('colleagues');
                         }else {
@@ -339,8 +255,7 @@
         </script>
         {/literal}
     {/if}
-        
-<<<<<<< HEAD
+    
     {if $script eq 'dephead_show_colleagues'}   
         <script type="text/javascript">
             var checkbox_dephead_show_colleagues = '{$form.attributes.id}';
@@ -365,20 +280,13 @@
         </script>
         {/literal}
     {/if}
-        
-=======
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
 {elseif $type eq 'ul'} 
     
     {* prefix *}
     {if $form.prefix neq ''} 
         {$form.prefix}
     {/if} 
-<<<<<<< HEAD
-        
-=======
     
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
     {* ul *}
     <div class="item-list">
     <ul>
@@ -437,7 +345,6 @@
             </tbody>
         </table>
         
-<<<<<<< HEAD
         {if $script eq 'calendar_year'}
             <div id="{$form.attributes.id}_mouseover" class="mouseover" style="display: none;">
                 <div class="date"></div>
@@ -541,9 +448,6 @@
            {/literal}
            
         {elseif $script eq 'dephead_calendar_year'}
-=======
-        {if $script eq 'mouseover'}
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
             <div id="{$form.attributes.id}_mouseover" class="mouseover" style="display: none;">
                 <div class="date"></div>
                 <div class="holiday"></div>
@@ -555,12 +459,8 @@
                 <div class="colleagues"></div>
                 <div class="rest"></div>
             </div>
-                
-<<<<<<< HEAD
+            
             <script type="text/javascript"> var table_dephead_calendar_year = '{$form.attributes.id}'; </script>    
-=======
-            <script type="text/javascript"> var table = '{$form.attributes.id}'; </script>    
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
                 
             {literal}
             <script type="text/javascript">          
@@ -568,20 +468,12 @@
                 (function($) {
 
                     $(document).ready(function() {
-
-<<<<<<< HEAD
+                        
                         $('#' + table_dephead_calendar_year + ' table td').each(function() {
 
                             $(this).mouseover(function() {
 
                                 $('#' + table_dephead_calendar_year + '_mouseover').hide();
-=======
-                        $('#' + table + ' table td').each(function() {
-
-                            $(this).mouseover(function() {
-
-                                $('#' + table + '_mouseover').hide();
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
 
                                 if($(this).attr('rel') && '' != $(this).attr('rel') ){
 
@@ -631,8 +523,7 @@
                                               i_rest++;
                                         }
                                     });
-
-<<<<<<< HEAD
+                                    
                                     $('#' + table_dephead_calendar_year + '_mouseover .date').html(date);
                                     $('#' + table_dephead_calendar_year + '_mouseover .holiday').html(holiday);
                                     $('#' + table_dephead_calendar_year + '_mouseover .mom_dad_day').html(mom_dad_day);
@@ -649,24 +540,6 @@
                                     $('#' + table_dephead_calendar_year + '_mouseover').css('left', left);
                                     
                                     $('#' + table_dephead_calendar_year + '_mouseover').show();
-=======
-                                    $('#' + table + '_mouseover .date').html(date);
-                                    $('#' + table + '_mouseover .holiday').html(holiday);
-                                    $('#' + table + '_mouseover .mom_dad_day').html(mom_dad_day);
-                                    $('#' + table + '_mouseover .leave').html(leave);
-                                    $('#' + table + '_mouseover .adjustments').html(adjustments);
-                                    $('#' + table + '_mouseover .colleagues').html(colleagues);
-                                    $('#' + table + '_mouseover .rest').html(rest);
-                                    
-                                    var top = $(this).position().top - $('#' + table + '_mouseover').height() - $('#' + table + '_mouseover').css('padding-top');
-                                    var top = $(this).position().top - $('#' + table + '_mouseover').height() - parseInt($('#' + table + '_mouseover').css('padding-top').slice(0,-2)) - parseInt($('#' + table + '_mouseover').css('padding-bottom').slice(0,-2));
-                                    var left = $(this).position().left + 30;
-                                   
-                                    $('#' + table + '_mouseover').css('top', top);
-                                    $('#' + table + '_mouseover').css('left', left);
-                                    
-                                    $('#' + table + '_mouseover').show();
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
                                 }
                             });
                         });
@@ -790,10 +663,7 @@
     {elseif $action eq 'script'}
     
     {/if}
-<<<<<<< HEAD
     
 {elseif $type eq 'error'}
     {$form.error}
-=======
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
 {/if}

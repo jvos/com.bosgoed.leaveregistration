@@ -5,14 +5,8 @@
  * Add contact sub types, relationship types, 
  * custom groups, custom fields and option groups
  */
-<<<<<<< HEAD
 function leaveregistration_civicrm_install() {
   $lr =  new leaveregistration('civicrm', 'leaveregistration_civicrm_install');
-=======
-function leaveregistration_civicrm_install()
-{
-  $lr =  new leaveregistration('civicrm');
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
   
   // create contact_sub_types
   $contact_sub_types = $lr->__get('contact_sub_types');
@@ -33,11 +27,7 @@ function leaveregistration_civicrm_install()
       if(!$result){
         CRM_Core_Session::setStatus( ts('An error occurred when creating the contact type ') .  $contact_sub_type . ts(' !'), ts('Creating contact type'), 'error');
       }else {
-<<<<<<< HEAD
         //CRM_Core_Session::setStatus( ts('Contact type employee created !'), ts('Creating contact type'), 'success');
-=======
-        CRM_Core_Session::setStatus( ts('Contact type employee created !'), ts('Creating contact type'), 'success');
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
       }
       
     }
@@ -70,11 +60,7 @@ function leaveregistration_civicrm_install()
       if(!$result){
         CRM_Core_Session::setStatus( ts('An error occurred when creating the relationship ') . $array['name_a_b'] . ts(' of !'), ts('Creating relationship'), 'error');
       }else {
-<<<<<<< HEAD
         //CRM_Core_Session::setStatus( ts('Relationship ') . $array['name_a_b'] . ts(' created !'), ts('Creating relationship'), 'success');
-=======
-        CRM_Core_Session::setStatus( ts('Relationship ') . $array['name_a_b'] . ts(' created !'), ts('Creating relationship'), 'success');
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
       }
     }
   }
@@ -99,7 +85,6 @@ function leaveregistration_civicrm_install()
     if(!$activity){
       CRM_Core_Session::setStatus( ts('An error occurred when creating the activity type Leave - Request !'), ts('Creating activity type'), 'error');
     }else {
-<<<<<<< HEAD
       //CRM_Core_Session::setStatus( ts('Activity type Leave - Request created !'), ts('Creating activity type'), 'success');
     }
   }
@@ -108,18 +93,6 @@ function leaveregistration_civicrm_install()
   $custom_groups = $lr->__get('custom_groups');
      
   foreach($custom_groups as $custom_group => $array){   
-=======
-      CRM_Core_Session::setStatus( ts('Activity type Leave - Request created !'), ts('Creating activity type'), 'success');
-    }
-  }
-  
-  $custom_groups = $lr->__get('custom_groups');
-  $custom_groups_fields = $lr->__get('custom_groups_fields');
-  $custom_fields = $lr->__get('custom_fields');
-  $option_groups = $lr->__get('option_group');
-    
-  foreach($custom_groups as $custom_group => $array){
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
     // first create group with title as name
     $fgparams = array(
       'version' => 3,
@@ -153,11 +126,7 @@ function leaveregistration_civicrm_install()
       $fgparams['extends_entity_column_value'] = '' . $activity['values'][0]['value'] . '';
       $sgparams['extends_entity_column_value'] = '' . $activity['values'][0]['value'] . '';
     }
-<<<<<<< HEAD
-        
-=======
-         
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
+    
     $cgroup = civicrm_api('CustomGroup', 'get', array('version' => 3,'sequential' => 1,'title' => $array['title']));
 
     // if don`t exists
@@ -171,7 +140,6 @@ function leaveregistration_civicrm_install()
     
       if(!$cgroup){
         CRM_Core_Session::setStatus( ts('An error occurred when creating the custom group ') . $custom_group . ts(' !'), ts('Creating custom group'), 'error');
-<<<<<<< HEAD
         return false;
       }else {
         //CRM_Core_Session::setStatus( ts('Custom group ') . $custom_group . ts(' created !'), ts('Creating custom group'), 'success');
@@ -220,32 +188,10 @@ function leaveregistration_civicrm_install()
     
     $cfcur = $custom_groups[$array['custom_group_name']]['id'];
     
-=======
-      }else {
-        CRM_Core_Session::setStatus( ts('Custom group ') . $custom_group . ts(' created !'), ts('Creating custom group'), 'success');
-
-        leaveregistration_civicrm_install_custom_fields($cgroup, $custom_group, $custom_groups, $custom_groups_fields, $custom_fields, $option_groups);
-      }
-    }else {
-      leaveregistration_civicrm_install_custom_fields($cgroup, $custom_group, $custom_groups, $custom_groups_fields, $custom_fields, $option_groups);
-    }
-  }
-  
-  return _leaveregistration_civix_civicrm_install();
-}
-
-function leaveregistration_civicrm_install_custom_fields($cgroup, $custom_group, $custom_groups, $custom_groups_fields, $custom_fields, $option_groups)
-{      
-  // custom field
-  $cfweight = 1;
-  foreach($custom_groups_fields[$custom_group] as $custom_groups_field){
-
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
     // first create field with name as label
     $ffparams = array(
       'version' => 3,
       'sequential' => 1,
-<<<<<<< HEAD
       'custom_group_id' => $custom_groups[$array['custom_group_name']]['id'],
       'name' => $array['name'],
       'label' => $array['name'],
@@ -253,15 +199,6 @@ function leaveregistration_civicrm_install_custom_fields($cgroup, $custom_group,
       'html_type' => $array['html_type'],
       'default_value' => $array['default_value'],
       'is_required' => $array['is_required'],
-=======
-      'custom_group_id' => $cgroup['values'][0]['id'],
-      'name' => $custom_fields[$custom_groups_field]['name'],
-      'label' => $custom_fields[$custom_groups_field]['name'],
-      'data_type' => $custom_fields[$custom_groups_field]['data_type'],
-      'html_type' => $custom_fields[$custom_groups_field]['html_type'],
-      'default_value' => $custom_fields[$custom_groups_field]['default_value'],
-      'is_required' => $custom_fields[$custom_groups_field]['is_required'],
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
       'is_searchable' => '1',
       'weight' => $cfweight,
       'is_active' => '1',
@@ -269,35 +206,22 @@ function leaveregistration_civicrm_install_custom_fields($cgroup, $custom_group,
       'date_format' => 'Null',
       'option_group_id' => 'Null',
     );
-<<<<<<< HEAD
-
-=======
     
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
     // second update field with label as label
     $sfparams = array(
       'version' => 3,
       'sequential' => 1,
-<<<<<<< HEAD
       'custom_group_id' => $custom_groups[$array['custom_group_name']]['id'],
       'name' => $array['name'],
       'label' => $array['label'],
       'data_type' => $array['data_type'],
       'html_type' => $array['html_type'],
       'is_required' => $array['is_required'],
-=======
-      'custom_group_id' => $cgroup['values'][0]['id'],
-      'label' => $custom_fields[$custom_groups_field]['label'],
-      'data_type' => $custom_fields[$custom_groups_field]['data_type'],
-      'html_type' => $custom_fields[$custom_groups_field]['html_type'],
-      'is_required' => $custom_fields[$custom_groups_field]['is_required'],
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
       'is_searchable' => '1',
       'weight' => $cfweight,
       'is_active' => '1',
     );
-
-<<<<<<< HEAD
+    
     if(isset($array['help_pre']) and '' != $array['help_pre']){
       $ffparams['help_pre'] = $array['help_pre'];
       $sfparams['help_pre'] = $array['help_pre'];
@@ -335,69 +259,7 @@ function leaveregistration_civicrm_install_custom_fields($cgroup, $custom_group,
     
     // custom field
     $cfield = civicrm_api('CustomField', 'get', array('version' => 3, 'sequential' => 1, 'name' => $array['name'], 'custom_group_id' => $custom_groups[$array['custom_group_name']]['id']));
-        
-=======
-    if(isset($custom_fields[$custom_groups_field]['help_pre']) and '' != $custom_fields[$custom_groups_field]['help_pre']){
-      $ffparams['help_pre'] = $custom_fields[$custom_groups_field]['help_pre'];
-      $sfparams['help_pre'] = $custom_fields[$custom_groups_field]['help_pre'];
-    }
     
-    if(isset($custom_fields[$custom_groups_field]['help_post']) and '' != $custom_fields[$custom_groups_field]['help_post']){
-      $ffparams['help_post'] = $custom_fields[$custom_groups_field]['help_post'];
-      $sfparams['help_post'] = $custom_fields[$custom_groups_field]['help_post'];
-    }
-    
-    if('Select Date' == $custom_fields[$custom_groups_field]['html_type']){
-      $ffparams['date_format'] = $custom_fields[$custom_groups_field]['date_format'];
-      $ffparams['time_format'] = $custom_fields[$custom_groups_field]['time_format'];
-      
-      $sfparams['date_format'] = $custom_fields[$custom_groups_field]['date_format'];
-      $sfparams['time_format'] = $custom_fields[$custom_groups_field]['time_format']; 
-    }
-    
-    // option_group
-    if('Select' == $custom_fields[$custom_groups_field]['html_type']){
-      $params = array(
-        'version' => 3,
-        'sequential' => 1,
-        'name' => $custom_fields[$custom_groups_field]['name'],
-        'title' => $custom_fields[$custom_groups_field]['label'],
-        'is_active' => '1',
-      );
-      
-      $ogroup = civicrm_api('OptionGroup', 'get', array('version' => 3, 'sequential' => 1, 'name' => $custom_fields[$custom_groups_field]['name']));
-            
-      if(empty($ogroup['values'])){
-        $ogroup = civicrm_api('OptionGroup', 'create', $params);
-              
-        if(!$ogroup){
-          CRM_Core_Session::setStatus( ts('An error occurred when creating the option group ') . $custom_groups_field . ts(' !'), ts('Creating option group'), 'error');
-        }else {
-          CRM_Core_Session::setStatus( ts('Option group ') . $custom_groups_field . ts(' created !'), ts('Creating option group'), 'success');
-          
-          // custom field
-          $ffparams['option_group_id'] = $ogroup['values'][0]['id'];
-          $sfparams['option_group_id'] = $ogroup['values'][0]['id'];
-          
-          leaveregistration_civicrm_install_option_values($ogroup, $custom_groups_field, $custom_groups, $custom_groups_fields, $custom_fields, $option_groups);
-        }
-      }else {
-        // custom field
-        $fparams['option_group_id'] = $ogroup['values'][0]['id'];
-        
-        leaveregistration_civicrm_install_option_values($ogroup, $custom_groups_field, $custom_groups, $custom_groups_fields, $custom_fields, $option_groups);
-      }
-
-    }else if('Select Date' == $custom_fields[$custom_groups_field]['html_type']){
-      $fparams['date_format'] = 'dd-mm-yy';
-    }
-
-    // custom field
-    $cfield = civicrm_api('CustomField', 'get', array('version' => 3, 'sequential' => 1, 'name' => $custom_fields[$custom_groups_field]['name'], 'custom_group_id' => $cgroup['values'][0]['id']));
-        
-    $cfweight++;
-    
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
     if(empty($cfield['values'])){
       // first create field with name as label
       $cfield = civicrm_api('CustomField', 'create', $ffparams);
@@ -405,7 +267,6 @@ function leaveregistration_civicrm_install_custom_fields($cgroup, $custom_group,
       // second update field with label as label
       $sfparams['id'] = $cfield['values'][0]['id'];
       $cfield = civicrm_api('CustomField', 'create', $sfparams);
-<<<<<<< HEAD
     
       if(!$cfield){
         CRM_Core_Session::setStatus( ts('An error occurred when creating the custom field ') . $array['name'] . ts(' !'), ts('Creating custom field'), 'error');
@@ -457,47 +318,5 @@ function leaveregistration_civicrm_install_custom_fields($cgroup, $custom_group,
   }
   
   return TRUE;
-=======
-      
-      if(!$cfield){
-        CRM_Core_Session::setStatus( ts('An error occurred when creating the custom field ') . $custom_groups_field . ts(' !'), ts('Creating custom field'), 'error');
-      }else {
-        CRM_Core_Session::setStatus( ts('Custom field ') . $custom_groups_field . ts(' created !'), ts('Creating custom field'), 'success');
-      }
-    }
-  }
-}
-
-function leaveregistration_civicrm_install_option_values($ogroup, $custom_groups_field, $custom_groups, $custom_groups_fields, $custom_fields, $option_groups)
-{   
-  // option value
-  $ovweight = 1;
-  foreach($option_groups[$custom_groups_field]['options'] as $value => $name){
-
-    $params = array(
-      'version' => 3,
-      'sequential' => 1,
-      'option_group_id' => $ogroup['values'][0]['id'],
-      'value' => $value,
-      'name' => $name,
-      'weight' => $ovweight,
-      'is_active' => '1'
-    );
-       
-    $result = civicrm_api('OptionValue', 'get', array('version' => 3, 'sequential' => 1, 'value' => $value, 'name' => $name, 'option_group_id' => $ogroup['values'][0]['id']));
-    
-    $ovweight++;
-    
-    if(empty($result['values'])){
-      $result = civicrm_api('OptionValue', 'create', $params);
-      
-      if(!$result){
-        CRM_Core_Session::setStatus( ts('An error occurred when creating the option value ') . $name . ts(' !'), ts('Creating option value'), 'error');
-      }else {
-        CRM_Core_Session::setStatus( ts('Option value ') . $name . ts(' created !'), ts('Creating option value'), 'success');
-      }
-    }
-  }
->>>>>>> 9f70b0cac9d9738add67f9684e3201e7e65f5e92
 }
 ?>

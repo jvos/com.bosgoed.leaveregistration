@@ -1,0 +1,479 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2015-12-01 11:42+0100\n"
+"PO-Revision-Date: 2015-12-01 11:43+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.7\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: nl_NL\n"
+
+msgid "Error in get_dephead_admin_link, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_admin_link, no year !"
+msgstr ""
+
+msgid "Year"
+msgstr "Jaar"
+
+msgid "Error in get_year, no cid !"
+msgstr ""
+
+msgid "Error in get_year, no year !"
+msgstr ""
+
+msgid "Error in get_admin_col_links_form, no user_cid !"
+msgstr ""
+
+msgid "Colleagues"
+msgstr "Collega's"
+
+msgid "Error in get_admin_col_links, no user_cid !"
+msgstr ""
+
+msgid "Error in get_admin_col_links, no year !"
+msgstr ""
+
+msgid "Error in get_dephead_col_links_form, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_col_links, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_col_links, no year !"
+msgstr ""
+
+msgid "Error in get_dephead_request_form, no user_cid !"
+msgstr ""
+
+msgid "Request Colleagues"
+msgstr "Aanvraag Collega's"
+
+msgid "Error in get_dephead_request, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_request, no year !"
+msgstr ""
+
+msgid "Error in get_dephead_request, no user_id !"
+msgstr ""
+
+msgid "view"
+msgstr "toon"
+
+msgid "change"
+msgstr "verander"
+
+msgid "delete"
+msgstr "verwijder"
+
+msgid "iCal"
+msgstr "iCal"
+
+msgid "Error in get_display_name, no cid !"
+msgstr ""
+
+msgid "Request"
+msgstr "Aanvraag"
+
+msgid "Error in get_request, no user_id !"
+msgstr ""
+
+msgid "Error in get_request, no year !"
+msgstr ""
+
+msgid "Error in get_request, no cid !"
+msgstr ""
+
+msgid "Error in get_request, no user_cid !"
+msgstr ""
+
+msgid "Legend"
+msgstr "Legende"
+
+msgid "Day"
+msgstr "Dag"
+
+msgid "Weekend"
+msgstr "Weekend"
+
+msgid "Holiday"
+msgstr "Vakantie"
+
+msgid "Today"
+msgstr "Vandaag"
+
+msgid "Lattice free"
+msgstr "Vrijedag"
+
+msgid "Credit"
+msgstr "Tegoed"
+
+msgid "Error in get_credit, no year !"
+msgstr ""
+
+msgid "Error in get_credit, no cid !"
+msgstr ""
+
+msgid "Credit over"
+msgstr "Tegoed over"
+
+msgid "Used"
+msgstr "Gebruikt"
+
+msgid "Over"
+msgstr "Over"
+
+msgid "Months"
+msgstr "Maanden"
+
+msgid "Error in get_months, no month !"
+msgstr ""
+
+msgid "all"
+msgstr "alles"
+
+msgid "Error in get_dephead_months_form, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_months, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_months, no month !"
+msgstr ""
+
+msgid "Show colleagues"
+msgstr "Toon collega's"
+
+msgid "Calendar"
+msgstr "Kalender"
+
+msgid "Error in get_calendar_year, no cid !"
+msgstr ""
+
+msgid "Error in get_calendar_year, no user_cid !"
+msgstr ""
+
+msgid "Error in get_calendar_year, no year !"
+msgstr ""
+
+msgid "Error in get_calendar_year, no user_id !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no error_platform !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no years !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no months !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_year, no year !"
+msgstr ""
+
+msgid "Error in get_calendar_month, no year !"
+msgstr ""
+
+msgid "Error in get_calendar_month, no month !"
+msgstr ""
+
+msgid "Error in get_calendar_month, no cid !"
+msgstr ""
+
+msgid "Error in get_calendar_month, no user_id !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month_form, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no error_platform !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no user_cid !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no years !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no months !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no year !"
+msgstr ""
+
+msgid "Error in get_dephead_calendar_month, no month !"
+msgstr ""
+
+msgid "Normal leave"
+msgstr "Normaal verlof"
+
+msgid "Special leave"
+msgstr "Bijzonder verlof"
+
+msgid "ATV"
+msgstr "ATV"
+
+msgid "Doctor visit"
+msgstr "Artsen bezoek"
+
+msgid "Parental"
+msgstr "Ouderschapsverlof"
+
+msgid "Normal leave < 1 day"
+msgstr "Normaal verlof < 1 dag"
+
+msgid "Study leave"
+msgstr "Studieverlof"
+
+msgid "Time for time"
+msgstr "Tijd voor tijd"
+
+msgid "Care"
+msgstr "Zorg"
+
+msgid "Maternity"
+msgstr "Zwangerschapverlof"
+
+msgid "Sick"
+msgstr "Ziek"
+
+msgid "Sick < 1 day"
+msgstr "Ziek < 1 dag"
+
+msgid "Monday"
+msgstr "Maandag"
+
+msgid "Tuesday"
+msgstr "Dinsdag"
+
+msgid "Wednesday"
+msgstr "Woensdag"
+
+msgid "Thursday"
+msgstr "Donderdag"
+
+msgid "Friday"
+msgstr "Vrijdag"
+
+msgid "Saturday"
+msgstr "Zaterdag"
+
+msgid "Sunday"
+msgstr "Zondag"
+
+msgid "monday"
+msgstr "maandag"
+
+msgid "tuesday"
+msgstr "dinsdag"
+
+msgid "wednesday"
+msgstr "woensdag"
+
+msgid "thursday"
+msgstr "donderdag"
+
+msgid "friday"
+msgstr "vrijdag"
+
+msgid "Ssaturday"
+msgstr "zaterdag"
+
+msgid "sunday"
+msgstr "zondag"
+
+msgid "Show all colleagues of"
+msgstr "Laat alle collega`s zien van "
+
+msgid "Day / Week / Month / Year"
+msgstr "Dag / Week / Maand / Jaar"
+
+msgid "On"
+msgstr "Op"
+
+msgid "Day of the week"
+msgstr "Dag van de week"
+
+msgid "Leave type"
+msgstr "Verlof type"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Daily / Weekly / Monthly / Annaually"
+msgstr "Dagelijks / Weekelijks / Maandelijks / Jaarlijks"
+
+msgid "Every day / Working day"
+msgstr "Elke dag / Werk dag"
+
+msgid "Every day of the month / Day of the week"
+msgstr "Elke dag van de maand / Dag van de week"
+
+msgid "Department"
+msgstr "Afdeling"
+
+msgid "Business"
+msgstr "Bedrijf"
+
+msgid "Main business"
+msgstr "Hoofd bedrijf"
+
+msgid "Week"
+msgstr "Week"
+
+msgid "Month"
+msgstr "Maand"
+
+msgid "First"
+msgstr "Eerste"
+
+msgid "Second"
+msgstr "Tweede"
+
+msgid "Third"
+msgstr "Derde"
+
+msgid "Fourth"
+msgstr "Vierde"
+
+msgid "Last"
+msgstr "Laatste"
+
+msgid "first"
+msgstr "eerste"
+
+msgid "second"
+msgstr "tweede"
+
+msgid "third"
+msgstr "derde"
+
+msgid "fourth"
+msgstr "vierde"
+
+msgid "last"
+msgstr "laatste"
+
+msgid "January"
+msgstr "Januari"
+
+msgid "February"
+msgstr "Februari"
+
+msgid "March"
+msgstr "Maart"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "Mei"
+
+msgid "June"
+msgstr "Juni"
+
+msgid "July"
+msgstr "Juli"
+
+msgid "August"
+msgstr "Augustus"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "Oktober"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "December"
+
+msgid "january"
+msgstr "januari"
+
+msgid "february"
+msgstr "februari"
+
+msgid "march"
+msgstr "maart"
+
+msgid "april"
+msgstr "april"
+
+msgid "may"
+msgstr "mei"
+
+msgid "june"
+msgstr "juni"
+
+msgid "july"
+msgstr "juli"
+
+msgid "august"
+msgstr "augustus"
+
+msgid "september"
+msgstr "september"
+
+msgid "october"
+msgstr "oktober"
+
+msgid "november"
+msgstr "november"
+
+msgid "december"
+msgstr "december"
+
+msgid "Daily"
+msgstr "Dagelijks"
+
+msgid "Weekly"
+msgstr "Weekelijks"
+
+msgid "Monthly"
+msgstr "Maandelijks"
+
+msgid "Annually"
+msgstr "Jaarlijks"
+
+msgid "In treatment"
+msgstr "In behandeling"
+
+msgid "Approved"
+msgstr "Goedgekeurd"
+
+msgid "Rejected"
+msgstr "Geweigerd"
+
+msgid "Working day"
+msgstr "Werk dag"
+
+msgid "Every day / Day of the week"
+msgstr "Elke dag / Dag van de week"
+
+msgid "Every day of the month"
+msgstr "Elke dag van de maand"
+
+msgid "Every day of the week"
+msgstr "Elke dag van de week"
+
+msgid "Weekend day"
+msgstr "Weekend dag"
