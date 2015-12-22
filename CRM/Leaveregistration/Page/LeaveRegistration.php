@@ -1043,14 +1043,16 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
   }
   
   public function get_months_form(){
-    $form['months'] = array
-    (
-      'type' => 'fieldset',
-      'title' => ts('Months')
-    );
+    if(!$this->lr->is_department_head[$this->data['cid']]){
+      $form['months'] = array
+      (
+        'type' => 'fieldset',
+        'title' => ts('Months')
+      );
+
+      $form['months']['months'] = $this->get_months();
+    }
     
-    $form['months']['months'] = $this->get_months();
-        
     return $this->response('months', $form, 'form', 'months');
   }
   
@@ -1076,7 +1078,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       }
     }
     
-    $options = array('select' => ts('- select -'), 'all' => ts('calendar'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
+    $options = array('all' => ts('all'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
    
     $form = array
     (
@@ -1161,7 +1163,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     $form = array();
     
     if($this->lr->is_department_head[$this->data['cid']]){
-      $options = array('select' => ts('- select -'), 'all' => ts('calendar'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
+      $options = array('all' => ts('all'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
    
       $form = array
       (
@@ -1181,14 +1183,15 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
   }
     
   public function get_show_colleagues_form(){
-    $form['show_colleagues'] = array
-    (
-      'type' => 'fieldset',
-      'title' => ts('Show colleagues')
-    );
-    
-    $form['show_colleagues']['show_colleagues'] = $this->get_show_colleagues();
-        
+    if(!$this->lr->is_department_head[$this->data['cid']]){
+      $form['show_colleagues'] = array
+      (
+        'type' => 'fieldset',
+        'title' => ts('Show colleagues')
+      );
+
+      $form['show_colleagues']['show_colleagues'] = $this->get_show_colleagues();
+    }
     return $this->response('show_colleagues', $form, 'form', 'show_colleagues');
   }
   
@@ -1271,21 +1274,22 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
   }
     
   public function get_calendar_year_form(){
-    $form['calendar_year'] = array
-    (
-      'type' => 'fieldset',
-      'title' => ts('Calendar')
-    );
-    
     if(!$this->lr->is_department_head[$this->data['cid']]){
-      $form['calendar_year']['calendar_year'] = $this->get_calendar_year();
-    }else {
-      $form['calendar_year']['calendar_year'] = array(
-          'type' => 'text',
-          'text' => ts('Choose calendar or a month above !')
+      $form['calendar_year'] = array
+      (
+        'type' => 'fieldset',
+        'title' => ts('Calendar')
       );
+
+      if(!$this->lr->is_department_head[$this->data['cid']]){
+        $form['calendar_year']['calendar_year'] = $this->get_calendar_year();
+      }else {
+        $form['calendar_year']['calendar_year'] = array(
+            'type' => 'text',
+            'text' => ts('Choose calendar or a month above !')
+        );
+      }
     }
-        
     return $this->response('calendar_year', $form, 'form', 'calendar_year');
   }
   
