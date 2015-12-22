@@ -81,7 +81,7 @@
 #edit-credit { display: inline-block; vertical-align: top; width: 325px; }
 
 /* months */
-#edit-months { display: inline-block; width: 100px; vertical-align: top; }
+#edit-months { display: inline-block; width: 130px; vertical-align: top; }
 #edit-show_colleagues { display: inline-block; width: 840px; }
 
 /* calendar year */
@@ -141,7 +141,7 @@
 }
 
 /* months */
-#edit-dephead_months { display: inline-block; width: 100px; vertical-align: top; }
+#edit-dephead_months { display: inline-block; width: 130px; vertical-align: top; }
 #edit-dephead_show_colleagues { display: inline-block; width: 840px; }
 
 /* calendar year */
