@@ -477,3 +477,9 @@ msgstr "Elke dag van de week"
 
 msgid "Weekend day"
 msgstr "Weekend dag"
+
+msgid "calendar"
+msgstr "kalender"
+
+msgid "Choose calendar or a month above !"
+msgstr "Kies boven kalender of een maand !"

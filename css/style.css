@@ -82,10 +82,10 @@
 
 /* months */
 #edit-months { display: inline-block; width: 100px; vertical-align: top; }
-#edit-show_colleagues { display: inline-block; width: 870px; }
+#edit-show_colleagues { display: inline-block; width: 840px; }
 
 /* calendar year */
-#edit-calendar_year { position: relative;}
+#edit-calendar_year { position: relative; min-height: 291px;}
 #edit-calendar_year a {color: #FFFFFF; text-decoration: none;}
 #edit-calendar_year th { font-size: 8px; }
 
@@ -142,10 +142,10 @@
 
 /* months */
 #edit-dephead_months { display: inline-block; width: 100px; vertical-align: top; }
-#edit-dephead_show_colleagues { display: inline-block; width: 870px; }
+#edit-dephead_show_colleagues { display: inline-block; width: 840px; }
 
 /* calendar year */
-#edit-dephead_calendar_year { position: relative;}
+#edit-dephead_calendar_year { position: relative; min-height: 291px;}
 #edit-dephead_calendar_year a {color: #FFFFFF; text-decoration: none;}
 #edit-dephead_calendar_year th { font-size: 8px; }
 

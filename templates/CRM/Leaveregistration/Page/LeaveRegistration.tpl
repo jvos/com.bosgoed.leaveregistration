@@ -105,6 +105,7 @@
                  
                 var type = '{$type}'; 
                 var _return = '{$return}';
+                var select_text = "{ts escape='js'}Choose calendar or a month above !{/ts}";
             </script> 
             
             {literal}
@@ -122,6 +123,11 @@
                             {
                                 case 'all':
                                     element = 'get_calendar_year'
+                                    break;
+                                case 'select':
+                                    element = 'get_calendar_select'
+                                    $('#edit-calendar_year .fieldset-wrapper').html('<span>' + select_text + '</span>');
+                                    return false;
                                     break;
                                     
                                 default:
@@ -173,6 +179,7 @@
                  
                 var type = '{$type}'; 
                 var _return = '{$return}';
+                var select_text = "{ts escape='js'}Choose calendar or a month above !{/ts}";
             </script> 
             
             {literal}
@@ -190,6 +197,11 @@
                             {
                                 case 'all':
                                     element = 'get_dephead_calendar_year'
+                                    break;
+                                case 'select':
+                                    element = 'get_dephead_calendar_select'
+                                    $('#edit-dephead_calendar_year .fieldset-wrapper').html('<span>' + select_text + '</span>');
+                                    return false;
                                     break;
                                     
                                 default:
@@ -631,6 +643,9 @@
 
 {elseif $type eq 'link'}
     <a href="{$form.href}">{$form.title}</a>
+
+{elseif $type eq 'text'}
+  <span>{$form.text}</span>
     
 {elseif $type eq 'script'} 
     

@@ -1076,7 +1076,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       }
     }
     
-    $options = array('all' => ts('all'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
+    $options = array('select' => ts('- select -'), 'all' => ts('calendar'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
    
     $form = array
     (
@@ -1086,6 +1086,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       'default_value' => $this->data['month'],
       'attributes' => array('id' => 'months'),
     );
+    
+    if($this->lr->is_department_head[$this->data['cid']]){
+      $form['default_value'] = 'select';
+    }
     
     if('form' == $this->data['type']){
       return $form;
@@ -1157,7 +1161,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     $form = array();
     
     if($this->lr->is_department_head[$this->data['cid']]){
-      $options = array('all' => ts('all'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
+      $options = array('select' => ts('- select -'), 'all' => ts('calendar'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
    
       $form = array
       (
@@ -1273,7 +1277,14 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       'title' => ts('Calendar')
     );
     
-    $form['calendar_year']['calendar_year'] = $this->get_calendar_year();
+    if(!$this->lr->is_department_head[$this->data['cid']]){
+      $form['calendar_year']['calendar_year'] = $this->get_calendar_year();
+    }else {
+      $form['calendar_year']['calendar_year'] = array(
+          'type' => 'text',
+          'text' => ts('Choose calendar or a month above !')
+      );
+    }
         
     return $this->response('calendar_year', $form, 'form', 'calendar_year');
   }
