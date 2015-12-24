@@ -1,16 +1,12 @@
 @CHARSET "ISO-8859-1";
 
-.leaveregistration { width: 990px; }
+.leaveregistration { width: 1020px; }
+.leaveregistration .form-wrapper {width: 1020px; box-sizing: border-box;}
 
-#leaveregistration-overview #edit-year { display: inline-block; width: 990px; vertical-align: top; }
-#leaveregistration-request #edit-year, 
-#leaveregistration-edit #edit-year { width: 990px; }
-
-#edit-dephead_col_links {display: inline-block; width: 990px;}
 #edit-dephead_col_links .item-list ul,
 #edit-dephead_col_links .item-list ul li { list-style-type: none; margin: 6px; padding: 0; display: inline-block; }
 
-#edit-admin_col_links {display: inline-block; width: 990px;}
+#edit-admin_col_links {display: inline-block; width: 1020px;}
 #edit-admin_col_links .item-list ul,
 #edit-admin_col_links .item-list ul li { list-style-type: none; margin: 6px; padding: 0; display: inline-block; }
 
@@ -46,7 +42,7 @@
     background-color: #FFFFFF;
 }
 
-#edit-legend { display: inline-block; width: 544px; }
+#edit-legend { display: inline-block; width: 550px; min-height: 190px; margin:0; padding:0;}
 
 #edit-legend .legend_leave_type { width: 170px; float: left; }
 #edit-legend .legend_leave_type ul,
@@ -77,12 +73,12 @@
 #edit-legend .legend_leave_type ul li.sick span,
 #edit-legend .legend_leave_type ul li.sick_less_one_day span { margin: 5px 4px 0 0; background-color: #cc3333; }
 
-#edit-credit_year { display: inline-block; width: 430px; vertical-align: top;}
-#edit-credit { display: inline-block; vertical-align: top; width: 325px; }
+#edit-credit_year { display: inline-block; width: 450px; vertical-align: top; min-height: 190px; margin:0; padding:0;}
+#edit-credit { display: inline-block; vertical-align: top; width: 450px; min-height: 190px; margin:0; padding:0;}
 
 /* months */
-#edit-months { display: inline-block; width: 130px; vertical-align: top; }
-#edit-show_colleagues { display: inline-block; width: 840px; }
+#edit-months { display: inline-block; width: 150px; vertical-align: top; min-height: 80px;}
+#edit-show_colleagues { display: inline-block; width: 840px; min-height: 80px; }
 
 /* calendar year */
 #edit-calendar_year { position: relative; min-height: 291px;}
@@ -141,8 +137,8 @@
 }
 
 /* months */
-#edit-dephead_months { display: inline-block; width: 130px; vertical-align: top; }
-#edit-dephead_show_colleagues { display: inline-block; width: 840px; }
+#edit-dephead_months { display: inline-block; width: 150px; vertical-align: top; min-height: 80px;}
+#edit-dephead_show_colleagues { display: inline-block; width: 840px; min-height: 80px;}
 
 /* calendar year */
 #edit-dephead_calendar_year { position: relative; min-height: 291px;}

@@ -5,6 +5,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
   
   private $data = array();
   public $lr = array();
+  public $lr_deph_col = array();
   
   function run($data = array()){ 
     $this->data = $data;
@@ -25,6 +26,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     // get civicrm contact id from drupal user
     $session = CRM_Core_Session::singleton();
     $user_cid = $session->get('userID'); 
+    
     $this->data['user_cid'] = $user_cid;
     
     foreach($this->data as $field => $value){
@@ -56,6 +58,37 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     $this->lr->set_contacts($cids);
     $this->lr->set_data($this->data['years'], $this->data['months']);
         
+    // department head colleages
+    if($this->lr->is_department_head[$this->data['cid']] or $this->lr->is_department_head[$this->data['user_cid']]){
+      if($this->lr->is_department_head[$this->data['user_cid']]){
+        $deph_col_cid = $this->data['user_cid'];
+      }
+      
+      if($this->lr->is_department_head[$this->data['cid']]){
+        $deph_col_cid = $this->data['cid'];
+      }
+      
+      $colleages = array();
+      foreach($this->lr->department_heads_colleages_ids[$deph_col_cid] as $did => $department){
+        foreach($department['employees'] as $cid => $employee){
+          if($cid != $this->data['user_cid'] and $cid != $this->data['cid']){
+            $colleages[htmlentities($employee['display_name'])] = $employee;
+          }
+        }
+      }
+
+      $colids = array();      
+      ksort($colleages);
+      foreach($colleages as $display_name => $employee){
+        $colids[] = $employee['id'];
+      }      
+            
+      $this->lr_deph_col = new leaveregistration($this->data['error_platform'], $this->data['error_id'] . ': department_heads_colleages_ids');
+      $this->lr_deph_col->set_fields();
+      $this->lr_deph_col->set_contacts($colids);
+      $this->lr_deph_col->set_data($this->data['years'], $this->data['months']);
+    }
+    
     if(isset($_POST['element']) and !empty($_POST['element'])){ 
       echo(call_user_func(array($this, $_POST['element'])));
       CRM_Utils_System::civiExit();
@@ -493,7 +526,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         $header[] = array('data' => ts($th));
       }
 
-      $colleages = array();
+      /*$colleages = array();
       foreach($this->lr->department_heads_colleages_ids[$this->data['user_cid']] as $did => $department){
         foreach($department['employees'] as $cid => $employee){
           $colleages[htmlentities($employee['display_name'])] = $employee;
@@ -509,10 +542,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       $lr = new leaveregistration($this->data['error_platform'], $this->data['error_id'] . ': get_dephead_request');
       $lr->set_fields();
       $lr->set_contacts($cids);
-      $lr->set_data($this->data['years'], $this->data['months']);
+      $lr->set_data($this->data['years'], $this->data['months']);*/
             
       $rows = array();
-      foreach($lr->request as $activity_id => $request){
+      foreach($this->lr_deph_col->request as $activity_id => $request){
 
         if('request' == $request['status']){
 
@@ -524,7 +557,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
 
             $datas = array();
 
-            $datas[] = array('data' => $lr->employees[$request['cid']]['display_name'], 'class' => $request['status']);
+            $datas[] = array('data' => $this->lr_deph_col->employees[$request['cid']]['display_name'], 'class' => $request['status']);
 
             switch($request['leave_type'])
             {
@@ -1734,7 +1767,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     }
     
     if($this->lr->is_department_head[$this->data['cid']]){
-              
+      /*      
       // all the employees where the cid department head is
       $colleages = array();
       foreach($this->lr->department_heads_colleages_ids[$this->data['cid']] as $did => $department){
@@ -1755,7 +1788,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       $lr = new leaveregistration($this->data['error_platform'], $this->data['error_id'] . ': get_dephead_calendar_year');
       $lr->set_fields();
       $lr->set_contacts($colids);
-      $lr->set_data($this->data['years'], $this->data['months']);
+      $lr->set_data($this->data['years'], $this->data['months']);*/
       
       $header = array();
       $header[] = array
@@ -1775,7 +1808,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         foreach($days as $day => $array){
           $class = '';
           $rel = '';
-          list($data, $class, $rel) = $this->get_dephead_calendar_year_day($day, $month, $this->data['year'], $array, $lr);
+          list($data, $class, $rel) = $this->get_dephead_calendar_year_day($day, $month, $this->data['year'], $array, $this->lr_deph_col);
 
           $datas[] = array
           (
@@ -2450,7 +2483,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     );
     
     if($this->lr->is_department_head[$this->data['cid']]){
-              
+      /*    
       // all the employees where the cid department head is
       $colleages = array();
       foreach($this->lr->department_heads_colleages_ids[$this->data['cid']] as $did => $department){
@@ -2471,7 +2504,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       $lr = new leaveregistration($this->data['error_platform'], $this->data['error_id'] . ': get_dephead_calendar_month');
       $lr->set_fields();
       $lr->set_contacts($colids);
-      $lr->set_data($this->data['years'], $this->data['months']);
+      $lr->set_data($this->data['years'], $this->data['months']);*/
             
       // every cid
       foreach($colids as $colid){
@@ -2482,11 +2515,11 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
 
         $datas[] = array
         (
-          'data' => $lr->employees[$colid]['display_name']
+          'data' => $this->lr_deph_col->employees[$colid]['display_name']
         );
 
-        foreach($lr->data[$colid][$this->data['year']][$this->data['month']] as $day => $array){
-          list($data, $class, $rel) = $this->get_dephead_calendar_month_day($lr->employees, $colid, $this->data['user_cid'], $user_id, $day, $this->data['month'], $this->data['year'], $array);
+        foreach($this->lr_deph_col->data[$colid][$this->data['year']][$this->data['month']] as $day => $array){
+          list($data, $class, $rel) = $this->get_dephead_calendar_month_day($this->lr_deph_col->employees, $colid, $this->data['user_cid'], $user_id, $day, $this->data['month'], $this->data['year'], $array);
 
           $datas[] = array
           (
