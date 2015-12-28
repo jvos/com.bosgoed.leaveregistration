@@ -385,7 +385,9 @@ class leaveregistration {
   private $request = array(); 
   private $total = array();
   
-  public function __construct($error_platform, $error_id){        
+  private $cache = [];
+  
+  public function __construct($error_platform, $error_id, $cache = []){        
     if('' == $error_platform){
       echo('Leaveregistration class, no error platform !') . '<br/>' . PHP_EOL;
       return false;
@@ -394,11 +396,23 @@ class leaveregistration {
     $this->error_platform = $error_platform;
     
     if(empty($error_id)){
-      $this->set_error( ts('An error occur in error id !'), ts('Construct'));
+      $this->set_error( ts('error id is empty !'), ts('Construct'));
       return false;
     }
     
     $this->error_id = $error_id;
+    
+    // cache
+    if(!isset($cache['do']) or empty($cache['do'])){
+      $cache['do'] = false;
+    }
+    
+    $this->cache = $cache;
+    
+    if(!$this->cache_settings()){
+      $this->set_error( ts('An error occur in cache settings !'), ts('Construct'));
+      return false;
+    }
   }
   
   public function set_fields(){ 
@@ -406,25 +420,47 @@ class leaveregistration {
       return false;
     }
     
-    if(!$this->set_relationship_types()){
-      $this->set_error( ts('An error occur in relationship types !'), ts('set_fields'));
-      return false;
+    $relationship_types = $this->cache_get('relationship_types');
+    $custom_groups = $this->cache_get('custom_groups');    
+    $custom_fields = $this->cache_get('custom_fields');
+    $option_groups = $this->cache_get('option_groups');
+    
+    if(empty($relationship_types) or empty($custom_groups) or empty($custom_fields) or empty($option_groups)){
+      $this->cache['do'] = true;
+      
+    }else {
+      $this->relationship_types = $relationship_types;
+      $this->custom_groups = $custom_groups;
+      $this->custom_fields = $custom_fields;
+      $this->option_groups = $option_groups;
     }
     
-    if(!$this->set_custom_groups()){
-      $this->set_error( ts('An error occur in custom groups !'), ts('set_fields'));
-      return false;
+    if($this->cache['do']){
+      if(!$this->set_relationship_types()){
+        $this->set_error( ts('An error occur in relationship types !'), ts('set_fields'));
+        return false;
+      }
+      
+      if(!$this->set_custom_groups()){
+        $this->set_error( ts('An error occur in custom groups !'), ts('set_fields'));
+        return false;
+      }
+            
+      if(!$this->set_custom_fields()){
+        $this->set_error( ts('An error occur in custom fields !'), ts('set_fields'));
+        return false;
+      }
+      
+      if(!$this->set_option_groups()){
+        $this->set_error( ts('An error occur in options groups !'), ts('set_fields'));
+        return false;
+      }
+            
+      $this->cache_set('relationship_types', $this->relationship_types);
+      $this->cache_set('custom_groups', $this->custom_groups);
+      $this->cache_set('custom_fields', $this->custom_fields);
+      $this->cache_set('option_groups', $this->option_groups);
     }
-    
-    if(!$this->set_custom_fields()){
-      $this->set_error( ts('An error occur in custom fields !'), ts('set_fields'));
-      return false;
-    }
-    
-    if(!$this->set_option_groups()){
-      $this->set_error( ts('An error occur in options groups !'), ts('set_fields'));
-      return false;
-    } 
   }
     
   /*
@@ -657,62 +693,62 @@ class leaveregistration {
       $this->is_department_head[$cid] = false;
       $this->is_administration[$cid] = false;
     }
-            
+   
     if(!$this->set_employees()){
       $this->set_error( ts('An error occur in employee !'), ts('set_contacts'));
       return false;
     }
-         
+
     if(!$this->set_departments()){
       $this->set_error( ts('An error occur in departments !'), ts('set_contacts'));
       return false;
     }
-    
+
     if(!$this->set_department_colleages_ids()){
       $this->set_error( ts('An error occur in departments colleages ids !'), ts('set_contacts'));
       return false;
     }
-    
+
     if(!$this->set_businesses()){
       $this->set_error( ts('An error occur in businesses !'), ts('set_contacts'));
       return false;
     }
-        
+
     if(!$this->set_business_colleages_ids()){
       $this->set_error( ts('An error occur in business colleages ids !'), ts('set_contacts'));
       return false;
     }
-    
+
     if(!$this->set_main_businesses()){
       $this->set_error( ts('An error occur in main businesses !'), ts('set_contacts'));
       return false;
     }
-    
+
     if(!$this->set_department_head()){
       $this->set_error( ts('An error occur in department head !'), ts('set_contacts'));
       return false;
     }
-    
+
     if(!$this->set_adminstration()){
       $this->set_error( ts('An error occur in administration !'), ts('set_contacts'));
       return false;
     }
-        
+
     if(!$this->set_department_heads_colleages_ids()){
       $this->set_error( ts('An error occur in department head colleages ids !'), ts('set_contacts'));
       return false;
     }
-        
+
     if(!$this->set_administration_colleages_ids()){
       $this->set_error( ts('An error occur in administration colleages ids !'), ts('set_contacts'));
       return false;
     }
-    
+
     if(!$this->set_settings()){
       $this->set_error( ts('An error occur in settings !'), ts('set_contacts'));
       return false;
-    } 
-    
+    }
+        
     return true;
   }
   
@@ -726,41 +762,48 @@ class leaveregistration {
       return false;
     }
             
-    foreach($this->cids as $cid){
-      $this->is_employee[$cid] = false;
+    foreach($this->cids as $cid){ 
+      $this->employees[$cid] = $this->cache_get($cid . '_employees');
       
-      $params = array(
-        'version' => 3,
-        'sequential' => 1,
-        'id' => $cid,
-      );
-      $contact = civicrm_api('Contact', 'getsingle', $params);
-      unset($params);
-      
-      // count
-      if(isset($contact['count']) and 0 == $contact['count']){
-        $this->set_error(ts('Employee with contact id: ') . $cid . (' does not exists !'), ts('set_employees'));
+      if($this->cache['do'] or empty($this->employees[$cid])){
+        $this->is_employee[$cid] = false;
+
+        $params = array(
+          'version' => 3,
+          'sequential' => 1,
+          'id' => $cid,
+        );
+        $contact = civicrm_api('Contact', 'getsingle', $params);
+        unset($params);
+
+        // count
+        if(isset($contact['count']) and 0 == $contact['count']){
+          $this->set_error(ts('Employee with contact id: ') . $cid . (' does not exists !'), ts('set_employees'));
+          unset($contact);
+          continue;
+        }
+
+        // error
+        if(isset($contact['is_error']) and $contact['is_error']){
+          $this->set_error(ts('Error result Contact getsingle employee ! Error message: ') . $administrations['error_message'], ts('set_employees'));
+          unset($contact);
+          continue;
+        }
+
+        $this->is_employee[$cid] = true;
+
+        $this->employees[$cid] = array();
+        $this->employees[$cid]['id'] = $cid;
+        $this->employees[$cid]['contact_type'] = $contact['contact_type'];
+        $this->employees[$cid]['contact_sub_type'] = $contact['contact_sub_type'];
+        $this->employees[$cid]['display_name'] = $contact['display_name'];
+        $this->employees[$cid]['email'] = $contact['email'];
+
         unset($contact);
-        continue;
+        
+        $this->cache_set($cid . '_is_employee', $this->is_employee[$cid]);
+        $this->cache_set($cid . '_employees', $this->employees[$cid]);
       }
-      
-      // error
-      if(isset($contact['is_error']) and $contact['is_error']){
-        $this->set_error(ts('Error result Contact getsingle employee ! Error message: ') . $administrations['error_message'], ts('set_employees'));
-        unset($contact);
-        continue;
-      }
-      
-      $this->is_employee[$cid] = true;
-      
-      $this->employees[$cid] = array();
-      $this->employees[$cid]['id'] = $cid;
-      $this->employees[$cid]['contact_type'] = $contact['contact_type'];
-      $this->employees[$cid]['contact_sub_type'] = $contact['contact_sub_type'];
-      $this->employees[$cid]['display_name'] = $contact['display_name'];
-      $this->employees[$cid]['email'] = $contact['email'];
-      
-      unset($contact);
     }
     
     // check
@@ -796,67 +839,74 @@ class leaveregistration {
     }
     
     foreach($this->cids as $cid){ 
-      $this->departments[$cid] = array();
-      $this->employees[$cid]['departments'] = array();
-              
-      $params = array(
-        'version' => 3,
-        'sequential' => 1,
-        'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-        'contact_id_a' => $cid,
-      );
-      $departments = civicrm_api('Relationship', 'get', $params);
-      unset($params);
+      $this->departments[$cid] = $this->cache_get($cid . '_departments');
       
-      // count
-      if(isset($departments['count']) and 0 == $departments['count']){
-        $this->set_error(ts('Employee with the name ') . $this->employees[$cid]['display_name'] . (' has no department !'), ts('set_departments'));
-        unset($departments);
-        continue;
-      }
-      
-      // error
-      if(isset($departments['is_error']) and $departments['is_error']){
-        $this->set_eror(ts('Error result Relationship get departments ! Error message: ') . $departments['error_message'], ts('set_departments'));
-        unset($departments);
-        continue;
-      }
-      
-      foreach($departments['values'] as $key => $department){
+      if($this->cache['do'] or empty($this->departments[$cid])){
+        $this->departments[$cid] = array();
+        $this->employees[$cid]['departments'] = array();
+
         $params = array(
           'version' => 3,
           'sequential' => 1,
-          'id' => $department['contact_id_b'],
+          'relationship_type_id' => $this->relationship_types['employee_of']['id'],
+          'contact_id_a' => $cid,
         );
-        $contact = civicrm_api('Contact', 'getsingle', $params);
+        $departments = civicrm_api('Relationship', 'get', $params);
         unset($params);
-        
+
         // count
-        if(isset($contact['count']) and 0 == $contact['count']){
-          $this->set_error(ts('Department with contact id ') . $department['contact_id_b'] . (' does not exists !'), ts('set_departments'));
-          unset($contact);
+        if(isset($departments['count']) and 0 == $departments['count']){
+          $this->set_error(ts('Employee with the name ') . $this->employees[$cid]['display_name'] . (' has no department !'), ts('set_departments'));
+          unset($departments);
           continue;
         }
-        
+
         // error
-        if(isset($contact['is_error']) and $contact['is_error']){
-          $this->set_eror(ts('Error result Contact getsingle department ! Error message: ') . $contact['error_message'], ts('set_departments'));
-          unset($contact);
+        if(isset($departments['is_error']) and $departments['is_error']){
+          $this->set_eror(ts('Error result Relationship get departments ! Error message: ') . $departments['error_message'], ts('set_departments'));
+          unset($departments);
           continue;
         }
-        
-        $this->departments[$cid][$department['contact_id_b']] = array();
-        $this->departments[$cid][$department['contact_id_b']]['id'] = $department['contact_id_b'];
-        $this->departments[$cid][$department['contact_id_b']]['contact_type'] = $contact['contact_type'];
-        $this->departments[$cid][$department['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
-        $this->departments[$cid][$department['contact_id_b']]['display_name'] = $contact['display_name'];
-        $this->departments[$cid][$department['contact_id_b']]['email'] = $contact['email'];
-        
-        $this->employees[$cid]['departments'][$department['contact_id_b']] = $department['contact_id_b'];
-        
-        unset($contact);
+
+        foreach($departments['values'] as $key => $department){
+          $params = array(
+            'version' => 3,
+            'sequential' => 1,
+            'id' => $department['contact_id_b'],
+          );
+          $contact = civicrm_api('Contact', 'getsingle', $params);
+          unset($params);
+
+          // count
+          if(isset($contact['count']) and 0 == $contact['count']){
+            $this->set_error(ts('Department with contact id ') . $department['contact_id_b'] . (' does not exists !'), ts('set_departments'));
+            unset($contact);
+            continue;
+          }
+
+          // error
+          if(isset($contact['is_error']) and $contact['is_error']){
+            $this->set_eror(ts('Error result Contact getsingle department ! Error message: ') . $contact['error_message'], ts('set_departments'));
+            unset($contact);
+            continue;
+          }
+
+          $this->departments[$cid][$department['contact_id_b']] = array();
+          $this->departments[$cid][$department['contact_id_b']]['id'] = $department['contact_id_b'];
+          $this->departments[$cid][$department['contact_id_b']]['contact_type'] = $contact['contact_type'];
+          $this->departments[$cid][$department['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
+          $this->departments[$cid][$department['contact_id_b']]['display_name'] = $contact['display_name'];
+          $this->departments[$cid][$department['contact_id_b']]['email'] = $contact['email'];
+
+          $this->employees[$cid]['departments'][$department['contact_id_b']] = $department['contact_id_b'];
+
+          unset($contact);
+        }
+        unset($departments);
+
+        $this->cache_set($cid . '_departments', $this->departments[$cid]);
+        $this->cache_set($cid . '_employees', $this->employees[$cid]);
       }
-      unset($departments);
     }
     
     // check if the employees has a department
@@ -866,7 +916,7 @@ class leaveregistration {
         $this->set_error( ts('Employee with name ') . $employee['display_name'] . (' has no department !'), ts('set_departments'));
       }
     }
-    
+        
     // check if the employee has multiple departments
     foreach($this->employees as $cid => $employee){
       if(isset($this->departments[$cid]) and 1 < count($this->departments[$cid])){
@@ -895,65 +945,70 @@ class leaveregistration {
       return false;
     }
         
-    foreach($this->departments as $cid => $departments){  
-      foreach($departments as $did => $department){
-        $this->department_colleages_ids[$cid] = array();  
-        $this->department_colleages_ids[$cid][$did] = array();  
-        $this->department_colleages_ids[$cid][$did]['employees'] = array();  
+    foreach($this->departments as $cid => $departments){
+      $this->department_colleages_ids[$cid] = cache_get($cid . '_department_colleages_ids');
+              
+      if($this->cache['do'] or empty($this->department_colleages_ids[$cid])){
+        foreach($departments as $did => $department){
+          $this->department_colleages_ids[$cid] = array();  
+          $this->department_colleages_ids[$cid][$did] = array();  
+          $this->department_colleages_ids[$cid][$did]['employees'] = array();  
 
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-          'contact_id_b' => $did,
-        );
-        $colleages = civicrm_api('Relationship', 'get', $params);
-        unset($params);
-
-        if(isset($contact['count']) and 0 != $contact['count']){
-            // department can have zero employees
-            unset($colleages);
-            continue;
-        }
-        
-        // error
-        if(isset($colleages['is_error']) and $colleages['is_error']){
-          $this->set_eror(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_department_colleages_ids'));
-          unset($colleages);
-          continue;
-        }
-
-        foreach($colleages['values'] as $key => $employee){
           $params = array(
             'version' => 3,
             'sequential' => 1,
-            'id' => $employee['contact_id_a'],
-            'is_deleted' => 0,
+            'relationship_type_id' => $this->relationship_types['employee_of']['id'],
+            'contact_id_b' => $did,
           );
-          $contact = civicrm_api('Contact', 'getsingle', $params);
+          $colleages = civicrm_api('Relationship', 'get', $params);
           unset($params);
-          
-          // sometimes a contact does not exist
-          if(isset($contact['count']) and 0 == $contact['count']){
-            unset($contact);
+
+          if(isset($contact['count']) and 0 != $contact['count']){
+              // department can have zero employees
+              unset($colleages);
+              continue;
+          }
+
+          // error
+          if(isset($colleages['is_error']) and $colleages['is_error']){
+            $this->set_eror(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_department_colleages_ids'));
+            unset($colleages);
             continue;
           }
-          
-          // sometimes the contact does not exist in the contact table, so only set error if there is a error and not on zero count
-          if(isset($contact['is_error']) and $contact['is_error']){  
-            $this->set_error(ts('Error result contact getsingle contacts ! Error message: ') . $contact['error_message'], ts('set_department_colleages_ids'));
+
+          foreach($colleages['values'] as $key => $employee){
+            $params = array(
+              'version' => 3,
+              'sequential' => 1,
+              'id' => $employee['contact_id_a'],
+              'is_deleted' => 0,
+            );
+            $contact = civicrm_api('Contact', 'getsingle', $params);
+            unset($params);
+
+            // sometimes a contact does not exist
+            if(isset($contact['count']) and 0 == $contact['count']){
+              unset($contact);
+              continue;
+            }
+
+            // sometimes the contact does not exist in the contact table, so only set error if there is a error and not on zero count
+            if(isset($contact['is_error']) and $contact['is_error']){  
+              $this->set_error(ts('Error result contact getsingle contacts ! Error message: ') . $contact['error_message'], ts('set_department_colleages_ids'));
+              unset($contact);
+              continue;
+            }
+
+            $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']] = array();
+            $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
+            $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
+            $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
+
             unset($contact);
-            continue;
           }
-               
-          $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']] = array();
-          $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
-          $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
-          $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
-          
-          unset($contact);
+          unset($colleages);
         }
-        unset($colleages);
+        $this->cache_set($cid . '_department_colleages_ids', $this->department_colleages_ids[$cid]);
       }
     }
         
@@ -986,73 +1041,81 @@ class leaveregistration {
     }
     
     foreach($this->departments as $cid => $departments){ 
-      $this->businesses[$cid] = array();
-      $this->employees[$cid]['businesses'] = array();
+      $this->businesses[$cid] = cache_get($cid . '_businesses');
+              
+      if($this->cache['do'] or empty($this->businesses[$cid])){
       
-      foreach($departments as $did => $department){
-        $this->departments[$cid][$did]['businesses'] = array();
-        
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['department_of']['id'],
-          'contact_id_a' => $did,
-        );
-        $business = civicrm_api('Relationship', 'get', $params);
-        unset($params);
-        
-        // count
-        if(isset($business['count']) and 0 == $business['count']){
-          $this->set_error(ts('Department with name ') . $department['display_name'] . (' has no business !'), ts('set_businesses'));
-          unset($business);
-          continue;
-        }
-          
-        // error
-        if(isset($business['is_error']) and $business['is_error']){
-          $this->set_eror(ts('Error result Relationship get business ! Error message: ') . $business['error_message'], ts('set_businesses'));
-          unset($business);
-          continue;
-        }
-        
-        foreach($business['values'] as $key => $business){
+        $this->businesses[$cid] = array();
+        $this->employees[$cid]['businesses'] = array();
+
+        foreach($departments as $did => $department){
+          $this->departments[$cid][$did]['businesses'] = array();
+
           $params = array(
             'version' => 3,
             'sequential' => 1,
-            'id' => $business['contact_id_b'],
-            'is_deleted' => 0,
+            'relationship_type_id' => $this->relationship_types['department_of']['id'],
+            'contact_id_a' => $did,
           );
-          $contact = civicrm_api('Contact', 'getsingle', $params);
+          $business = civicrm_api('Relationship', 'get', $params);
           unset($params);
-          
+
           // count
-          if(isset($contact['count']) and 0 == $contact['count']){
-            $this->set_error(ts('Business with contact id ') . $business['contact_id_b'] . (' does not exists !'), ts('set_businesses'));
-            unset($contact);
+          if(isset($business['count']) and 0 == $business['count']){
+            $this->set_error(ts('Department with name ') . $department['display_name'] . (' has no business !'), ts('set_businesses'));
+            unset($business);
             continue;
           }
-          
+
           // error
-          if(isset($contact['is_error']) and $contact['is_error']){
-            $this->set_eror(ts('Error result Contact getsingle business ! Error message: ') . $contact['error_message'], ts('set_businesses'));
-            unset($contact);
+          if(isset($business['is_error']) and $business['is_error']){
+            $this->set_eror(ts('Error result Relationship get business ! Error message: ') . $business['error_message'], ts('set_businesses'));
+            unset($business);
             continue;
           }
-          
-          $this->businesses[$cid][$business['contact_id_b']] = array();
-          $this->businesses[$cid][$business['contact_id_b']]['id'] = $business['contact_id_b'];
-          $this->businesses[$cid][$business['contact_id_b']]['contact_type'] = $contact['contact_type'];
-          $this->businesses[$cid][$business['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
-          $this->businesses[$cid][$business['contact_id_b']]['display_name'] = $contact['display_name'];
-          $this->businesses[$cid][$business['contact_id_b']]['email'] = $contact['email'];
-          
-          $this->departments[$cid][$did]['businesses'][$business['contact_id_b']] = $business['contact_id_b'];
-          
-          $this->employees[$cid]['businesses'][$business['contact_id_b']] =$business['contact_id_b'];
-          
-          unset($contact);
+
+          foreach($business['values'] as $key => $business){
+            $params = array(
+              'version' => 3,
+              'sequential' => 1,
+              'id' => $business['contact_id_b'],
+              'is_deleted' => 0,
+            );
+            $contact = civicrm_api('Contact', 'getsingle', $params);
+            unset($params);
+
+            // count
+            if(isset($contact['count']) and 0 == $contact['count']){
+              $this->set_error(ts('Business with contact id ') . $business['contact_id_b'] . (' does not exists !'), ts('set_businesses'));
+              unset($contact);
+              continue;
+            }
+
+            // error
+            if(isset($contact['is_error']) and $contact['is_error']){
+              $this->set_eror(ts('Error result Contact getsingle business ! Error message: ') . $contact['error_message'], ts('set_businesses'));
+              unset($contact);
+              continue;
+            }
+
+            $this->businesses[$cid][$business['contact_id_b']] = array();
+            $this->businesses[$cid][$business['contact_id_b']]['id'] = $business['contact_id_b'];
+            $this->businesses[$cid][$business['contact_id_b']]['contact_type'] = $contact['contact_type'];
+            $this->businesses[$cid][$business['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
+            $this->businesses[$cid][$business['contact_id_b']]['display_name'] = $contact['display_name'];
+            $this->businesses[$cid][$business['contact_id_b']]['email'] = $contact['email'];
+
+            $this->departments[$cid][$did]['businesses'][$business['contact_id_b']] = $business['contact_id_b'];
+
+            $this->employees[$cid]['businesses'][$business['contact_id_b']] =$business['contact_id_b'];
+
+            unset($contact);
+          }
+          unset($business);
         }
-        unset($business);
+        $this->cache_set($cid . '_businesses', $this->businesses[$cid]);
+        $this->cache_set($cid . '_departments', $this->departments[$cid]);
+        $this->cache_set($cid . '_employees', $this->employees[$cid]);
       }
     }
     
@@ -1093,95 +1156,101 @@ class leaveregistration {
       return false;
     }
     
-    foreach($this->businesses as $cid => $businesses){  
-      foreach($businesses as $bid => $business){
-        $this->business_colleages_ids[$cid] = array();
-        $this->business_colleages_ids[$cid][$bid] = array();
-        $this->business_colleages_ids[$cid][$bid]['employees'] = array();
-
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['department_of']['id'],
-          'contact_id_b' => $bid,
-        );
-
-        $departments = civicrm_api('Relationship', 'get', $params);
-        unset($params);
-
-        // count
-        if(isset($departments['count']) and 0 == $departments['count']){
-          // business can have zero departments
-          unset($departments);
-          continue;
-        }
-          
-        // error
-        if(isset($departments['is_error']) and $departments['is_error']){
-          $this->set_error(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_business_colleages_ids'));
-          unset($departments);
-          continue;
-        }
-
-        foreach($departments['values'] as $key => $department){     
+    foreach($this->businesses as $cid => $businesses){
+      $this->business_colleages_ids[$cid] = cache_get($cid . '_business_colleages_ids');
+              
+      if($this->cache['do'] or empty($this->business_colleages_ids[$cid])){
+        foreach($businesses as $bid => $business){
+          $this->business_colleages_ids[$cid] = array();
+          $this->business_colleages_ids[$cid][$bid] = array();
+          $this->business_colleages_ids[$cid][$bid]['employees'] = array();
 
           $params = array(
             'version' => 3,
             'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-            'contact_id_b' => $department['contact_id_a'],
+            'relationship_type_id' => $this->relationship_types['department_of']['id'],
+            'contact_id_b' => $bid,
           );
-          $colleages = civicrm_api('Relationship', 'get', $params);
+
+          $departments = civicrm_api('Relationship', 'get', $params);
           unset($params);
 
           // count
-          if(isset($colleages['count']) and 0 == $colleages['count']){
-            // department can have zero employees
-            unset($colleages);
-            continue;
-          }
-            
-          // error
-          if(isset($colleages['is_error']) and $colleages['is_error']){
-            $this->set_error(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_business_colleages_ids'));
-            unset($colleages);
+          if(isset($departments['count']) and 0 == $departments['count']){
+            // business can have zero departments
+            unset($departments);
             continue;
           }
 
-          foreach($colleages['values'] as $key => $employee){
+          // error
+          if(isset($departments['is_error']) and $departments['is_error']){
+            $this->set_error(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_business_colleages_ids'));
+            unset($departments);
+            continue;
+          }
+
+          foreach($departments['values'] as $key => $department){     
+
             $params = array(
               'version' => 3,
               'sequential' => 1,
-              'id' => $employee['contact_id_a'],
-              'is_deleted' => 0,
+              'relationship_type_id' => $this->relationship_types['employee_of']['id'],
+              'contact_id_b' => $department['contact_id_a'],
             );
-            $contact = civicrm_api('Contact', 'getsingle', $params);
-
+            $colleages = civicrm_api('Relationship', 'get', $params);
             unset($params);
 
-            // somnethimes a contact does not exist
-            if(isset($contact['count']) and 0 == $contact['count']){
-              unset($contact);
+            // count
+            if(isset($colleages['count']) and 0 == $colleages['count']){
+              // department can have zero employees
+              unset($colleages);
               continue;
             }
-            
+
             // error
-            if(isset($contact['is_error']) and $contact['is_error']){
-              $this->set_error(ts('Error result contact getsingle contacts ! Error message: ') . $contact['error_message'], ts('set_business_colleages_ids'));
-              unset($contact);
+            if(isset($colleages['is_error']) and $colleages['is_error']){
+              $this->set_error(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_business_colleages_ids'));
+              unset($colleages);
               continue;
             }
-              
-            $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']] = array();
-            $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
-            $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
-            $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];      
+
+            foreach($colleages['values'] as $key => $employee){
+              $params = array(
+                'version' => 3,
+                'sequential' => 1,
+                'id' => $employee['contact_id_a'],
+                'is_deleted' => 0,
+              );
+              $contact = civicrm_api('Contact', 'getsingle', $params);
+
+              unset($params);
+
+              // somnethimes a contact does not exist
+              if(isset($contact['count']) and 0 == $contact['count']){
+                unset($contact);
+                continue;
+              }
+
+              // error
+              if(isset($contact['is_error']) and $contact['is_error']){
+                $this->set_error(ts('Error result contact getsingle contacts ! Error message: ') . $contact['error_message'], ts('set_business_colleages_ids'));
+                unset($contact);
+                continue;
+              }
+
+              $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']] = array();
+              $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
+              $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
+              $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];      
+            }
+            unset($colleages);
           }
-          unset($colleages);
+          unset($departments);
         }
-        unset($departments);
-      }
-    }  
+        
+        $this->cache_set($cid . '_business_colleages_ids', $this->business_colleages_ids[$cid]);
+      } 
+    }
       
     if($this->isset_error()){
       return false;
@@ -1212,74 +1281,81 @@ class leaveregistration {
     }
     
     foreach($this->businesses as $cid => $businesses){ 
-      $this->main_businesses[$cid] = array();
-      $this->employees[$cid]['main_businesses'] = array();
+      $this->main_businesses[$cid] = $this->cache_get($cid . '_main_businesses');
       
-      
-      foreach($businesses as $bid => $business){
-        $this->businesses[$cid][$bid]['main_businesses'] = array();
-        
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['main_organization']['id'],
-          'contact_id_a' => $bid,
-        );
-        $main_business = civicrm_api('Relationship', 'get', $params);
-        unset($params);
-        
-        // count
-        if(isset($main_business['count']) and 0 == $main_business['count']){
-          //$this->set_error(ts('Business with name ') . $business['display_name'] . (' has no main business !'), ts('set_main_businesses'));
-          unset($main_business);
-          continue; 
-        }
-          
-        // error
-        if(isset($main_business['is_error']) and $main_business['is_error']){
-          $this->set_eror(ts('Error result Relationship get main business ! Error message: ') . $main_business['error_message'], ts('set_main_businesses'));
-          unset($main_business);
-          continue;
-        }
-        
-        foreach($main_business['values'] as $key => $main_business){
+      if($this->cache['do'] or empty($this->main_businesses[$cid])){
+        $this->main_businesses[$cid] = array();
+        $this->employees[$cid]['main_businesses'] = array();
+
+
+        foreach($businesses as $bid => $business){
+          $this->businesses[$cid][$bid]['main_businesses'] = array();
+
           $params = array(
             'version' => 3,
             'sequential' => 1,
-            'id' => $main_business['contact_id_b'],
-            'is_deleted' => 0,
+            'relationship_type_id' => $this->relationship_types['main_organization']['id'],
+            'contact_id_a' => $bid,
           );
-          $contact = civicrm_api('Contact', 'getsingle', $params);
+          $main_business = civicrm_api('Relationship', 'get', $params);
           unset($params);
-          
-          // sometimes a contact does not exist, but the relationship does
-          if(isset($contact['count']) and 0 == $contact['count']){
-            //$this->set_error(ts('Main business with contact id ') . $main_business['contact_id_b'] . (' does not exists !'), ts('set_main_businesses'));
-            unset($contact);
-            continue;
+
+          // count
+          if(isset($main_business['count']) and 0 == $main_business['count']){
+            //$this->set_error(ts('Business with name ') . $business['display_name'] . (' has no main business !'), ts('set_main_businesses'));
+            unset($main_business);
+            continue; 
           }
-            
+
           // error
-          if(isset($contact['is_error']) and $contact['is_error']){
-            $this->set_eror(ts('Error result Contact getsingle main business ! Error message: ') . $contact['error_message'], ts('set_main_businesses'));
-            unset($contact);
+          if(isset($main_business['is_error']) and $main_business['is_error']){
+            $this->set_eror(ts('Error result Relationship get main business ! Error message: ') . $main_business['error_message'], ts('set_main_businesses'));
+            unset($main_business);
             continue;
           }
-          
-          $this->main_businesses[$cid][$main_business['contact_id_b']] = array();
-          $this->main_businesses[$cid][$main_business['contact_id_b']]['id'] = $main_business['contact_id_b'];
-          $this->main_businesses[$cid][$main_business['contact_id_b']]['contact_type'] = $business['contact_type'];
-          $this->main_businesses[$cid][$main_business['contact_id_b']]['contact_sub_type'] = $business['contact_sub_type'];
-          $this->main_businesses[$cid][$main_business['contact_id_b']]['display_name'] = $business['display_name'];
-          $this->main_businesses[$cid][$main_business['contact_id_b']]['email'] = $business['email'];
-          
-          $this->businesses[$cid][$bid]['main_businesses'][$main_business['contact_id_b']] = $main_business['contact_id_b'];
-          
-          $this->employees[$cid]['main_businesses'][$main_business['contact_id_b']] = $main_business['contact_id_b'];
-          
-          unset($contact);
+
+          foreach($main_business['values'] as $key => $main_business){
+            $params = array(
+              'version' => 3,
+              'sequential' => 1,
+              'id' => $main_business['contact_id_b'],
+              'is_deleted' => 0,
+            );
+            $contact = civicrm_api('Contact', 'getsingle', $params);
+            unset($params);
+
+            // sometimes a contact does not exist, but the relationship does
+            if(isset($contact['count']) and 0 == $contact['count']){
+              //$this->set_error(ts('Main business with contact id ') . $main_business['contact_id_b'] . (' does not exists !'), ts('set_main_businesses'));
+              unset($contact);
+              continue;
+            }
+
+            // error
+            if(isset($contact['is_error']) and $contact['is_error']){
+              $this->set_eror(ts('Error result Contact getsingle main business ! Error message: ') . $contact['error_message'], ts('set_main_businesses'));
+              unset($contact);
+              continue;
+            }
+
+            $this->main_businesses[$cid][$main_business['contact_id_b']] = array();
+            $this->main_businesses[$cid][$main_business['contact_id_b']]['id'] = $main_business['contact_id_b'];
+            $this->main_businesses[$cid][$main_business['contact_id_b']]['contact_type'] = $business['contact_type'];
+            $this->main_businesses[$cid][$main_business['contact_id_b']]['contact_sub_type'] = $business['contact_sub_type'];
+            $this->main_businesses[$cid][$main_business['contact_id_b']]['display_name'] = $business['display_name'];
+            $this->main_businesses[$cid][$main_business['contact_id_b']]['email'] = $business['email'];
+
+            $this->businesses[$cid][$bid]['main_businesses'][$main_business['contact_id_b']] = $main_business['contact_id_b'];
+
+            $this->employees[$cid]['main_businesses'][$main_business['contact_id_b']] = $main_business['contact_id_b'];
+
+            unset($contact);
+          }
+          unset($main_business);
         }
-        unset($main_business);
+        $this->cache_set($cid . '_main_businesses', $this->main_businesses[$cid]);
+        $this->cache_set($cid . '_businesses', $this->businesses[$cid]);
+        $this->cache_set($cid . '_employees', $this->employees[$cid]);
       }
     }
     
@@ -1304,74 +1380,81 @@ class leaveregistration {
       return false;
     }
     
-    foreach($this->departments as $cid => $departments){ 
-      $this->department_heads[$cid] = array();
-      $this->employees[$cid]['department_heads'] = array();
+    foreach($this->departments as $cid => $departments){
+      $this->department_heads[$cid] = $this->cache_get($cid . '_department_heads');
       
-      foreach($departments as $did => $department){
-        $this->departments[$cid][$did]['department_heads'] = array();
-        
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['department_head']['id'],
-          'contact_id_a' => $did,
-        );
-        $department_heads = civicrm_api('Relationship', 'get', $params);
-        unset($params);
-        
-        // count
-        if(isset($department_heads['count']) and 0 == $department_heads['count']){
-          $this->set_error(ts('Department with name ') . $department['display_name'] . (' has no department head !'), ts('set_department_head'));
-          unset($department_heads);
-          continue;
-        }
-          
-        // error
-        if(isset($department_heads['is_error']) and $department_heads['is_error']){
-          $this->set_eror(ts('Error result Relationship get business ! Error message: ') . $department_heads['error_message'], ts('set_department_head'));
-          unset($department_heads);
-          continue;
-        }
-        
-        foreach($department_heads['values'] as $key => $department_head){
+      if($this->cache['do'] or empty($this->department_heads[$cid])){
+        $this->department_heads[$cid] = array();
+        $this->employees[$cid]['department_heads'] = array();
+
+        foreach($departments as $did => $department){
+          $this->departments[$cid][$did]['department_heads'] = array();
+
           $params = array(
             'version' => 3,
             'sequential' => 1,
-            'id' => $department_head['contact_id_b'],
-            'is_deleted' => 0,
+            'relationship_type_id' => $this->relationship_types['department_head']['id'],
+            'contact_id_a' => $did,
           );
-          $contact = civicrm_api('Contact', 'getsingle', $params);
+          $department_heads = civicrm_api('Relationship', 'get', $params);
           unset($params);
-          
-          // sometimes a contact does not exist but the ralationship does
-          if(isset($contact['count']) and 0 == $contact['count']){
-            //$this->set_error(ts('Department head with contact id ') . $department_head['contact_id_b'] . (' does not exists !'), ts('set_department_head'));
-            unset($contact);
+
+          // count
+          if(isset($department_heads['count']) and 0 == $department_heads['count']){
+            $this->set_error(ts('Department with name ') . $department['display_name'] . (' has no department head !'), ts('set_department_head'));
+            unset($department_heads);
             continue;
           }
-            
+
           // error
-          if(isset($contact['is_error']) and $contact['is_error']){
-            $this->set_eror(ts('Error result Contact getsingle department head ! Error message: ') . $contact['error_message'], ts('set_department_head'));
-            unset($contact);
+          if(isset($department_heads['is_error']) and $department_heads['is_error']){
+            $this->set_eror(ts('Error result Relationship get business ! Error message: ') . $department_heads['error_message'], ts('set_department_head'));
+            unset($department_heads);
             continue;
           }
-          
-          $this->department_heads[$cid][$department_head['contact_id_b']] = array();
-          $this->department_heads[$cid][$department_head['contact_id_b']]['id'] = $department_head['contact_id_b'];
-          $this->department_heads[$cid][$department_head['contact_id_b']]['contact_type'] = $contact['contact_type'];
-          $this->department_heads[$cid][$department_head['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
-          $this->department_heads[$cid][$department_head['contact_id_b']]['display_name'] = $contact['display_name'];
-          $this->department_heads[$cid][$department_head['contact_id_b']]['email'] = $contact['email'];
-          
-          $this->departments[$cid][$did]['department_heads'][$department_head['contact_id_b']] = $department_head['contact_id_b'];
-          
-          $this->employees[$cid]['department_heads'][$department_head['contact_id_b']] = $department_head['contact_id_b'];
-          
-          unset($contact);
+
+          foreach($department_heads['values'] as $key => $department_head){
+            $params = array(
+              'version' => 3,
+              'sequential' => 1,
+              'id' => $department_head['contact_id_b'],
+              'is_deleted' => 0,
+            );
+            $contact = civicrm_api('Contact', 'getsingle', $params);
+            unset($params);
+
+            // sometimes a contact does not exist but the ralationship does
+            if(isset($contact['count']) and 0 == $contact['count']){
+              //$this->set_error(ts('Department head with contact id ') . $department_head['contact_id_b'] . (' does not exists !'), ts('set_department_head'));
+              unset($contact);
+              continue;
+            }
+
+            // error
+            if(isset($contact['is_error']) and $contact['is_error']){
+              $this->set_eror(ts('Error result Contact getsingle department head ! Error message: ') . $contact['error_message'], ts('set_department_head'));
+              unset($contact);
+              continue;
+            }
+
+            $this->department_heads[$cid][$department_head['contact_id_b']] = array();
+            $this->department_heads[$cid][$department_head['contact_id_b']]['id'] = $department_head['contact_id_b'];
+            $this->department_heads[$cid][$department_head['contact_id_b']]['contact_type'] = $contact['contact_type'];
+            $this->department_heads[$cid][$department_head['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
+            $this->department_heads[$cid][$department_head['contact_id_b']]['display_name'] = $contact['display_name'];
+            $this->department_heads[$cid][$department_head['contact_id_b']]['email'] = $contact['email'];
+
+            $this->departments[$cid][$did]['department_heads'][$department_head['contact_id_b']] = $department_head['contact_id_b'];
+
+            $this->employees[$cid]['department_heads'][$department_head['contact_id_b']] = $department_head['contact_id_b'];
+
+            unset($contact);
+          }
+          unset($department_heads);
         }
-        unset($department_heads);
+        $this->cache_set($cid . '_department_heads', $this->department_heads[$cid]);
+        $this->cache_set($cid . '_departments', $this->departments[$cid]);
+        $this->cache_set($cid . '_employees', $this->employees[$cid]);
       }
     }
     
@@ -1479,107 +1562,114 @@ class leaveregistration {
     
     // get all the departments where the employee is department head of
     foreach($this->cids as $cid){
-      $this->is_department_head[$cid] = false;
+      $this->department_heads_colleages_ids[$cid] = $this->cache_get($cid . '_department_heads_colleages_ids');
       
-      $params = array(
-        'version' => 3,
-        'sequential' => 1,
-        'relationship_type_id' => $this->relationship_types['department_head']['id'],
-        'contact_id_b' => $cid,
-        'is_active' => 1,
-      );
-      $departments = civicrm_api('Relationship', 'get', $params);
-      unset($params);
-      
-      // no department
-      if(isset($departments['count']) and 0 == $departments['count']){
+      if($this->cache['do'] or empty($this->department_heads_colleages_ids[$cid])){
         $this->is_department_head[$cid] = false;
-        unset($departments);
-        continue;
-      }
-      
-      // error
-      if(isset($departments['is_error']) and $departments['is_error']){ 
-        $this->set_error(ts('Error result relationship get department of ! Error message: ') . $departments['error_message'], ts('set_department_heads_colleages_ids'));
-        $this->is_department_head[$cid] = false;
-        unset($departments);
-        continue;
-      }
-                  
-      $this->is_department_head[$cid] = true;
-      $this->department_heads_colleages_ids[$cid] = array();
-
-      // loop throught the departments (departments is contact_id_a), and get the employee ids
-      foreach ($departments['values'] as $key => $department){
-
-        // add the department to $department_heads_colleages_ids
-        $this->department_heads_colleages_ids[$cid][$department['contact_id_a']] = array();
-        $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['id'] = $department['contact_id_a'];
-        $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'] = array();
 
         $params = array(
           'version' => 3,
           'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-          'contact_id_b' => $department['contact_id_a'],
+          'relationship_type_id' => $this->relationship_types['department_head']['id'],
+          'contact_id_b' => $cid,
           'is_active' => 1,
         );
-        $employees = civicrm_api('Relationship', 'get', $params);
+        $departments = civicrm_api('Relationship', 'get', $params);
         unset($params);
 
-        // count
-        if(isset($employees['count']) and 0 == $employees['count']){
-          $this->set_error( ts('The department with name ') . $this->departments[$department['contact_id_a']]['display_name'] . ts(' has no employees !'), ts('set_department_heads_colleages_ids'));
-          // let the script run and let it generate multiple errors
-          unset($employees);
+        // no department
+        if(isset($departments['count']) and 0 == $departments['count']){
+          $this->is_department_head[$cid] = false;
+          unset($departments);
           continue;
         }
-          
+
         // error
-        if(isset($employees['is_error']) and $employees['is_error']){
-          $this->set_error(ts('Error result relationship get employee of ! Error message: ') . $employees['error_message'], ts('set_department_heads_colleages_ids'));
-          unset($employees);
+        if(isset($departments['is_error']) and $departments['is_error']){ 
+          $this->set_error(ts('Error result relationship get department of ! Error message: ') . $departments['error_message'], ts('set_department_heads_colleages_ids'));
+          $this->is_department_head[$cid] = false;
+          unset($departments);
           continue;
         }
 
-        // loop thought the employees and save the id in $department_heads_colleages_ids
-        foreach($employees['values'] as $key => $employee){   
+        $this->is_department_head[$cid] = true;
+        $this->department_heads_colleages_ids[$cid] = array();
 
-          // there are some relationships with contacts that not exists, so
-          // we have to check if the contact exists
+        // loop throught the departments (departments is contact_id_a), and get the employee ids
+        foreach ($departments['values'] as $key => $department){
+
+          // add the department to $department_heads_colleages_ids
+          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']] = array();
+          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['id'] = $department['contact_id_a'];
+          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'] = array();
+
           $params = array(
             'version' => 3,
             'sequential' => 1,
-            'id' => $employee['contact_id_a'],
-            'contact_sub_type' => $this->contact_sub_types['employee']['contact_sub_type'],
-            'is_deleted' => 0,
+            'relationship_type_id' => $this->relationship_types['employee_of']['id'],
+            'contact_id_b' => $department['contact_id_a'],
+            'is_active' => 1,
           );
-          $contact = civicrm_api('Contact', 'getsingle', $params);
+          $employees = civicrm_api('Relationship', 'get', $params);
           unset($params);
 
-          // sometimes a contact does not exists, but the relationship does
-          if(isset($contact['count']) and 0 == $contact['count']){
-            // the employee does not exsist
-            unset($contact);
-            continue;
-          }
-            
-          // error
-          if(isset($contact['is_error']) and $contact['is_error']){
-            $this->set_error(ts('Error result contact get ! Error message: ') . $contact['error_message'], ts('set_department_heads_colleages_ids'));
-            unset($contact);
+          // count
+          if(isset($employees['count']) and 0 == $employees['count']){
+            $this->set_error( ts('The department with name ') . $this->departments[$department['contact_id_a']]['display_name'] . ts(' has no employees !'), ts('set_department_heads_colleages_ids'));
+            // let the script run and let it generate multiple errors
+            unset($employees);
             continue;
           }
 
-          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']] = array();
-          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
-          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
-          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
-          
+          // error
+          if(isset($employees['is_error']) and $employees['is_error']){
+            $this->set_error(ts('Error result relationship get employee of ! Error message: ') . $employees['error_message'], ts('set_department_heads_colleages_ids'));
+            unset($employees);
+            continue;
+          }
+
+          // loop thought the employees and save the id in $department_heads_colleages_ids
+          foreach($employees['values'] as $key => $employee){   
+
+            // there are some relationships with contacts that not exists, so
+            // we have to check if the contact exists
+            $params = array(
+              'version' => 3,
+              'sequential' => 1,
+              'id' => $employee['contact_id_a'],
+              'contact_sub_type' => $this->contact_sub_types['employee']['contact_sub_type'],
+              'is_deleted' => 0,
+            );
+            $contact = civicrm_api('Contact', 'getsingle', $params);
+            unset($params);
+
+            // sometimes a contact does not exists, but the relationship does
+            if(isset($contact['count']) and 0 == $contact['count']){
+              // the employee does not exsist
+              unset($contact);
+              continue;
+            }
+
+            // error
+            if(isset($contact['is_error']) and $contact['is_error']){
+              $this->set_error(ts('Error result contact get ! Error message: ') . $contact['error_message'], ts('set_department_heads_colleages_ids'));
+              unset($contact);
+              continue;
+            }
+
+            $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']] = array();
+            $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
+            $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
+            $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
+
+          }
+          unset($employees);
         }
-        unset($employees);
+        unset($departments);
+        
+        $this->cache_set($cid . '_department_heads_colleages_ids', $this->department_heads_colleages_ids[$cid]);
+        $this->cache_set($cid . '_is_department_head', $this->is_department_head[$cid]);
       }
-      unset($departments);
     }
     
     // if $department_heads_colleages_ids is not empty check if all the departments have employees
@@ -1615,140 +1705,147 @@ class leaveregistration {
     
     // get all the business of where he is administration of
     foreach($this->cids as $cid){
-      $this->is_administration[$cid] = false;
+      $this->administration_colleages_ids[$cid] = $this->cache_get($cid . '_administration_colleages_ids');
       
-      $params = array(
-        'version' => 3,
-        'sequential' => 1,
-        'relationship_type_id' => $this->relationship_types['administration_of']['id'],
-        'contact_id_a' => $cid,
-        'is_active' => 1,
-      );
-      $businesses = civicrm_api('Relationship', 'get', $params);
-      unset($params);
-
-      // if there is no result (count is zero), the employee is not a administration
-      if(isset($businesses['count']) and 0 == $businesses['count']){
+      if($this->cache['do'] or empty($this->administration_colleages_ids[$cid])){
         $this->is_administration[$cid] = false;
-        unset($businesses);
-        continue;
-      }
-      
-      // if there is a error (a error occure also if there is no business)
-      if(isset($businesses['is_error']) and $businesses['is_error']){
-        $this->set_error(ts('Error result relationship get business ! Error message: ') . $businesses['error_message'], ts('set_administration_colleages_ids'));
-        unset($businesses);
-        continue;
-      }
-      
-      $this->is_administration[$cid] = true;
-      $this->administration_colleages_ids[$cid] = array();
 
-      // loop throught the businesses (business id is contact_id_b) and get all the departments
-      foreach($businesses['values'] as $key => $business){
-
-        // add the business to the $administration_colleages_ids
-        $this->administration_colleages_ids[$cid][$business['contact_id_b']] = array();
-        $this->administration_colleages_ids[$cid][$business['contact_id_b']]['id'] = $business['contact_id_b'];
-        $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'] = array();
-
-        // get all the departments
         $params = array(
           'version' => 3,
           'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['department_of']['id'],
-          'contact_id_b' => $business['contact_id_b'],
+          'relationship_type_id' => $this->relationship_types['administration_of']['id'],
+          'contact_id_a' => $cid,
           'is_active' => 1,
         );
-        $departments = civicrm_api('Relationship', 'get', $params);
+        $businesses = civicrm_api('Relationship', 'get', $params);
         unset($params);
 
-        // count 
-        if(isset($departments['count']) and 0 == $departments['count']){
-          $this->set_error( ts('The business with name ') . $this->businesses[$business['contact_id_b']]['display_name'] . ts(' has no departments !'), ts('set_administration_colleages_ids'));
-          unset($departments);
-          continue;
-        }
-         
-        // error
-        if(isset($departments['is_error']) and $departments['is_error']){
-          $this->set_error(ts('Error result relationship get department of ! Error message: ') . $departments['error_message'], ts('set_administration_colleages_ids'));
-          unset($departments);
+        // if there is no result (count is zero), the employee is not a administration
+        if(isset($businesses['count']) and 0 == $businesses['count']){
+          $this->is_administration[$cid] = false;
+          unset($businesses);
           continue;
         }
 
-        // loop through all the departments (department id is contact_id_a) and get all the employees
-        foreach ($departments['values'] as $key => $department){
+        // if there is a error (a error occure also if there is no business)
+        if(isset($businesses['is_error']) and $businesses['is_error']){
+          $this->set_error(ts('Error result relationship get business ! Error message: ') . $businesses['error_message'], ts('set_administration_colleages_ids'));
+          unset($businesses);
+          continue;
+        }
+
+        $this->is_administration[$cid] = true;
+        $this->administration_colleages_ids[$cid] = array();
+
+        // loop throught the businesses (business id is contact_id_b) and get all the departments
+        foreach($businesses['values'] as $key => $business){
+
+          // add the business to the $administration_colleages_ids
+          $this->administration_colleages_ids[$cid][$business['contact_id_b']] = array();
+          $this->administration_colleages_ids[$cid][$business['contact_id_b']]['id'] = $business['contact_id_b'];
+          $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'] = array();
+
+          // get all the departments
           $params = array(
             'version' => 3,
             'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-            'contact_id_b' => $department['contact_id_a'],
+            'relationship_type_id' => $this->relationship_types['department_of']['id'],
+            'contact_id_b' => $business['contact_id_b'],
             'is_active' => 1,
           );
-          $employees = civicrm_api('Relationship', 'get', $params);
+          $departments = civicrm_api('Relationship', 'get', $params);
           unset($params);
 
-          // count
-          if(isset($employees['count']) and 0 == $employees['count']){
-            $this->set_error( ts('The department with name ') . $this->departments[$department['contact_id_a']]['display_name'] . ts(' has no employees !'), ts('set_administration_colleages_ids'));
-            // let the script run and let it generate multiple errors
-            unset($employees);
+          // count 
+          if(isset($departments['count']) and 0 == $departments['count']){
+            $this->set_error( ts('The business with name ') . $this->businesses[$business['contact_id_b']]['display_name'] . ts(' has no departments !'), ts('set_administration_colleages_ids'));
+            unset($departments);
             continue;
           }
-            
+
           // error
-          if(isset($employees['is_error']) and $employees['is_error']){
-            $this->set_error(ts('Error result relationship get employee of ! Error message: ') . $employees['error_message'], ts('set_administration_colleages_ids'));
-            unset($employees);
+          if(isset($departments['is_error']) and $departments['is_error']){
+            $this->set_error(ts('Error result relationship get department of ! Error message: ') . $departments['error_message'], ts('set_administration_colleages_ids'));
+            unset($departments);
             continue;
           }
 
-          // loop thought the employees and save the id in $administration_colleages_ids
-          foreach($employees['values'] as $key => $employee){   
-
-            // there are some relationships with contacts that not exists, so
-            // we have to check if the contact exists
+          // loop through all the departments (department id is contact_id_a) and get all the employees
+          foreach ($departments['values'] as $key => $department){
             $params = array(
               'version' => 3,
               'sequential' => 1,
-              'id' => $employee['contact_id_a'],
-              'contact_sub_type' => $this->contact_sub_types['employee']['contact_sub_type'],
-              'is_deleted' => 0,
+              'relationship_type_id' => $this->relationship_types['employee_of']['id'],
+              'contact_id_b' => $department['contact_id_a'],
+              'is_active' => 1,
             );
-            $contact = civicrm_api('Contact', 'getsingle', $params);
+            $employees = civicrm_api('Relationship', 'get', $params);
             unset($params);
 
-            // sometimes a contact does not exists, but the realtionship does
-            if(isset($contact['count']) and 0 == $contact['count']){
-              // the employee does not exsist
-              unset($contact);
+            // count
+            if(isset($employees['count']) and 0 == $employees['count']){
+              $this->set_error( ts('The department with name ') . $this->departments[$department['contact_id_a']]['display_name'] . ts(' has no employees !'), ts('set_administration_colleages_ids'));
+              // let the script run and let it generate multiple errors
+              unset($employees);
               continue;
             }
-            
+
             // error
-            if(isset($contact['is_error']) and $contact['is_error']){
-              $this->set_error(ts('Error result contact get ! Error message: ') . $contact['error_message'], ts('set_administration_colleages_ids'));
-              unset($contact);
+            if(isset($employees['is_error']) and $employees['is_error']){
+              $this->set_error(ts('Error result relationship get employee of ! Error message: ') . $employees['error_message'], ts('set_administration_colleages_ids'));
+              unset($employees);
               continue;
             }
 
-            $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']] = array();
-            $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
-            $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
-            $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
+            // loop thought the employees and save the id in $administration_colleages_ids
+            foreach($employees['values'] as $key => $employee){   
 
-            unset($contact);
+              // there are some relationships with contacts that not exists, so
+              // we have to check if the contact exists
+              $params = array(
+                'version' => 3,
+                'sequential' => 1,
+                'id' => $employee['contact_id_a'],
+                'contact_sub_type' => $this->contact_sub_types['employee']['contact_sub_type'],
+                'is_deleted' => 0,
+              );
+              $contact = civicrm_api('Contact', 'getsingle', $params);
+              unset($params);
+
+              // sometimes a contact does not exists, but the realtionship does
+              if(isset($contact['count']) and 0 == $contact['count']){
+                // the employee does not exsist
+                unset($contact);
+                continue;
+              }
+
+              // error
+              if(isset($contact['is_error']) and $contact['is_error']){
+                $this->set_error(ts('Error result contact get ! Error message: ') . $contact['error_message'], ts('set_administration_colleages_ids'));
+                unset($contact);
+                continue;
+              }
+
+              $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']] = array();
+              $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
+              $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
+              $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
+
+              unset($contact);
+            }
+
+            unset($employees);
           }
 
-          unset($employees);
+          unset($departments);
         }
 
-        unset($departments);
+        unset($businesses);
+        
+        $this->cache_set($cid . '_administration_colleages_ids', $this->administration_colleages_ids[$cid]);
       }
-
-      unset($businesses);
     }
+    
     // if $administration_colleages_ids is not empty check if all the business have employees
     foreach($this->administration_colleages_ids as $cid => $businessess){
       foreach($businessess as $bid => $business){
@@ -1800,6 +1897,7 @@ class leaveregistration {
     
     // set to default if not exists
     foreach($this->cids as $cid){
+      
       if(!isset($this->settings[$cid])){
         $this->settings[$cid] = array();
       }
@@ -1829,80 +1927,106 @@ class leaveregistration {
       $this->set_error(ts('No employees !'), ts('set_data'));
     }
     
-    if(empty($this->departments)){
-      $this->set_error(ts('No departments !'), ts('set_data'));
-    }
-    
-    if(empty($this->businesses)){
-      $this->set_error(ts('No business !'), ts('set_data'));
-    }
-    
-    if(empty($this->department_heads)){
-      $this->set_error(ts('No department heads !'), ts('set_data'));
+    if(empty($years)){
+      $this->set_error(ts('No years !'), ts('set_data'));
     }
     
     if($this->isset_error()){
       return false;
     }
     
-    $this->data = array();
     foreach($this->cids as $cid){
-      $this->data[$cid] = array();
+      foreach($years as $year){
+        $this->data[$year] = $this->cache_get($cid . '_data_' . $year);
+        if(empty($this->data[$cid])){
+          $this->cache['do'] = true;
+        }
+      }
     }
         
-    if(!$this->set_years($years)){
-      $this->set_error( ts('An error occur in years !'), ts('set_data'));
-      return false;
-    }
+    if($this->cache['do']){
+      if(empty($this->departments)){
+        $this->set_error(ts('No departments !'), ts('set_data'));
+      }
+
+      if(empty($this->businesses)){
+        $this->set_error(ts('No business !'), ts('set_data'));
+      }
+
+      if(empty($this->department_heads)){
+        $this->set_error(ts('No department heads !'), ts('set_data'));
+      }
+
+      if($this->isset_error()){
+        return false;
+      }
+
+      $this->data = array();
+      foreach($this->cids as $cid){
+        $this->data[$cid] = array();
+      }
+
+      if(!$this->set_years($years)){
+        $this->set_error( ts('An error occur in years !'), ts('set_data'));
+        return false;
+      }
+
+      if(!$this->set_months($months)){
+        $this->set_error( ts('An error occur in months !'), ts('set_data'));
+        return false;
+      }
+
+      if(!$this->set_days()){
+        $this->set_error( ts('An error occur in days !'), ts('set_data'));
+        return false;
+      }
+
+      if(!$this->set_holidays()){
+        $this->set_error( ts('An error occur in holidays !'), ts('set_data'));
+        return false;
+      }
+
+      if(!$this->set_general()){
+        $this->set_error( ts('An error occur in general !'), ts('set_data'));
+        return false;
+      }
+
+      if(!$this->set_overall_adjustments()){
+        $this->set_error( ts('An error occur in overall adjustments !'), ts('set_data'));
+        return false;
+      }
+
+      if(!$this->set_overall_credit()){
+        $this->set_error( ts('An error occur in overall credits!'), ts('set_data'));
+        return false;
+      }
+
+      if(!$this->set_adjustments()){
+        $this->set_error( ts('An error occur in adjustments !'), ts('set_data'));
+        return false;
+      }    
+
+      if(!$this->set_credit()){
+        $this->set_error( ts('An error occur in credits !'), ts('set_data'));
+        return false;
+      }  
+
+      if(!$this->set_request()){
+        $this->set_error( ts('An error occur in request !'), ts('set_data'));
+        return false;
+      }  
+
+      if(!$this->set_total()){
+        $this->set_error( ts('An error occur in total !'), ts('set_data'));
+        return false;
+      }
+      
+      foreach($this->cids as $cid){
+        foreach($years as $year){
+          $this->cache_set($cid . '_data_' . $year, $this->data[$year]);
+        }
+      }
     
-    if(!$this->set_months($months)){
-      $this->set_error( ts('An error occur in months !'), ts('set_data'));
-      return false;
-    }
-        
-    if(!$this->set_days()){
-      $this->set_error( ts('An error occur in days !'), ts('set_data'));
-      return false;
-    }
-   
-    if(!$this->set_holidays()){
-      $this->set_error( ts('An error occur in holidays !'), ts('set_data'));
-      return false;
-    }
-    
-    if(!$this->set_general()){
-      $this->set_error( ts('An error occur in general !'), ts('set_data'));
-      return false;
-    }
-    
-    if(!$this->set_overall_adjustments()){
-      $this->set_error( ts('An error occur in overall adjustments !'), ts('set_data'));
-      return false;
-    }
-        
-    if(!$this->set_overall_credit()){
-      $this->set_error( ts('An error occur in overall credits!'), ts('set_data'));
-      return false;
-    }
-    
-    if(!$this->set_adjustments()){
-      $this->set_error( ts('An error occur in adjustments !'), ts('set_data'));
-      return false;
-    }    
-    
-    if(!$this->set_credit()){
-      $this->set_error( ts('An error occur in credits !'), ts('set_data'));
-      return false;
-    }  
-    
-    if(!$this->set_request()){
-      $this->set_error( ts('An error occur in request !'), ts('set_data'));
-      return false;
-    }  
-        
-    if(!$this->set_total()){
-      $this->set_error( ts('An error occur in total !'), ts('set_data'));
-      return false;
     }
         
     return true;
@@ -4814,6 +4938,61 @@ class leaveregistration {
     return $id;
   }
   
+  public function cache_settings(){
+    $private = drupal_realpath('private://');
+    if(empty($private)){
+      $this->set_error( ts('No private path in drupal file system !'), ts('Cache Settings'));
+      return false;
+    }
+    
+    $this->cache['path'] = $private . '/civicrm/leaveregistration/';
+    if (!file_exists($this->cache['path'])) {
+      if(mkdir($this->cache['path'], 0755, true)){
+        $this->set_error( ts('Cannnot make dir (%1) !', array(1 => $this->cache['path'])), ts('cache_settings'));
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
+  public function cache_set($key, $data){
+    $filename = $this->cache['path'] . $key . '.php';
+        
+    $content = "<?php" . PHP_EOL;
+    $content .= "if(basename(__FILE__) == basename(\$_SERVER['PHP_SELF'])){return array();}" . PHP_EOL;
+    $content .= "return " . var_export($data, true) . ";";  
+    
+    if (!$handle = fopen($filename, "w")){
+      $this->set_error( ts('Cannnot open the cache file (%1) !', array(1 => $filename)), ts('cache_set'));
+      return false;
+    }
+
+    if (fwrite($handle, $content) === FALSE) {
+      fclose($handle);
+      $this->set_error( ts('Cannnot wite to cache file (%1) !', array(1 => $filename)), ts('cache_set'));
+      return false;
+    }
+    fclose($handle);
+    
+    return true;
+  }
+  
+  public function cache_get($key){
+    $filename = $this->cache['path'] . $key . '.php';
+    
+    $data = array();
+    if (file_exists($filename)) {
+      //ob_start();
+      $data = include ($filename);
+      //ob_end_clean();
+      //echo('cache_get $data: ' . $data);
+      //$data = unserialize($data);
+    }
+        
+    return $data;
+  }
+
   private function ical_date($timestamp) {
     return date('Ymd\THis\Z', $timestamp);
   }

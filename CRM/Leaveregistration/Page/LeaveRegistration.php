@@ -53,7 +53,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     $cids[$this->data['user_cid']] = $this->data['user_cid'];
         
     // cid
-    $this->lr = new leaveregistration($this->data['error_platform'], $this->data['error_id']);
+    $this->lr = new leaveregistration($this->data['error_platform'], $this->data['error_id'], ['do' => true]);
     $this->lr->set_fields();
     $this->lr->set_contacts($cids);
     $this->lr->set_data($this->data['years'], $this->data['months']);
