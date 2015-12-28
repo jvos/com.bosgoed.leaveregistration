@@ -148,7 +148,8 @@
                                     'month': month,
                                     'type': type,
                                     'return': 'echo',
-                                    'element': element
+                                    'element': element,
+                                    'cache': true
                                 },
                                 function(data) {
                                    $('#edit-calendar_year .fieldset-wrapper').html(data);
@@ -222,7 +223,8 @@
                                     'month': month,
                                     'type': type,
                                     'return': 'echo',
-                                    'element': element
+                                    'element': element,
+                                    'cache': true
                                 },
                                 function(data) {
                                    $('#edit-dephead_calendar_year .fieldset-wrapper').html(data);
