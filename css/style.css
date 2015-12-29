@@ -43,7 +43,7 @@
     background-color: #FFFFFF;
 }
 
-#edit-legend { display: inline-block; width: 559px; min-height: 190px;}
+#edit-legend { display: inline-block; width: 558px; min-height: 190px;}
 
 #edit-legend .legend_leave_type { width: 179px; float: left; }
 #edit-legend .legend_leave_type ul,
@@ -82,7 +82,7 @@
 #edit-credit { display: inline-block; vertical-align: top; width: 450px; min-height: 190px;}
 
 /* months */
-#edit-months { display: inline-block; width: 169px; vertical-align: top; min-height: 85px;}
+#edit-months { display: inline-block; width: 168px; vertical-align: top; min-height: 85px;}
 #edit-show_colleagues { display: inline-block; width: 840px; min-height: 85px; }
 
 /* calendar year */
@@ -142,7 +142,7 @@
 }
 
 /* months */
-#edit-dephead_months { display: inline-block; width: 169px; vertical-align: top; min-height: 85px;}
+#edit-dephead_months { display: inline-block; width: 168px; vertical-align: top; min-height: 85px;}
 #edit-dephead_show_colleagues { display: inline-block; width: 840px; min-height: 85px;}
 
 /* calendar year */
