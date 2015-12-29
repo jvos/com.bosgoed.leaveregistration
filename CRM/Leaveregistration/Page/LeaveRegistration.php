@@ -1411,8 +1411,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       }
     }
     
-    $form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year');
-    if($this->data['cache'] or empty($form)){
+    //$form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year');
+    //if($this->data['cache'] or empty($form)){
       // all the colleages
       $colleages = array();
       switch ($this->lr->settings[$this->data['cid']]['show_all_colleagues']){
@@ -1512,8 +1512,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         'empty' => ''
       );
       
-      $this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year', $form);
-    }
+      //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year', $form);
+    //}
                 
     if('form' == $this->data['type']){
       return $form;
@@ -1823,8 +1823,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       }
     }
     
-    $form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year');
-    if($this->data['cache'] or empty($form)){
+    //$form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year');
+    //if($this->data['cache'] or empty($form)){
       if($this->lr->is_department_head[$this->data['cid']]){
         /*      
         // all the employees where the cid department head is
@@ -1895,8 +1895,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           'empty' => ''
         );
       }
-      $this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year', $form);
-    }
+      //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year', $form);
+    //}
     
     if('form' == $this->data['type']){
       return $form;
