@@ -1,7 +1,8 @@
 @CHARSET "ISO-8859-1";
 
-.leaveregistration { width: 1020px; }
+.leaveregistration {position: relative; width: 1020px; }
 .leaveregistration .form-wrapper {width: 1020px; box-sizing: border-box;}
+.leaveregistration div:first-child {position: relative;}
 
 #edit-dephead_col_links .item-list ul,
 #edit-dephead_col_links .item-list ul li { list-style-type: none; margin: 6px; padding: 0; display: inline-block; }
@@ -42,9 +43,9 @@
     background-color: #FFFFFF;
 }
 
-#edit-legend { display: inline-block; width: 550px; min-height: 190px; margin:0; padding:0;}
+#edit-legend { display: inline-block; width: 559px; min-height: 190px;}
 
-#edit-legend .legend_leave_type { width: 170px; float: left; }
+#edit-legend .legend_leave_type { width: 179px; float: left; }
 #edit-legend .legend_leave_type ul,
 #edit-legend .legend_leave_type ul li { list-style-type: none; margin: 2px; padding: 0; }
 #edit-legend .legend_leave_type ul li span { display: block; width: 15px; height: 15px; float: left; }
@@ -73,12 +74,16 @@
 #edit-legend .legend_leave_type ul li.sick span,
 #edit-legend .legend_leave_type ul li.sick_less_one_day span { margin: 5px 4px 0 0; background-color: #cc3333; }
 
-#edit-credit_year { display: inline-block; width: 450px; vertical-align: top; min-height: 190px; margin:0; padding:0;}
-#edit-credit { display: inline-block; vertical-align: top; width: 450px; min-height: 190px; margin:0; padding:0;}
+#edit-legend #leave_legend_0 {width: 170px;}
+#edit-legend #leave_legend_1 {width: 195px;}
+#edit-legend #leave_legend_2 {width: 170px;}
+
+#edit-credit_year { display: inline-block; width: 450px; vertical-align: top; min-height: 200px;}
+#edit-credit { display: inline-block; vertical-align: top; width: 450px; min-height: 190px;}
 
 /* months */
-#edit-months { display: inline-block; width: 150px; vertical-align: top; min-height: 80px;}
-#edit-show_colleagues { display: inline-block; width: 840px; min-height: 80px; }
+#edit-months { display: inline-block; width: 169px; vertical-align: top; min-height: 85px;}
+#edit-show_colleagues { display: inline-block; width: 840px; min-height: 85px; }
 
 /* calendar year */
 #edit-calendar_year { position: relative; min-height: 291px;}
@@ -137,8 +142,8 @@
 }
 
 /* months */
-#edit-dephead_months { display: inline-block; width: 150px; vertical-align: top; min-height: 80px;}
-#edit-dephead_show_colleagues { display: inline-block; width: 840px; min-height: 80px;}
+#edit-dephead_months { display: inline-block; width: 169px; vertical-align: top; min-height: 85px;}
+#edit-dephead_show_colleagues { display: inline-block; width: 840px; min-height: 85px;}
 
 /* calendar year */
 #edit-dephead_calendar_year { position: relative; min-height: 291px;}
@@ -195,6 +200,21 @@
   width: 441px; height: 291px; display: block;
   position: relative; left: 50%; margin-left: -220px; top: 50%; margin-top: -145px;
 }
+
+#loading {
+  position: absolute; top: -15px; left: -15px; bottom: -15px; right: -15px;
+  background: #ffffff; opacity: 0.6; filter: alpha(opacity=60); /* For IE8 and earlier */
+  z-index: 999 !important;
+  display: none;
+}
+
+#loading span {
+  background: url('../img/loading.gif') no-repeat center center;
+  width: 441px; height: 291px; display: block;
+  position: relative; left: 50%; margin-left: -220px; top: 50%; margin-top: -145px;
+}
+
+#toolbar {z-index: 9999 !important;}
 
 /* CIVICRM */
 #Activiteiten #edit-year { width: 100%; }

@@ -683,4 +683,39 @@
     
 {elseif $type eq 'error'}
     {$form.error}
+    
+{elseif $type eq 'loading'} 
+    
+    {if $action eq 'page'}
+    <div id="loading" class="loading page"><span></span></div>
+    
+      {literal}
+        <script type="text/javascript">          
+
+            (function($) {
+
+                $(document).ready(function() {
+                  $('.leaveregistration').find('a').each(function() {
+                    $(this).click(function() {
+                      $('#loading').show();
+                    });
+                  });
+                  $('#edit-submit').click(function() {
+                    $('#loading').show();
+                  });
+                  $('#edit-yes').click(function() {
+                    $('#loading').show();
+                  });
+                  $('#edit-no').click(function() {
+                    $('#loading').show();
+                  });
+                  $('#edit-year-select').change(function() {
+                    $('#loading').show();
+                  });
+                });
+            })(jQuery_leave_registration);
+
+        </script>
+       {/literal}
+    {/if}
 {/if}

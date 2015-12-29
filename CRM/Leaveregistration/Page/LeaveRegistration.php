@@ -108,6 +108,12 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     return self::$_template->fetch('CRM/Leaveregistration/Page/LeaveRegistration.tpl');
   }
     
+  public function loading(){
+    $this->assign('type', 'loading');
+    $this->assign('action', 'page');
+    return self::$_template->fetch('CRM/Leaveregistration/Page/LeaveRegistration.tpl');
+  }
+  
   private function response($name, $form, $type, $script){
     if('serialize' == $this->data['return']){
       return serialize($form);
