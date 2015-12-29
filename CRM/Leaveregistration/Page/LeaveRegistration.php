@@ -1351,9 +1351,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
   }
     
   public function get_calendar_year_form(){
+    $form = [];
     if(!$this->lr->is_department_head[$this->data['cid']]){
-      $form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year_form');
-      if($this->data['cache'] or empty($form)){
+      //$form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year_form');
+      //if($this->data['cache'] or empty($form)){
         $form['calendar_year'] = array
         (
           'type' => 'fieldset',
@@ -1368,8 +1369,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
               'text' => ts('Choose calendar or a month above !')
           );
         }
-        $this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year_form', $form);
-      }
+        //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year_form', $form);
+      //}
     }
     return $this->response('calendar_year', $form, 'form', 'calendar_year');
   }
@@ -1760,8 +1761,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     $form = array();
     
     if($this->lr->is_department_head[$this->data['cid']]){
-      $form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year_form');
-      if($this->data['cache'] or empty($form)){
+      //$form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year_form');
+      //if($this->data['cache'] or empty($form)){
         $form['dephead_calendar_year'] = array
         (
           'type' => 'fieldset',
@@ -1769,8 +1770,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         );
 
         $form['dephead_calendar_year']['dephead_calendar_year'] = $this->get_dephead_calendar_year();
-        $this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year_form', $form);
-      }
+        //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year_form', $form);
+      //}
     }
         
     return $this->response('dephead_calendar_year', $form, 'form', 'dephead_calendar_year');
@@ -1826,9 +1827,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     //$form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year');
     //if($this->data['cache'] or empty($form)){
       if($this->lr->is_department_head[$this->data['cid']]){
-        /*      
+             
         // all the employees where the cid department head is
-        $colleages = array();
+        /*$colleages = array();
         foreach($this->lr->department_heads_colleages_ids[$this->data['cid']] as $did => $department){
           foreach($department['employees'] as $cid => $employee){
             if($cid != $this->data['user_cid'] and $cid != $this->data['cid']){
@@ -2544,7 +2545,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     );
     
     if($this->lr->is_department_head[$this->data['cid']]){
-      /*    
+      /* 
       // all the employees where the cid department head is
       $colleages = array();
       foreach($this->lr->department_heads_colleages_ids[$this->data['cid']] as $did => $department){

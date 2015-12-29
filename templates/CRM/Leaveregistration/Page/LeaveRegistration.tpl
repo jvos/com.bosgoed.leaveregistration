@@ -652,17 +652,17 @@
 {elseif $type eq 'script'} 
     
     {if $action eq 'js'}
-        <script src="{$extension_url}com.bosgoed.leaveregistration/js/jquery-1.8.2.js"></script>
-        <script src="{$extension_url}com.bosgoed.leaveregistration/js/jquery-noconfilct.js"></script>
+        <script src="{$extension_url}com.bosgoed.leaveregistration/js/jquery-1.8.2.min.js"></script>
+        <script src="{$extension_url}com.bosgoed.leaveregistration/js/jquery-noconfilct_min.js"></script>
         
-        <script src="{$extension_url}com.bosgoed.leaveregistration/js/utf8_decode.js"></script>
-        <script src="{$extension_url}com.bosgoed.leaveregistration/js/rawurldecode.js"></script>
-        <script src="{$extension_url}com.bosgoed.leaveregistration/js/rawurlencode.js"></script>
-        <script src="{$extension_url}com.bosgoed.leaveregistration/js/serialize.js"></script>
-        <script src="{$extension_url}com.bosgoed.leaveregistration/js/unserialize.js"></script>
+        <script src="{$extension_url}com.bosgoed.leaveregistration/js/utf8_decode.js" defer="defer"></script>
+        <script src="{$extension_url}com.bosgoed.leaveregistration/js/rawurldecode.js" defer="defer"></script>
+        <script src="{$extension_url}com.bosgoed.leaveregistration/js/rawurlencode.js" defer="defer"></script>
+        <script src="{$extension_url}com.bosgoed.leaveregistration/js/serialize.js" defer="defer"></script>
+        <script src="{$extension_url}com.bosgoed.leaveregistration/js/unserialize.js" defer="defer"></script>
         
     {elseif $action eq 'css'}
-        <link rel="stylesheet" type="text/css" href="{$extension_url}com.bosgoed.leaveregistration/css/style.css">
+        <link rel="stylesheet" type="text/css" href="{$extension_url}com.bosgoed.leaveregistration/css/style_min.css">
         
     {elseif $action eq 'calendar_year'}
         <div id="calendar_year_item">
