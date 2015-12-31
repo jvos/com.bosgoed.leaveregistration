@@ -462,7 +462,7 @@ class leaveregistration {
       $this->cache_set('option_groups', $this->option_groups);
     }
     
-    echo('$this->relationship_types: <pre>');
+    /*echo('$this->relationship_types: <pre>');
     print_r($this->relationship_types);
     echo('</pre>');
     echo('$this->custom_groups: <pre>');
@@ -473,7 +473,7 @@ class leaveregistration {
     echo('</pre>');
     echo('$this->option_groups: <pre>');
     print_r($this->option_groups);
-    echo('</pre>');
+    echo('</pre>');*/
   }
     
   /*
@@ -762,7 +762,7 @@ class leaveregistration {
       return false;
     }
     
-    echo('$this->employees: <pre>');
+    /*echo('$this->employees: <pre>');
     print_r($this->employees);
     echo('</pre>');
     echo('$this->departments: <pre>');
@@ -788,7 +788,7 @@ class leaveregistration {
     echo('</pre>');
     echo('$this->settings: <pre>');
     print_r($this->settings);
-    echo('</pre>');
+    echo('</pre>');*/
     
     return true;
   }
@@ -2070,13 +2070,12 @@ class leaveregistration {
     
     }
     
-    foreach($this->data as $cid => $years){
+    /*foreach($this->data as $cid => $years){
       echo('$cid: ' . $cid) . '<br/>' . PHP_EOL;
       foreach($years as $year => $months){
         echo('$year: ' . $year) . '<br/>' . PHP_EOL;
       }
-      
-    }
+    }*/
     return true;
   }
       
