@@ -27,8 +27,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     // get civicrm contact id from drupal user
     $session = CRM_Core_Session::singleton();
     $user_cid = $session->get('userID'); 
+    unset($deph_col_cid);
     
     $this->data['user_cid'] = $user_cid;
+    unset($user_cid);
     
     foreach($this->data as $field => $value){
       if('years' == $field or 'months' == $field){
@@ -77,12 +79,17 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           }
         }
       }
-
-      $colids = array();      
+      unset($deph_col_cid);
+      unset($did);
+      unset($department);
+      unset($cid);
+      unset($employee);
+    
       ksort($colleages);
       foreach($colleages as $display_name => $employee){
         $this->lr_colids[] = $employee['id'];
-      }      
+      }
+      unset($colleages);
             
       $this->lr_deph_col = new leaveregistration($this->data['error_platform'], $this->data['error_id'] . ': department_heads_colleages_ids');
       $this->lr_deph_col->set_fields();
@@ -232,6 +239,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       'default_value' => '?year=' . $this->data['year'] . '&cid=' . $this->data['cid'],
       'attributes' => array('id' => 'year'),
     );
+    
+    unset($options);
         
     if('form' == $this->data['type']){
       return $form;
@@ -330,6 +339,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $colleages[htmlentities($employee['display_name'])] = $employee;
         }
       }
+      unset($did);
+      unset($department);
+      unset($cid);
+      unset($employee);
 
       ksort($colleages);    
       foreach($colleages as $display_name => $employee){
@@ -344,6 +357,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
 
         $form['items'][] = array('data' => self::$_template->fetch('CRM/Leaveregistration/Page/LeaveRegistration.tpl'));
       }
+      unset($colleages);
+      unset($display_name);
+      unset($employee);
     }
     
     if('form' == $this->data['type']){
@@ -445,6 +461,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
             $colleages[htmlentities($employee['display_name'])] = $employee;
           }
         }
+        unset($aid);
+        unset($administration);
+        unset($cid);
+        unset($employee);
 
         ksort($colleages);     
         foreach($colleages as $display_name => $employee){
@@ -460,6 +480,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
 
           $form['items'][] = array('data' => self::$_template->fetch('CRM/Leaveregistration/Page/LeaveRegistration.tpl'));
         }
+        unset($colleages);
+        unset($display_name);
+        unset($employee);
+        
         $this->lr->cache_set($this->data['user_cid'] . '_dephead_col_links', $form);
       }
     }
@@ -556,6 +580,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       foreach($ths as $key => $th){
         $header[] = array('data' => ts($th));
       }
+      unset($ths);
 
       /*$colleages = array();
       foreach($this->lr->department_heads_colleages_ids[$this->data['user_cid']] as $did => $department){
@@ -644,6 +669,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
             (
               'data' => $datas
             );
+            
+            unset($operations);
+            unset($datas);
           }
         }
       }
@@ -659,6 +687,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         'sticky' => false,
         'empty' => ''
       );
+      
+      unset($header);
+      unset($rows);
     }
     
     if('form' == $this->data['type']){
@@ -756,6 +787,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     foreach($ths as $key => $th){
       $header[] = array('data' => ts($th));
     }
+    unset($ths);    
         
     $rows = array();    
     foreach($this->lr->request as $rid => $request){      
@@ -846,6 +878,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         (
           'data' => $datas
         );
+        unset($operations);
+        unset($datas);
       }
       
     }
@@ -861,6 +895,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       'sticky' => false,
       'empty' => ''
     );
+    unset($header);
+    unset($rows);
     
     if('form' == $this->data['type']){
       return $form;
@@ -927,10 +963,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     
     $key = 1;
     $i = 0;
-    
-    $leave_types = $this->lr->option_groups['leave_request_leave_type']['options'];
-    
-    foreach($leave_types as $leave_type => $title){
+        
+    foreach($this->lr->option_groups['leave_request_leave_type']['options'] as $leave_type => $title){
       if(6 == $i){
         $key++;
       }
@@ -1001,6 +1035,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         'data' => $year
       );
     }
+    unset($year);
     
     $credit = array();    
     foreach($this->lr->total[$this->data['cid']] as $year => $total){
@@ -1058,6 +1093,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         $minutes = round($total['over']) - ($hours * 60);
         $credit[$year]['over'] = $hours . ':' . sprintf("%02s", $minutes);
       }
+      unset($hours);
+      unset($minutes);
     }
         
     $datas = array();
@@ -1099,6 +1136,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     (
       'data' => $datas
     );
+    unset($datas);
    
     $form = array
     (
@@ -1111,6 +1149,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       'sticky' => false,
       'empty' => ''
     );
+    unset($header);
+    unset($rows);
     
     if('form' == $this->data['type']){
       return $form;
@@ -1155,13 +1195,11 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       }
     }
     
-    $options = array('all' => ts('all'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
-   
     $form = array
     (
       'type' => 'select',
       'title' => '',
-      'options' => $options,
+      'options' => array('all' => ts('all'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12'),
       'default_value' => $this->data['month'],
       'attributes' => array('id' => 'months'),
     );
@@ -1239,14 +1277,12 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     
     $form = array();
     
-    if($this->lr->is_department_head[$this->data['cid']]){
-      $options = array('all' => ts('all'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12');
-   
+    if($this->lr->is_department_head[$this->data['cid']]){   
       $form = array
       (
         'type' => 'select',
         'title' => '',
-        'options' => $options,
+        'options' => array('all' => ts('all'), '01' => '01', '02' => '02', '03' => '03', '04' => '04', '05' => '05', '06' => '06', '07' => '07', '08' => '08', '09' => '09', '10' => '10', '11' => '11', '12' => '12'),
         'default_value' => $this->data['month'],
         'attributes' => array('id' => 'dephead_months'),
       );
@@ -1425,6 +1461,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
               }
             }
           }
+          unset($bid);
+          unset($business);
+          unset($cid);
+          unset($employee);
           break;
         /*case 'main_business':
           foreach($this->lr->department_heads_colleages_ids[$this->data['cid']] as $did => $department){
@@ -1443,6 +1483,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
               }
             }
           }
+          unset($did);
+          unset($department);
+          unset($cid);
+          unset($employee);
       }
 
       // all the department heads
@@ -1452,6 +1496,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
             $colleages[htmlentities($department_head['display_name'])] = $department_head;
           }
         }
+        unset($dhid);
+        unset($department_head);
       }
 
       $colids = array();      
@@ -1459,6 +1505,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       foreach($colleages as $display_name => $employee){
         $colids[] = $employee['id'];
       }
+      unset($colleages);
 
       if(!empty($colids)){
         $lr = new leaveregistration($this->data['error_platform'], $this->data['error_id'] . ': get_calendar_year');
@@ -1466,6 +1513,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         $lr->set_contacts($colids);
         $lr->set_data($this->data['years'], $this->data['months']);
       }
+      unset($colids);
 
       $header = array();
       $header[] = array
@@ -1494,12 +1542,24 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
             'rel' => rawurlencode(serialize($rel))
           );
         }
+        unset($data);
+        unset($class);
+        unset($rel);
+        unset($day);
+        unset($array);
+        
 
         $rows[] = array
         (
           'data' => $datas
         );
+        unset($datas);
+        unset($month);
+        unset($days);
       }
+      
+      unset($lr);
+      unset($array);
 
       $form = array
       (
@@ -1512,6 +1572,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         'sticky' => false,
         'empty' => ''
       );
+      unset($header);
+      unset($rows);
       
       //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_calendar_year', $form);
     //}
@@ -1523,7 +1585,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     }
   }
   
-  public function get_calendar_year_day($day, $month, $year, $array, $lr){
+  public function get_calendar_year_day(&$day, &$month, &$year, &$array, &$lr){
     $data = '';
     $class = '';
     $rel = array();
@@ -1605,6 +1667,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $this->lr->employees[$this->data['cid']]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['normal_leave']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
     
     // request status request
@@ -1655,6 +1720,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $this->lr->employees[$this->data['cid']]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['request']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
         
     // is holiday
@@ -1702,6 +1770,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $this->lr->employees[$this->data['cid']]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['time_for_time']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
 
     // everyone else
@@ -1717,6 +1788,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         if('0:00' != $duration){ // if duration is not 0:00
           $rel[str_replace(' ', '_', strtolower($lr->employees[$cid]['display_name']))] = $lr->employees[$cid]['display_name'] . ' ' . ts($lr->option_groups['leave_request_leave_type']['options'][$lr->data[$cid][$year][$month][$day]['normal_leave']['leave_type']]) . ' ' . $duration;
         }
+        unset($hours);
+        unset($minutes);
+        unset($duration);
       }
 
       if(isset($lr->data[$cid][$year][$month][$day]['request']['is_request']) and 1 == $lr->data[$cid][$year][$month][$day]['request']['is_request'] and 'approved' == $lr->data[$cid][$year][$month][$day]['request']['status']){                
@@ -1730,6 +1804,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         if('0:00' != $duration){ // if duration is not 0:00
           $rel[str_replace(' ', '_', strtolower($lr->employees[$cid]['display_name']))] = $lr->employees[$cid]['display_name'] . ' ' . ts($lr->option_groups['leave_request_leave_type']['options'][$lr->data[$cid][$year][$month][$day]['request']['leave_type']]) . ' ' . $duration;
         }
+        unset($hours);
+        unset($minutes);
+        unset($duration);
       }
     }
         
@@ -1859,6 +1936,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         foreach($this->lr->data[$this->data['cid']][$this->data['year']]['01'] as $day => $array){
           $header[] = array('data' => $day);
         }
+        unset($day);
+        unset($array);
 
         foreach($this->lr->data[$this->data['cid']][$this->data['year']] as $month => $days){
           $datas = array();
@@ -1877,12 +1956,20 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
               'rel' => rawurlencode(serialize($rel))
             );
           }
+          unset($day);
+          unset($array);
+          unset($data);
+          unset($class);
+          unset($rel);
 
           $rows[] = array
           (
             'data' => $datas
           );
         }
+        unset($month);
+        unset($days);
+        unset($datas);
 
         $form = array
         (
@@ -1895,6 +1982,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           'sticky' => false,
           'empty' => ''
         );
+        unset($header);
+        unset($rows);
       }
       //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_dephead_calendar_year', $form);
     //}
@@ -1906,7 +1995,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     }
   }
   
-  public function get_dephead_calendar_year_day($day, $month, $year, $array, $lr){
+  public function get_dephead_calendar_year_day(&$day, &$month, &$year, &$array, &$lr){
     $data = '';
     $class = '';
     $rel = array();
@@ -1957,6 +2046,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $this->lr->employees[$this->data['cid']]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['normal_leave']['leave_type']]) . ' ' . $duration;
         }
       }
+      
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
     
     // request status request
@@ -1988,6 +2081,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $this->lr->employees[$this->data['cid']]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['request']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
         
     // is holiday
@@ -2016,6 +2112,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $this->lr->employees[$this->data['cid']]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['time_for_time']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
           
     foreach($lr->employees as $cid => $employee){
@@ -2031,6 +2130,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         if('0:00' != $duration){ // if duration is not 0:00
           $rel[str_replace(' ', '_', strtolower($lr->employees[$cid]['display_name']))] = $lr->employees[$cid]['display_name'] . ' ' . ts($lr->option_groups['leave_request_leave_type']['options'][$lr->data[$cid][$year][$month][$day]['normal_leave']['leave_type']]) . ' ' . $duration;
         }
+        
+        unset($hours);
+        unset($minutes);
+        unset($duration);
       }
 
       if(isset($lr->data[$cid][$year][$month][$day]['request']['is_request']) and 1 == $lr->data[$cid][$year][$month][$day]['request']['is_request'] and 'approved' == $lr->data[$cid][$year][$month][$day]['request']['status']){                
@@ -2044,6 +2147,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         if('0:00' != $duration){ // if duration is not 0:00
           $rel[str_replace(' ', '_', strtolower($lr->employees[$cid]['display_name']))] = $lr->employees[$cid]['display_name'] . ' ' . ts($lr->option_groups['leave_request_leave_type']['options'][$lr->data[$cid][$year][$month][$day]['request']['leave_type']]) . ' ' . $duration;
         }
+        
+        unset($hours);
+        unset($minutes);
+        unset($duration);
       }
     }
         
@@ -2112,6 +2219,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     foreach($this->lr->data[$this->data['cid']][$this->data['year']][$this->data['month']] as $day => $array){
       $header[] = array('data' => $day);
     }
+    unset($day);
+    unset($array);
     
     // employee self
     $datas = array();
@@ -2136,11 +2245,17 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         'rel' => rawurlencode(serialize($rel))
       );
     }
+    unset($day);
+    unset($array);
+    unset($data);
+    unset($class);
+    unset($rel);
 
     $rows[] = array
     (
       'data' => $datas
     );
+    unset($datas);
     
     // all the colleages
     $colleages = array();
@@ -2153,6 +2268,11 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
             }
           }
         }
+        unset($bid);
+        unset($business);
+        unset($cid);
+        unset($employee);
+        
         break;
       /*case 'main_business':
         foreach($this->lr->department_heads_colleages_ids[$this->data['user_cid']] as $did => $department){
@@ -2171,6 +2291,10 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
             }
           }
         }
+        unset($did);
+        unset($department);
+        unset($cid);
+        unset($employee);
     }
 
     // all the department heads
@@ -2180,13 +2304,18 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $colleages[htmlentities($department_head['display_name'])] = $department_head;
         }
       }
+      unset($dhid);
+      unset($department_head);
     }
         
     $colids = array();      
     ksort($colleages);
     foreach($colleages as $display_name => $employee){
       $colids[] = $employee['id'];
-    }      
+    }
+    unset($colleages);
+    unset($display_name);
+    unset($employee);
 
     if(!empty($colids)){
       $lrcol = new leaveregistration($this->data['error_platform'], $this->data['error_id'] . ': get_calendar_month');
@@ -2216,12 +2345,18 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           'rel' => rawurlencode(serialize($rel))
         );
       }
+      unset($day);
+      unset($array);
+      unset($data);
+      unset($class);
+      unset($rel);
       
       $rows[] = array
       (
         'data' => $datas
       );
     }
+    unset($datas);
     
     $form = array
     (
@@ -2234,6 +2369,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       'sticky' => false,
       'empty' => ''
     );
+    unset($header);
+    unset($rows);
+    unset($month);
     
     if('form' == $this->data['type']){
       return $form;
@@ -2242,7 +2380,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     }
   }
   
-  private function get_calendar_month_day($employee, $cid, $user_cid, $user_id, $day, $month, $year, $array){
+  private function get_calendar_month_day(&$employee, &$cid, &$user_cid, &$user_id, &$day, &$month, &$year, &$array){
     $data = '';
     $class = '';
     $rel = array();
@@ -2314,6 +2452,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $employee[$cid]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['normal_leave']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
     
     // request status request
@@ -2364,6 +2505,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $employee[$cid]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['request']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
     
     // normal_leave status request
@@ -2414,6 +2558,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $employee[$cid]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['time_for_time']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
     return array($data, $class, $rel);
   }
@@ -2537,12 +2684,18 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         'class' => $class,
         'rel' => rawurlencode(serialize($rel))
       );
+      unset($day);
+      unset($array);
+      unset($data);
+      unset($class);
+      unset($rel);
     }
 
     $rows[] = array
     (
       'data' => $datas
     );
+    unset($datas);
     
     if($this->lr->is_department_head[$this->data['cid']]){
       /* 
@@ -2589,13 +2742,19 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
             'class' => $class,
             'rel' => rawurlencode(serialize($rel))
           );
+          unset($day);
+          unset($array);
+          unset($data);
+          unset($class);
+          unset($rel);
         }
+        
 
         $rows[] = array
         (
           'data' => $datas
         );
-        
+        unset($datas);
       }
       
       $form = array
@@ -2609,6 +2768,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         'sticky' => false,
         'empty' => ''
       );
+      unset($header);
+      unset($rows);
     }
             
     if('form' == $this->data['type']){
@@ -2618,7 +2779,7 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     }
   }
     
-  private function get_dephead_calendar_month_day($employee, $cid, $user_cid, $user_id, $day, $month, $year, $array){
+  private function get_dephead_calendar_month_day(&$employee, &$cid, &$user_cid, &$user_id, &$day, &$month, &$year, &$array){
     $data = '';
     $class = '';
     $rel = array();
@@ -2690,6 +2851,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $employee[$cid]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['normal_leave']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
     
     // request status request
@@ -2739,6 +2903,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $employee[$cid]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['request']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
     
     // normal_leave status request
@@ -2795,6 +2962,9 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           $rel['leave'] = $employee[$cid]['display_name'] . ' ' . ts($this->lr->option_groups['leave_request_leave_type']['options'][$array['time_for_time']['leave_type']]) . ' ' . $duration;
         }
       }
+      unset($hours);
+      unset($minutes);
+      unset($duration);
     }
 
     return array($data, $class, $rel);

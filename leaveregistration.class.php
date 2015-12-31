@@ -461,6 +461,19 @@ class leaveregistration {
       $this->cache_set('custom_fields', $this->custom_fields);
       $this->cache_set('option_groups', $this->option_groups);
     }
+    
+    echo('$this->relationship_types: <pre>');
+    print_r($this->relationship_types);
+    echo('</pre>');
+    echo('$this->custom_groups: <pre>');
+    print_r($this->custom_groups);
+    echo('</pre>');
+    echo('$this->custom_fields: <pre>');
+    print_r($this->custom_fields);
+    echo('</pre>');
+    echo('$this->option_groups: <pre>');
+    print_r($this->option_groups);
+    echo('</pre>');
   }
     
   /*
@@ -748,7 +761,35 @@ class leaveregistration {
       $this->set_error( ts('An error occur in settings !'), ts('set_contacts'));
       return false;
     }
-        
+    
+    echo('$this->employees: <pre>');
+    print_r($this->employees);
+    echo('</pre>');
+    echo('$this->departments: <pre>');
+    print_r($this->departments);
+    echo('</pre>');
+    echo('$this->businesses: <pre>');
+    print_r($this->businesses);
+    echo('</pre>');
+    echo('$this->business_colleages_ids: <pre>');
+    print_r($this->business_colleages_ids);
+    echo('</pre>');
+    echo('$this->main_businesses: <pre>');
+    print_r($this->main_businesses);
+    echo('</pre>');
+    echo('$this->department_heads: <pre>');
+    print_r($this->department_heads);
+    echo('</pre>');
+    echo('$this->administrations: <pre>');
+    print_r($this->administrations);
+    echo('</pre>');
+    echo('$this->department_heads_colleages_ids: <pre>');
+    print_r($this->department_heads_colleages_ids);
+    echo('</pre>');
+    echo('$this->settings: <pre>');
+    print_r($this->settings);
+    echo('</pre>');
+    
     return true;
   }
   
@@ -2028,11 +2069,18 @@ class leaveregistration {
       }
     
     }
-        
+    
+    foreach($this->data as $cid => $years){
+      echo('$cid: ' . $cid) . '<br/>' . PHP_EOL;
+      foreach($years as $year => $months){
+        echo('$year: ' . $year) . '<br/>' . PHP_EOL;
+      }
+      
+    }
     return true;
   }
       
-  private function set_years($years = array()) {
+  private function set_years(&$years = array()) {
     if($this->isset_error()){
       return false;
     }
@@ -2046,7 +2094,7 @@ class leaveregistration {
     return true;
   }
   
-  private function set_months($months = array()) {
+  private function set_months(&$months = array()) {
     if($this->isset_error()){
       return false;
     }
