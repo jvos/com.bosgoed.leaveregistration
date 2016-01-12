@@ -32,6 +32,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     $this->data['user_cid'] = $user_cid;
     unset($user_cid);
     
+    $this->data['cache'] = true;
+    
     foreach($this->data as $field => $value){
       if('years' == $field or 'months' == $field){
         $this->assign($field, serialize($value));
@@ -169,8 +171,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     // check if the current cid is administration of the cid
     if($this->lr->is_department_head[$this->data['user_cid']] or $this->lr->is_administration[$this->data['user_cid']]){
 
-      $form = $this->lr->cache_get($this->data['user_cid'] . '_dephead_admin_link');
-      if($this->data['cache'] or empty($form)){
+      //$form = $this->lr->cache_get($this->data['user_cid'] . '_dephead_admin_link');
+      //if($this->data['cache'] or empty($form)){
 
         $form = array(
           'type' => 'link',
@@ -178,8 +180,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
           'href' => '/user/' . $this->data['user_cid'] . '/leave?year=' . $this->data['year']
         );
 
-        $this->lr->cache_set($this->data['user_cid'] . '_dephead_admin_link', $form);
-      }
+        //$this->lr->cache_set($this->data['user_cid'] . '_dephead_admin_link', $form);
+      //}
       return $this->response('dephead_admin_link', $form, 'link', '');
     }    
   }
@@ -277,8 +279,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     if($this->lr->is_administration[$this->data['user_cid']]){
       
       
-      $form = $this->lr->cache_get($this->data['user_cid'] . '_admin_col_links_form');
-      if($this->data['cache'] or empty($form)){
+      //$form = $this->lr->cache_get($this->data['user_cid'] . '_admin_col_links_form');
+      //if($this->data['cache'] or empty($form)){
 
         $form['admin_col_links'] = array(
           'type' => 'fieldset',
@@ -287,8 +289,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
 
         $form['admin_col_links']['admin_col_links'] = $this->get_admin_col_links();
         
-        $this->lr->cache_set($this->data['user_cid'] . '_admin_col_links_form', $form);
-      }
+        //$this->lr->cache_set($this->data['user_cid'] . '_admin_col_links_form', $form);
+      //}
     }
     return $this->response('admin_col_links', $form, 'form', '');
   }
@@ -394,8 +396,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     
     // check if the current cid is department head
     if($this->lr->is_department_head[$this->data['user_cid']]){
-      $form = $this->lr->cache_get($this->data['user_cid'] . '_dephead_col_links_form');
-      if($this->data['cache'] or empty($form)){
+      //$form = $this->lr->cache_get($this->data['user_cid'] . '_dephead_col_links_form');
+      //if($this->data['cache'] or empty($form)){
         $form['dephead_col_links'] = array
         (
           'type' => 'fieldset',
@@ -403,8 +405,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         );
 
         $form['dephead_col_links']['dephead_col_links'] = $this->get_dephead_col_links(); 
-        $this->lr->cache_set($this->data['user_cid'] . '_dephead_col_links_form', $form);
-      }
+        //$this->lr->cache_set($this->data['user_cid'] . '_dephead_col_links_form', $form);
+      //}
     }
     
     return $this->response('dephead_col_links', $form, 'form', '');
@@ -444,8 +446,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     
     // check if the current cid is department head
     if($this->lr->is_department_head[$this->data['user_cid']]){
-      $form = $this->lr->cache_get($this->data['user_cid'] . '_dephead_col_links');
-      if($this->data['cache'] or empty($form)){
+      //$form = $this->lr->cache_get($this->data['user_cid'] . '_dephead_col_links');
+      //if($this->data['cache'] or empty($form)){
         $form = array(
           'title' => '',
           'type' => 'ul',
@@ -484,8 +486,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
         unset($display_name);
         unset($employee);
         
-        $this->lr->cache_set($this->data['user_cid'] . '_dephead_col_links', $form);
-      }
+        //$this->lr->cache_set($this->data['user_cid'] . '_dephead_col_links', $form);
+      //}
     }
     
     if('form' == $this->data['type']){
@@ -519,8 +521,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
     $form = array();
     
     if($this->lr->is_department_head[$this->data['user_cid']]){
-      $form = $this->lr->cache_get($this->data['user_cid'] . '_' . $this->data['year'] . '_dephead_request_form');
-      if($this->data['cache'] or empty($form)){
+      //$form = $this->lr->cache_get($this->data['user_cid'] . '_' . $this->data['year'] . '_dephead_request_form');
+      //if($this->data['cache'] or empty($form)){
         $form['request_colleague_didh'] = array
         (
           'type' => 'fieldset',
@@ -529,8 +531,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
 
         $form['request_colleague_didh']['request_colleague_didh'] = $this->get_dephead_request();
         
-        $this->lr->cache_set($this->data['user_cid'] . '_' . $this->data['year'] . '_dephead_request_form', $form);
-      }
+        //$this->lr->cache_set($this->data['user_cid'] . '_' . $this->data['year'] . '_dephead_request_form', $form);
+      //}
     }   
     
     return $this->response('dephead_request', $form, 'form', 'department_head_request');
@@ -722,8 +724,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
   
   public function get_request_form(){
     
-    $form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_request_form');
-    if($this->data['cache'] or empty($form)){
+    //$form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_request_form');
+    //if($this->data['cache'] or empty($form)){
       $form['request'] = array
       (
         'type' => 'fieldset',
@@ -732,8 +734,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       
       $form['request']['request'] = $this->get_request();
       
-      $this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_request_form', $form);
-    }
+      //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_request_form', $form);
+    //}
     return $this->response('request', $form, 'form', 'request');
   }
   
@@ -906,8 +908,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
   }
   
   public function get_legend_form(){
-    $form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_legend_form');
-    if($this->data['cache'] or empty($form)){
+    //$form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_legend_form');
+    //if($this->data['cache'] or empty($form)){
       $form['legend'] = array
       (
         'type' => 'fieldset',
@@ -915,8 +917,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       );
 
       $form['legend']['legende'] = $this->get_legend();
-      $this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_legend_form', $form);
-    }
+      //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_legend_form', $form);
+    //}
     
     return $this->response('legend', $form, 'form', '');
   }
@@ -981,8 +983,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
   }
   
   public function get_credit_form(){
-    $form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_credit_form');
-    if($this->data['cache'] or empty($form)){
+    //$form = $this->lr->cache_get($this->data['cid'] . '_' . $this->data['year'] . '_credit_form');
+    //if($this->data['cache'] or empty($form)){
       $form['credit_year'] = array
       (
         'type' => 'fieldset',
@@ -990,8 +992,8 @@ class CRM_Leaveregistration_Page_LeaveRegistration extends CRM_Core_Page {
       );
 
       $form['credit_year']['credit_year'] = $this->get_credit();
-      $this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_credit_form', $form);
-    }
+      //$this->lr->cache_set($this->data['cid'] . '_' . $this->data['year'] . '_credit_form', $form);
+    //}
         
     return $this->response('credit', $form, 'form', '');
   }

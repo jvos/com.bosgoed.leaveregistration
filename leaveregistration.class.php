@@ -407,6 +407,8 @@ class leaveregistration {
       $cache['do'] = false;
     }
     
+    $cache['do'] = true;
+    
     $this->cache = $cache;
     
     if(!$this->cache_settings()){
@@ -420,12 +422,12 @@ class leaveregistration {
       return false;
     }
     
-    $relationship_types = $this->cache_get('relationship_types');
-    $custom_groups = $this->cache_get('custom_groups');    
-    $custom_fields = $this->cache_get('custom_fields');
-    $option_groups = $this->cache_get('option_groups');
+    //$relationship_types = $this->cache_get('relationship_types');
+    //$custom_groups = $this->cache_get('custom_groups');    
+    //$custom_fields = $this->cache_get('custom_fields');
+    //$option_groups = $this->cache_get('option_groups');
     
-    if(empty($relationship_types) or empty($custom_groups) or empty($custom_fields) or empty($option_groups)){
+    /*if(empty($relationship_types) or empty($custom_groups) or empty($custom_fields) or empty($option_groups)){
       $this->cache['do'] = true;
       
     }else {
@@ -433,9 +435,9 @@ class leaveregistration {
       $this->custom_groups = $custom_groups;
       $this->custom_fields = $custom_fields;
       $this->option_groups = $option_groups;
-    }
+    }*/
     
-    if($this->cache['do']){
+    //if($this->cache['do']){
       if(!$this->set_relationship_types()){
         $this->set_error( ts('An error occur in relationship types !'), ts('set_fields'));
         return false;
@@ -456,11 +458,11 @@ class leaveregistration {
         return false;
       }
             
-      $this->cache_set('relationship_types', $this->relationship_types);
-      $this->cache_set('custom_groups', $this->custom_groups);
-      $this->cache_set('custom_fields', $this->custom_fields);
-      $this->cache_set('option_groups', $this->option_groups);
-    }
+      //$this->cache_set('relationship_types', $this->relationship_types);
+      //$this->cache_set('custom_groups', $this->custom_groups);
+      //$this->cache_set('custom_fields', $this->custom_fields);
+      //$this->cache_set('option_groups', $this->option_groups);
+    //}
     
     /*echo('$this->relationship_types: <pre>');
     print_r($this->relationship_types);
@@ -804,9 +806,9 @@ class leaveregistration {
     }
             
     foreach($this->cids as $cid){ 
-      $this->employees[$cid] = $this->cache_get($cid . '_employees');
+      //$this->employees[$cid] = $this->cache_get($cid . '_employees');
       
-      if($this->cache['do'] or empty($this->employees[$cid])){
+      //if($this->cache['do'] or empty($this->employees[$cid])){
         $this->is_employee[$cid] = false;
 
         $params = array(
@@ -842,9 +844,9 @@ class leaveregistration {
 
         unset($contact);
         
-        $this->cache_set($cid . '_is_employee', $this->is_employee[$cid]);
-        $this->cache_set($cid . '_employees', $this->employees[$cid]);
-      }
+        //$this->cache_set($cid . '_is_employee', $this->is_employee[$cid]);
+        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
+      //}
     }
     
     // check
@@ -880,9 +882,9 @@ class leaveregistration {
     }
     
     foreach($this->cids as $cid){ 
-      $this->departments[$cid] = $this->cache_get($cid . '_departments');
+      //$this->departments[$cid] = $this->cache_get($cid . '_departments');
       
-      if($this->cache['do'] or empty($this->departments[$cid])){
+      //if($this->cache['do'] or empty($this->departments[$cid])){
         $this->departments[$cid] = array();
         $this->employees[$cid]['departments'] = array();
 
@@ -945,9 +947,9 @@ class leaveregistration {
         }
         unset($departments);
 
-        $this->cache_set($cid . '_departments', $this->departments[$cid]);
-        $this->cache_set($cid . '_employees', $this->employees[$cid]);
-      }
+        //$this->cache_set($cid . '_departments', $this->departments[$cid]);
+        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
+      //}
     }
     
     // check if the employees has a department
@@ -987,9 +989,9 @@ class leaveregistration {
     }
         
     foreach($this->departments as $cid => $departments){
-      $this->department_colleages_ids[$cid] = cache_get($cid . '_department_colleages_ids');
+      //$this->department_colleages_ids[$cid] = cache_get($cid . '_department_colleages_ids');
               
-      if($this->cache['do'] or empty($this->department_colleages_ids[$cid])){
+      //if($this->cache['do'] or empty($this->department_colleages_ids[$cid])){
         foreach($departments as $did => $department){
           $this->department_colleages_ids[$cid] = array();  
           $this->department_colleages_ids[$cid][$did] = array();  
@@ -1049,8 +1051,8 @@ class leaveregistration {
           }
           unset($colleages);
         }
-        $this->cache_set($cid . '_department_colleages_ids', $this->department_colleages_ids[$cid]);
-      }
+        //$this->cache_set($cid . '_department_colleages_ids', $this->department_colleages_ids[$cid]);
+      //}
     }
         
     if($this->isset_error()){
@@ -1082,9 +1084,9 @@ class leaveregistration {
     }
     
     foreach($this->departments as $cid => $departments){ 
-      $this->businesses[$cid] = cache_get($cid . '_businesses');
+      //$this->businesses[$cid] = cache_get($cid . '_businesses');
               
-      if($this->cache['do'] or empty($this->businesses[$cid])){
+      //if($this->cache['do'] or empty($this->businesses[$cid])){
       
         $this->businesses[$cid] = array();
         $this->employees[$cid]['businesses'] = array();
@@ -1154,10 +1156,10 @@ class leaveregistration {
           }
           unset($business);
         }
-        $this->cache_set($cid . '_businesses', $this->businesses[$cid]);
-        $this->cache_set($cid . '_departments', $this->departments[$cid]);
-        $this->cache_set($cid . '_employees', $this->employees[$cid]);
-      }
+        //$this->cache_set($cid . '_businesses', $this->businesses[$cid]);
+        //$this->cache_set($cid . '_departments', $this->departments[$cid]);
+        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
+      //}
     }
     
     // check if employee has a business
@@ -1198,9 +1200,9 @@ class leaveregistration {
     }
     
     foreach($this->businesses as $cid => $businesses){
-      $this->business_colleages_ids[$cid] = cache_get($cid . '_business_colleages_ids');
+      //$this->business_colleages_ids[$cid] = cache_get($cid . '_business_colleages_ids');
               
-      if($this->cache['do'] or empty($this->business_colleages_ids[$cid])){
+      //if($this->cache['do'] or empty($this->business_colleages_ids[$cid])){
         foreach($businesses as $bid => $business){
           $this->business_colleages_ids[$cid] = array();
           $this->business_colleages_ids[$cid][$bid] = array();
@@ -1289,8 +1291,8 @@ class leaveregistration {
           unset($departments);
         }
         
-        $this->cache_set($cid . '_business_colleages_ids', $this->business_colleages_ids[$cid]);
-      } 
+        //$this->cache_set($cid . '_business_colleages_ids', $this->business_colleages_ids[$cid]);
+      //} 
     }
       
     if($this->isset_error()){
@@ -1322,9 +1324,9 @@ class leaveregistration {
     }
     
     foreach($this->businesses as $cid => $businesses){ 
-      $this->main_businesses[$cid] = $this->cache_get($cid . '_main_businesses');
+      //$this->main_businesses[$cid] = $this->cache_get($cid . '_main_businesses');
       
-      if($this->cache['do'] or empty($this->main_businesses[$cid])){
+      //if($this->cache['do'] or empty($this->main_businesses[$cid])){
         $this->main_businesses[$cid] = array();
         $this->employees[$cid]['main_businesses'] = array();
 
@@ -1394,10 +1396,10 @@ class leaveregistration {
           }
           unset($main_business);
         }
-        $this->cache_set($cid . '_main_businesses', $this->main_businesses[$cid]);
-        $this->cache_set($cid . '_businesses', $this->businesses[$cid]);
-        $this->cache_set($cid . '_employees', $this->employees[$cid]);
-      }
+        //$this->cache_set($cid . '_main_businesses', $this->main_businesses[$cid]);
+        //$this->cache_set($cid . '_businesses', $this->businesses[$cid]);
+        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
+      //}
     }
     
     if($this->isset_error()){
@@ -1422,9 +1424,9 @@ class leaveregistration {
     }
     
     foreach($this->departments as $cid => $departments){
-      $this->department_heads[$cid] = $this->cache_get($cid . '_department_heads');
+      //$this->department_heads[$cid] = $this->cache_get($cid . '_department_heads');
       
-      if($this->cache['do'] or empty($this->department_heads[$cid])){
+      //if($this->cache['do'] or empty($this->department_heads[$cid])){
         $this->department_heads[$cid] = array();
         $this->employees[$cid]['department_heads'] = array();
 
@@ -1493,10 +1495,10 @@ class leaveregistration {
           }
           unset($department_heads);
         }
-        $this->cache_set($cid . '_department_heads', $this->department_heads[$cid]);
-        $this->cache_set($cid . '_departments', $this->departments[$cid]);
-        $this->cache_set($cid . '_employees', $this->employees[$cid]);
-      }
+        //$this->cache_set($cid . '_department_heads', $this->department_heads[$cid]);
+        //$this->cache_set($cid . '_departments', $this->departments[$cid]);
+        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
+      //}
     }
     
     // check if employee has a department head
@@ -1603,9 +1605,9 @@ class leaveregistration {
     
     // get all the departments where the employee is department head of
     foreach($this->cids as $cid){
-      $this->department_heads_colleages_ids[$cid] = $this->cache_get($cid . '_department_heads_colleages_ids');
+      //$this->department_heads_colleages_ids[$cid] = $this->cache_get($cid . '_department_heads_colleages_ids');
       
-      if($this->cache['do'] or empty($this->department_heads_colleages_ids[$cid])){
+      //if($this->cache['do'] or empty($this->department_heads_colleages_ids[$cid])){
         $this->is_department_head[$cid] = false;
 
         $params = array(
@@ -1708,9 +1710,9 @@ class leaveregistration {
         }
         unset($departments);
         
-        $this->cache_set($cid . '_department_heads_colleages_ids', $this->department_heads_colleages_ids[$cid]);
-        $this->cache_set($cid . '_is_department_head', $this->is_department_head[$cid]);
-      }
+        //$this->cache_set($cid . '_department_heads_colleages_ids', $this->department_heads_colleages_ids[$cid]);
+        //$this->cache_set($cid . '_is_department_head', $this->is_department_head[$cid]);
+      //}
     }
     
     // if $department_heads_colleages_ids is not empty check if all the departments have employees
@@ -1746,9 +1748,9 @@ class leaveregistration {
     
     // get all the business of where he is administration of
     foreach($this->cids as $cid){
-      $this->administration_colleages_ids[$cid] = $this->cache_get($cid . '_administration_colleages_ids');
+      //$this->administration_colleages_ids[$cid] = $this->cache_get($cid . '_administration_colleages_ids');
       
-      if($this->cache['do'] or empty($this->administration_colleages_ids[$cid])){
+      //if($this->cache['do'] or empty($this->administration_colleages_ids[$cid])){
         $this->is_administration[$cid] = false;
 
         $params = array(
@@ -1883,8 +1885,8 @@ class leaveregistration {
 
         unset($businesses);
         
-        $this->cache_set($cid . '_administration_colleages_ids', $this->administration_colleages_ids[$cid]);
-      }
+        //$this->cache_set($cid . '_administration_colleages_ids', $this->administration_colleages_ids[$cid]);
+      //}
     }
     
     // if $administration_colleages_ids is not empty check if all the business have employees
@@ -1976,16 +1978,16 @@ class leaveregistration {
       return false;
     }
     
-    foreach($this->cids as $cid){
+    /*foreach($this->cids as $cid){
       foreach($years as $year){
         $this->data[$year] = $this->cache_get($cid . '_data_' . $year);
         if(empty($this->data[$cid])){
           $this->cache['do'] = true;
         }
       }
-    }
+    }*/
         
-    if($this->cache['do']){
+    //if($this->cache['do']){
       if(empty($this->departments)){
         $this->set_error(ts('No departments !'), ts('set_data'));
       }
@@ -2062,13 +2064,13 @@ class leaveregistration {
         return false;
       }
       
-      foreach($this->cids as $cid){
+      /*foreach($this->cids as $cid){
         foreach($years as $year){
           $this->cache_set($cid . '_data_' . $year, $this->data[$year]);
         }
-      }
+      }*/
     
-    }
+    //}
     
     /*foreach($this->data as $cid => $years){
       echo('$cid: ' . $cid) . '<br/>' . PHP_EOL;
@@ -4986,7 +4988,7 @@ class leaveregistration {
   }
   
   public function cache_settings(){
-    $private = drupal_realpath('private://');
+    /*$private = drupal_realpath('private://');
     if(empty($private)){
       $this->set_error( ts('No private path in drupal file system !'), ts('Cache Settings'));
       return false;
@@ -4998,13 +5000,13 @@ class leaveregistration {
         $this->set_error( ts('Cannnot make dir (%1) !', array(1 => $this->cache['path'])), ts('cache_settings'));
         return false;
       }
-    }
+    }*/
     
     return true;
   }
   
   public function cache_set($key, $data){
-    $filename = $this->cache['path'] . $key . '.php';
+    /*$filename = $this->cache['path'] . $key . '.php';
         
     $content = "<?php" . PHP_EOL;
     $content .= "if(basename(__FILE__) == basename(\$_SERVER['PHP_SELF'])){return array();}" . PHP_EOL;
@@ -5020,7 +5022,7 @@ class leaveregistration {
       $this->set_error( ts('Cannnot wite to cache file (%1) !', array(1 => $filename)), ts('cache_set'));
       return false;
     }
-    fclose($handle);
+    fclose($handle);*/
     
     return true;
   }
@@ -5029,13 +5031,13 @@ class leaveregistration {
     $filename = $this->cache['path'] . $key . '.php';
     
     $data = array();
-    if (file_exists($filename)) {
+    /*if (file_exists($filename)) {
       //ob_start();
       $data = include ($filename);
       //ob_end_clean();
       //echo('cache_get $data: ' . $data);
       //$data = unserialize($data);
-    }
+    }*/
         
     return $data;
   }
