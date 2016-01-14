@@ -1285,10 +1285,7 @@ class leaveregistration {
       $where .= " OR civicrm_relationship.contact_id_b = '" . $bid . "'";
     }
         
-    $query .= substr($where, 3) . ")";
-        
-    echo('$query: ' . $query) . '<br/>' . PHP_EOL;
-    
+    $query .= substr($where, 3) . ")";  
     
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()){
