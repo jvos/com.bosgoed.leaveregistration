@@ -422,87 +422,53 @@ class leaveregistration {
       return false;
     }
     
-    //$relationship_types = $this->cache_get('relationship_types');
-    //$custom_groups = $this->cache_get('custom_groups');    
-    //$custom_fields = $this->cache_get('custom_fields');
-    //$option_groups = $this->cache_get('option_groups');
-    
-    /*if(empty($relationship_types) or empty($custom_groups) or empty($custom_fields) or empty($option_groups)){
-      $this->cache['do'] = true;
-      
-    }else {
-      $this->relationship_types = $relationship_types;
-      $this->custom_groups = $custom_groups;
-      $this->custom_fields = $custom_fields;
-      $this->option_groups = $option_groups;
-    }*/
-    
-    //if($this->cache['do']){
-      if(!$this->set_relationship_types()){
-        $this->set_error( ts('An error occur in relationship types !'), ts('set_fields'));
-        return false;
-      }
-      
-      if(!$this->set_custom_groups()){
-        $this->set_error( ts('An error occur in custom groups !'), ts('set_fields'));
-        return false;
-      }
-            
-      if(!$this->set_custom_fields()){
-        $this->set_error( ts('An error occur in custom fields !'), ts('set_fields'));
-        return false;
-      }
-      
-      if(!$this->set_option_groups()){
-        $this->set_error( ts('An error occur in options groups !'), ts('set_fields'));
-        return false;
-      }
-            
-      //$this->cache_set('relationship_types', $this->relationship_types);
-      //$this->cache_set('custom_groups', $this->custom_groups);
-      //$this->cache_set('custom_fields', $this->custom_fields);
-      //$this->cache_set('option_groups', $this->option_groups);
-    //}
-    
-    /*echo('$this->relationship_types: <pre>');
-    print_r($this->relationship_types);
-    echo('</pre>');
-    echo('$this->custom_groups: <pre>');
-    print_r($this->custom_groups);
-    echo('</pre>');
-    echo('$this->custom_fields: <pre>');
-    print_r($this->custom_fields);
-    echo('</pre>');
-    echo('$this->option_groups: <pre>');
-    print_r($this->option_groups);
-    echo('</pre>');*/
+    if(!$this->set_relationship_types()){
+      $this->set_error( ts('An error occur in relationship types !'), ts('set_fields'));
+      return false;
+    }
+
+    if(!$this->set_custom_groups()){
+      $this->set_error( ts('An error occur in custom groups !'), ts('set_fields'));
+      return false;
+    }
+
+    if(!$this->set_custom_fields()){
+      $this->set_error( ts('An error occur in custom fields !'), ts('set_fields'));
+      return false;
+    }
+
+    if(!$this->set_option_groups()){
+      $this->set_error( ts('An error occur in options groups !'), ts('set_fields'));
+      return false;
+    }
   }
     
   /*
    * Get all the relationship type ids
    */
-  private function set_relationship_types(){
+  private function set_relationship_types(){        
+    $query = "SELECT id, name_a_b FROM `civicrm_relationship_type`";
+    $query .= " WHERE";
+    
+    $where = "";
     foreach($this->relationship_types as $relationship => $relationship_type){
-      $params = array(
-        'version' => 3,
-        'sequential' => 1,
-        'return'=> 'id',
-        'name_a_b' => $relationship_type['name_a_b'],
-        'contact_type_a' => $relationship_type['contact_type_a'],
-        'contact_type_b' => $relationship_type['contact_type_b'],
-      );
+      $where .= " OR name_a_b = '" . $relationship_type['name_a_b'] . "'";
+    }
+        
+    $query .= substr($where, 3);
             
-      $result = civicrm_api('RelationshipType', 'getsingle', $params); 
-      unset($params);     
-      
-      if(isset($result['is_error']) and $result['is_error']){
-        $this->set_error( ts('Error result RelationshipType getvalue, from relationship type with the name ') . $relationship_type['name_a_b'] . ts(' ! Error message: ') . $result['error_message'], ts('Relationship type'));
-      }else {
-        $this->relationship_types[$relationship]['id'] = $result['id'];
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      foreach($this->relationship_types as $relationship => $relationship_type){
+        if($relationship_type['name_a_b'] == $dao->name_a_b){
+          $this->relationship_types[$relationship]['id'] = $dao->id;
+        }
       }
     }
     
-    unset($result); 
+    unset($query);
+    unset($where);
+    unset($dao);
     
     // check if every relationship type has a id
     foreach($this->relationship_types as $relationship => $relationship_type){
@@ -539,6 +505,10 @@ class leaveregistration {
         }
       }
     }
+    
+    unset($query);
+    unset($where);
+    unset($dao);
     
     // check
     foreach($this->custom_groups as $id => $custom_group){
@@ -581,6 +551,10 @@ class leaveregistration {
       $this->custom_fields[$dao->name]['option_group_id'] = $dao->option_group_id;
     }
         
+    unset($query);
+    unset($where);
+    unset($dao);
+    
     // check
     foreach($this->custom_fields as $id => $custom_field){
       // column name
@@ -622,6 +596,10 @@ class leaveregistration {
       $options[$dao->name][$dao->value] = $dao->label;
     }
     
+    unset($query);
+    unset($where);
+    unset($dao);
+    
     foreach($this->option_groups as $key => $option_group){
       if(isset($options[$option_group['name']]) and !empty($options[$option_group['name']])){
         $this->option_groups[$key]['options'] = $options[$option_group['name']];
@@ -633,6 +611,8 @@ class leaveregistration {
         $this->set_error( ts('the option group with name ') . $option_group['title_en_US'] . ts(' has no options !'), ts('Options groups'));
       }
     }
+    
+    unset($query);
         
     if($this->isset_error()){
       return false;
@@ -718,7 +698,7 @@ class leaveregistration {
       $this->set_error( ts('An error occur in departments !'), ts('set_contacts'));
       return false;
     }
-
+    
     if(!$this->set_department_colleages_ids()){
       $this->set_error( ts('An error occur in departments colleages ids !'), ts('set_contacts'));
       return false;
@@ -763,35 +743,7 @@ class leaveregistration {
       $this->set_error( ts('An error occur in settings !'), ts('set_contacts'));
       return false;
     }
-    
-    /*echo('$this->employees: <pre>');
-    print_r($this->employees);
-    echo('</pre>');
-    echo('$this->departments: <pre>');
-    print_r($this->departments);
-    echo('</pre>');
-    echo('$this->businesses: <pre>');
-    print_r($this->businesses);
-    echo('</pre>');
-    echo('$this->business_colleages_ids: <pre>');
-    print_r($this->business_colleages_ids);
-    echo('</pre>');
-    echo('$this->main_businesses: <pre>');
-    print_r($this->main_businesses);
-    echo('</pre>');
-    echo('$this->department_heads: <pre>');
-    print_r($this->department_heads);
-    echo('</pre>');
-    echo('$this->administrations: <pre>');
-    print_r($this->administrations);
-    echo('</pre>');
-    echo('$this->department_heads_colleages_ids: <pre>');
-    print_r($this->department_heads_colleages_ids);
-    echo('</pre>');
-    echo('$this->settings: <pre>');
-    print_r($this->settings);
-    echo('</pre>');*/
-    
+        
     return true;
   }
   
@@ -804,50 +756,33 @@ class leaveregistration {
       $this->set_error(ts('No contact ids !'), ts('set_employees'));
       return false;
     }
-            
-    foreach($this->cids as $cid){ 
-      //$this->employees[$cid] = $this->cache_get($cid . '_employees');
-      
-      //if($this->cache['do'] or empty($this->employees[$cid])){
-        $this->is_employee[$cid] = false;
-
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'id' => $cid,
-        );
-        $contact = civicrm_api('Contact', 'getsingle', $params);
-        unset($params);
-
-        // count
-        if(isset($contact['count']) and 0 == $contact['count']){
-          $this->set_error(ts('Employee with contact id: ') . $cid . (' does not exists !'), ts('set_employees'));
-          unset($contact);
-          continue;
-        }
-
-        // error
-        if(isset($contact['is_error']) and $contact['is_error']){
-          $this->set_error(ts('Error result Contact getsingle employee ! Error message: ') . $administrations['error_message'], ts('set_employees'));
-          unset($contact);
-          continue;
-        }
-
-        $this->is_employee[$cid] = true;
-
-        $this->employees[$cid] = array();
-        $this->employees[$cid]['id'] = $cid;
-        $this->employees[$cid]['contact_type'] = $contact['contact_type'];
-        $this->employees[$cid]['contact_sub_type'] = $contact['contact_sub_type'];
-        $this->employees[$cid]['display_name'] = $contact['display_name'];
-        $this->employees[$cid]['email'] = $contact['email'];
-
-        unset($contact);
         
-        //$this->cache_set($cid . '_is_employee', $this->is_employee[$cid]);
-        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
-      //}
+    $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email FROM `civicrm_contact`";
+    $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
+    $query .= " WHERE";
+    
+    $where = "";
+    foreach($this->cids as $cid){ 
+      $where .= " OR civicrm_contact.id = '" . $cid . "'";
     }
+        
+    $query .= substr($where, 3);
+            
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      $this->is_employee[$dao->id] = true;
+      
+      $this->employees[$dao->id] = array();
+      $this->employees[$dao->id]['id'] = $dao->id;
+      $this->employees[$dao->id]['contact_type'] = $dao->contact_type;
+      $this->employees[$dao->id]['contact_sub_type'] = $dao->contact_sub_type;
+      $this->employees[$dao->id]['display_name'] = $dao->display_name;
+      $this->employees[$dao->id]['email'] = $dao->email;
+    }
+    
+    unset($query);
+    unset($where);
+    unset($dao);
     
     // check
     foreach($this->employees as $cid => $employee){
@@ -863,6 +798,8 @@ class leaveregistration {
         $this->set_error(ts('Employee has no email !'), ts('set_employees'));
       }
     }
+    
+    unset($employee);
             
     if($this->isset_error()){
       return false;
@@ -880,80 +817,38 @@ class leaveregistration {
       $this->set_error(ts('No contact ids !'), ts('set_departments'));
       return false;
     }
+        
+    $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email, civicrm_relationship.contact_id_a, civicrm_relationship.contact_id_b";
+    $query .= " FROM `civicrm_contact`";
+    $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
+    $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
+    $query .= " WHERE";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND (";
     
+    $where = "";
     foreach($this->cids as $cid){ 
-      //$this->departments[$cid] = $this->cache_get($cid . '_departments');
-      
-      //if($this->cache['do'] or empty($this->departments[$cid])){
-        $this->departments[$cid] = array();
-        $this->employees[$cid]['departments'] = array();
+      $where .= " OR civicrm_relationship.contact_id_a = '" . $cid . "'";
+    }
+        
+    $query .= substr($where, 3) . ")";
+            
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      $this->departments[$dao->contact_id_a][$dao->contact_id_b] = array();
+      $this->departments[$dao->contact_id_a][$dao->contact_id_b]['id'] = $dao->contact_id_b;
+      $this->departments[$dao->contact_id_a][$dao->contact_id_b]['contact_type'] = $dao->contact_type;
+      $this->departments[$dao->contact_id_a][$dao->contact_id_b]['contact_sub_type'] = $dao->contact_sub_type;
+      $this->departments[$dao->contact_id_a][$dao->contact_id_b]['display_name'] = $dao->display_name;
+      $this->departments[$dao->contact_id_a][$dao->contact_id_b]['email'] = $dao->email;
 
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-          'contact_id_a' => $cid,
-        );
-        $departments = civicrm_api('Relationship', 'get', $params);
-        unset($params);
-
-        // count
-        if(isset($departments['count']) and 0 == $departments['count']){
-          $this->set_error(ts('Employee with the name ') . $this->employees[$cid]['display_name'] . (' has no department !'), ts('set_departments'));
-          unset($departments);
-          continue;
-        }
-
-        // error
-        if(isset($departments['is_error']) and $departments['is_error']){
-          $this->set_eror(ts('Error result Relationship get departments ! Error message: ') . $departments['error_message'], ts('set_departments'));
-          unset($departments);
-          continue;
-        }
-
-        foreach($departments['values'] as $key => $department){
-          $params = array(
-            'version' => 3,
-            'sequential' => 1,
-            'id' => $department['contact_id_b'],
-          );
-          $contact = civicrm_api('Contact', 'getsingle', $params);
-          unset($params);
-
-          // count
-          if(isset($contact['count']) and 0 == $contact['count']){
-            $this->set_error(ts('Department with contact id ') . $department['contact_id_b'] . (' does not exists !'), ts('set_departments'));
-            unset($contact);
-            continue;
-          }
-
-          // error
-          if(isset($contact['is_error']) and $contact['is_error']){
-            $this->set_eror(ts('Error result Contact getsingle department ! Error message: ') . $contact['error_message'], ts('set_departments'));
-            unset($contact);
-            continue;
-          }
-
-          $this->departments[$cid][$department['contact_id_b']] = array();
-          $this->departments[$cid][$department['contact_id_b']]['id'] = $department['contact_id_b'];
-          $this->departments[$cid][$department['contact_id_b']]['contact_type'] = $contact['contact_type'];
-          $this->departments[$cid][$department['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
-          $this->departments[$cid][$department['contact_id_b']]['display_name'] = $contact['display_name'];
-          $this->departments[$cid][$department['contact_id_b']]['email'] = $contact['email'];
-
-          $this->employees[$cid]['departments'][$department['contact_id_b']] = $department['contact_id_b'];
-
-          unset($contact);
-        }
-        unset($departments);
-
-        //$this->cache_set($cid . '_departments', $this->departments[$cid]);
-        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
-      //}
+      $this->employees[$dao->contact_id_a]['departments'][$dao->contact_id_b] = $dao->contact_id_b;
     }
     
-    // check if the employees has a department
+    unset($query);
+    unset($where);
+    unset($dao);
     
+    // check if the employees has a department
     foreach($this->employees as $cid => $employee){
       if(!isset($this->departments[$cid]) or empty($this->departments[$cid])){
         $this->set_error( ts('Employee with name ') . $employee['display_name'] . (' has no department !'), ts('set_departments'));
@@ -967,6 +862,8 @@ class leaveregistration {
       }
     }
 
+    unset($employee);
+    
     if($this->isset_error()){
       return false;
     }else {
@@ -988,72 +885,44 @@ class leaveregistration {
       return false;
     }
         
+    $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email, civicrm_relationship.contact_id_a, civicrm_relationship.contact_id_b";
+    $query .= " FROM `civicrm_contact`";
+    $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
+    $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
+    $query .= " WHERE";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND"; 
+    $query .= " is_deleted = '0' AND (";
+    
+    $where = "";
     foreach($this->departments as $cid => $departments){
-      //$this->department_colleages_ids[$cid] = cache_get($cid . '_department_colleages_ids');
-              
-      //if($this->cache['do'] or empty($this->department_colleages_ids[$cid])){
-        foreach($departments as $did => $department){
-          $this->department_colleages_ids[$cid] = array();  
-          $this->department_colleages_ids[$cid][$did] = array();  
-          $this->department_colleages_ids[$cid][$did]['employees'] = array();  
-
-          $params = array(
-            'version' => 3,
-            'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-            'contact_id_b' => $did,
-          );
-          $colleages = civicrm_api('Relationship', 'get', $params);
-          unset($params);
-
-          if(isset($contact['count']) and 0 != $contact['count']){
-              // department can have zero employees
-              unset($colleages);
-              continue;
-          }
-
-          // error
-          if(isset($colleages['is_error']) and $colleages['is_error']){
-            $this->set_eror(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_department_colleages_ids'));
-            unset($colleages);
-            continue;
-          }
-
-          foreach($colleages['values'] as $key => $employee){
-            $params = array(
-              'version' => 3,
-              'sequential' => 1,
-              'id' => $employee['contact_id_a'],
-              'is_deleted' => 0,
-            );
-            $contact = civicrm_api('Contact', 'getsingle', $params);
-            unset($params);
-
-            // sometimes a contact does not exist
-            if(isset($contact['count']) and 0 == $contact['count']){
-              unset($contact);
-              continue;
-            }
-
-            // sometimes the contact does not exist in the contact table, so only set error if there is a error and not on zero count
-            if(isset($contact['is_error']) and $contact['is_error']){  
-              $this->set_error(ts('Error result contact getsingle contacts ! Error message: ') . $contact['error_message'], ts('set_department_colleages_ids'));
-              unset($contact);
-              continue;
-            }
-
-            $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']] = array();
-            $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
-            $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
-            $this->department_colleages_ids[$cid][$did]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
-
-            unset($contact);
-          }
-          unset($colleages);
-        }
-        //$this->cache_set($cid . '_department_colleages_ids', $this->department_colleages_ids[$cid]);
-      //}
+      foreach($departments as $did => $department){
+        $this->department_colleages_ids[$cid] = array();  
+        $this->department_colleages_ids[$cid][$did] = array();  
+        $this->department_colleages_ids[$cid][$did]['employees'] = array(); 
+          
+        $where .= " OR civicrm_relationship.contact_id_b = '" . $did . "'";
+      }
     }
+        
+    $query .= substr($where, 3) . ")";
+            
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      foreach($this->department_colleages_ids as $cid => $department){
+        foreach($department as $did => $employees){
+          if($dao->contact_id_b == $did){
+            $this->department_colleages_ids[$cid][$did]['employees'][$dao->contact_id_a] = array();
+            $this->department_colleages_ids[$cid][$did]['employees'][$dao->contact_id_a]['id'] = $dao->contact_id_a;
+            $this->department_colleages_ids[$cid][$did]['employees'][$dao->contact_id_a]['display_name'] = $dao->display_name;
+            $this->department_colleages_ids[$cid][$did]['employees'][$dao->contact_id_a]['email'] = $dao->email;
+          }
+        }
+      }
+    }  
+    
+    unset($query);
+    unset($where);
+    unset($dao);
         
     if($this->isset_error()){
       return false;
@@ -1083,84 +952,51 @@ class leaveregistration {
       return false;
     }
     
+    $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email, civicrm_relationship.contact_id_a, civicrm_relationship.contact_id_b";
+    $query .= " FROM `civicrm_contact`";
+    $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
+    $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
+    $query .= " WHERE";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_of']['id'] . "' AND"; 
+    $query .= " is_deleted = '0' AND (";
+    
+    $where = "";
     foreach($this->departments as $cid => $departments){ 
-      //$this->businesses[$cid] = cache_get($cid . '_businesses');
-              
-      //if($this->cache['do'] or empty($this->businesses[$cid])){
-      
-        $this->businesses[$cid] = array();
-        $this->employees[$cid]['businesses'] = array();
+      $this->businesses[$cid] = array();
+      $this->employees[$cid]['businesses'] = array();
 
-        foreach($departments as $did => $department){
-          $this->departments[$cid][$did]['businesses'] = array();
+      foreach($departments as $did => $department){
+        $this->departments[$cid][$did]['businesses'] = array();
 
-          $params = array(
-            'version' => 3,
-            'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['department_of']['id'],
-            'contact_id_a' => $did,
-          );
-          $business = civicrm_api('Relationship', 'get', $params);
-          unset($params);
-
-          // count
-          if(isset($business['count']) and 0 == $business['count']){
-            $this->set_error(ts('Department with name ') . $department['display_name'] . (' has no business !'), ts('set_businesses'));
-            unset($business);
-            continue;
-          }
-
-          // error
-          if(isset($business['is_error']) and $business['is_error']){
-            $this->set_eror(ts('Error result Relationship get business ! Error message: ') . $business['error_message'], ts('set_businesses'));
-            unset($business);
-            continue;
-          }
-
-          foreach($business['values'] as $key => $business){
-            $params = array(
-              'version' => 3,
-              'sequential' => 1,
-              'id' => $business['contact_id_b'],
-              'is_deleted' => 0,
-            );
-            $contact = civicrm_api('Contact', 'getsingle', $params);
-            unset($params);
-
-            // count
-            if(isset($contact['count']) and 0 == $contact['count']){
-              $this->set_error(ts('Business with contact id ') . $business['contact_id_b'] . (' does not exists !'), ts('set_businesses'));
-              unset($contact);
-              continue;
-            }
-
-            // error
-            if(isset($contact['is_error']) and $contact['is_error']){
-              $this->set_eror(ts('Error result Contact getsingle business ! Error message: ') . $contact['error_message'], ts('set_businesses'));
-              unset($contact);
-              continue;
-            }
-
-            $this->businesses[$cid][$business['contact_id_b']] = array();
-            $this->businesses[$cid][$business['contact_id_b']]['id'] = $business['contact_id_b'];
-            $this->businesses[$cid][$business['contact_id_b']]['contact_type'] = $contact['contact_type'];
-            $this->businesses[$cid][$business['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
-            $this->businesses[$cid][$business['contact_id_b']]['display_name'] = $contact['display_name'];
-            $this->businesses[$cid][$business['contact_id_b']]['email'] = $contact['email'];
-
-            $this->departments[$cid][$did]['businesses'][$business['contact_id_b']] = $business['contact_id_b'];
-
-            $this->employees[$cid]['businesses'][$business['contact_id_b']] =$business['contact_id_b'];
-
-            unset($contact);
-          }
-          unset($business);
-        }
-        //$this->cache_set($cid . '_businesses', $this->businesses[$cid]);
-        //$this->cache_set($cid . '_departments', $this->departments[$cid]);
-        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
-      //}
+        $where .= " OR civicrm_relationship.contact_id_a = '" . $did . "'";
+      }
     }
+        
+    $query .= substr($where, 3) . ")";
+            
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      foreach($this->departments as $cid => $departments){ 
+        foreach($departments as $did => $department){
+          if($dao->contact_id_a == $did){
+            $this->businesses[$cid][$dao->contact_id_b] = array();
+            $this->businesses[$cid][$dao->contact_id_b]['id'] = $dao->contact_id_b;
+            $this->businesses[$cid][$dao->contact_id_b]['contact_type'] = $dao->contact_type;
+            $this->businesses[$cid][$dao->contact_id_b]['contact_sub_type'] = $dao->contact_sub_type;
+            $this->businesses[$cid][$dao->contact_id_b]['display_name'] = $dao->display_name;
+            $this->businesses[$cid][$dao->contact_id_b]['email'] = $dao->email;
+
+            $this->departments[$cid][$did]['businesses'][$dao->contact_id_b] = $dao->contact_id_b;
+
+            $this->employees[$cid]['businesses'][$dao->contact_id_b] = $dao->contact_id_b;
+          }
+        }
+      }
+    }
+    
+    unset($query);
+    unset($where);
+    unset($dao);
     
     // check if employee has a business
     foreach($this->employees as $cid => $employee){
@@ -1168,6 +1004,8 @@ class leaveregistration {
         $this->set_error( ts('Employee with the name ') . $employee['display_name'] . ts(' has no business !'), ts('set_businesses'));
       }
     }
+    
+    unset($employee);
     
     // check if the departments has a business    
     foreach($this->departments as $cid => $departments){
@@ -1177,6 +1015,8 @@ class leaveregistration {
         }
       }
     }
+    
+    unset($departments);
     
     if($this->isset_error()){
       return false;
@@ -1199,101 +1039,55 @@ class leaveregistration {
       return false;
     }
     
+    $query = "SELECT 
+      contact.id, contact.contact_type, contact.display_name, contact_emial.email,
+      business.contact_id_b AS business_id
+
+
+      FROM `civicrm_contact` AS contact
+
+      LEFT JOIN civicrm_email AS contact_emial ON contact_emial.contact_id = contact.id 
+      LEFT JOIN civicrm_relationship AS contact_relationship ON contact_relationship.contact_id_a = contact.id 
+		
+      INNER JOIN civicrm_relationship AS business ON business.contact_id_a = contact_relationship.contact_id_b
+
+      WHERE 
+      contact_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND 
+      contact_relationship.is_active = '1' AND
+
+      business.relationship_type_id = '" . $this->relationship_types['department_of']['id'] . "' AND
+      business.is_active = '1' AND (
+      ";
+
+    $where = "";
     foreach($this->businesses as $cid => $businesses){
-      //$this->business_colleages_ids[$cid] = cache_get($cid . '_business_colleages_ids');
-              
-      //if($this->cache['do'] or empty($this->business_colleages_ids[$cid])){
-        foreach($businesses as $bid => $business){
-          $this->business_colleages_ids[$cid] = array();
-          $this->business_colleages_ids[$cid][$bid] = array();
-          $this->business_colleages_ids[$cid][$bid]['employees'] = array();
-
-          $params = array(
-            'version' => 3,
-            'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['department_of']['id'],
-            'contact_id_b' => $bid,
-          );
-
-          $departments = civicrm_api('Relationship', 'get', $params);
-          unset($params);
-
-          // count
-          if(isset($departments['count']) and 0 == $departments['count']){
-            // business can have zero departments
-            unset($departments);
-            continue;
-          }
-
-          // error
-          if(isset($departments['is_error']) and $departments['is_error']){
-            $this->set_error(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_business_colleages_ids'));
-            unset($departments);
-            continue;
-          }
-
-          foreach($departments['values'] as $key => $department){     
-
-            $params = array(
-              'version' => 3,
-              'sequential' => 1,
-              'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-              'contact_id_b' => $department['contact_id_a'],
-            );
-            $colleages = civicrm_api('Relationship', 'get', $params);
-            unset($params);
-
-            // count
-            if(isset($colleages['count']) and 0 == $colleages['count']){
-              // department can have zero employees
-              unset($colleages);
-              continue;
-            }
-
-            // error
-            if(isset($colleages['is_error']) and $colleages['is_error']){
-              $this->set_error(ts('Error result relationship get department colleages ! Error message: ') . $administrations['error_message'], ts('set_business_colleages_ids'));
-              unset($colleages);
-              continue;
-            }
-
-            foreach($colleages['values'] as $key => $employee){
-              $params = array(
-                'version' => 3,
-                'sequential' => 1,
-                'id' => $employee['contact_id_a'],
-                'is_deleted' => 0,
-              );
-              $contact = civicrm_api('Contact', 'getsingle', $params);
-
-              unset($params);
-
-              // somnethimes a contact does not exist
-              if(isset($contact['count']) and 0 == $contact['count']){
-                unset($contact);
-                continue;
-              }
-
-              // error
-              if(isset($contact['is_error']) and $contact['is_error']){
-                $this->set_error(ts('Error result contact getsingle contacts ! Error message: ') . $contact['error_message'], ts('set_business_colleages_ids'));
-                unset($contact);
-                continue;
-              }
-
-              $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']] = array();
-              $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
-              $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
-              $this->business_colleages_ids[$cid][$bid]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];      
-            }
-            unset($colleages);
-          }
-          unset($departments);
-        }
-        
-        //$this->cache_set($cid . '_business_colleages_ids', $this->business_colleages_ids[$cid]);
-      //} 
+      foreach($businesses as $bid => $business){
+        $this->business_colleages_ids[$cid] = array();
+        $this->business_colleages_ids[$cid][$bid] = array();
+        $this->business_colleages_ids[$cid][$bid]['employees'] = array();
+        $where .= " OR business.contact_id_b = '" . $bid . "'";
+      }
     }
+
+    $query .= substr($where, 3) . ")";
+    
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      foreach($this->businesses as $cid => $businesses){
+        foreach($businesses as $bid => $business){
+          if($dao->business_id == $bid){
+            $this->business_colleages_ids[$cid][$dao->business_id]['employees'][$dao->id] = array();
+            $this->business_colleages_ids[$cid][$dao->business_id]['employees'][$dao->id]['id'] = $dao->id;
+            $this->business_colleages_ids[$cid][$dao->business_id]['employees'][$dao->id]['display_name'] = $dao->display_name;
+            $this->business_colleages_ids[$cid][$dao->business_id]['employees'][$dao->id]['email'] = $dao->email; 
+          }
+        }
+      }
+    }
+    
+    unset($query);
+    unset($where);
+    unset($dao);
       
     if($this->isset_error()){
       return false;
@@ -1322,85 +1116,54 @@ class leaveregistration {
       $this->set_error(ts('No businesses !'), ts('set_main_businesses'));
       return false;
     }
+        
+    $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email, civicrm_relationship.contact_id_a, civicrm_relationship.contact_id_b";
+    $query .= " FROM `civicrm_contact`";
+    $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
+    $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
+    $query .= " WHERE";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['main_organization']['id'] . "' AND"; 
+    $query .= " is_deleted = '0' AND (";
     
+    $where = "";
     foreach($this->businesses as $cid => $businesses){ 
-      //$this->main_businesses[$cid] = $this->cache_get($cid . '_main_businesses');
-      
-      //if($this->cache['do'] or empty($this->main_businesses[$cid])){
-        $this->main_businesses[$cid] = array();
-        $this->employees[$cid]['main_businesses'] = array();
 
+      $this->main_businesses[$cid] = array();
+      $this->employees[$cid]['main_businesses'] = array();
 
-        foreach($businesses as $bid => $business){
-          $this->businesses[$cid][$bid]['main_businesses'] = array();
-
-          $params = array(
-            'version' => 3,
-            'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['main_organization']['id'],
-            'contact_id_a' => $bid,
-          );
-          $main_business = civicrm_api('Relationship', 'get', $params);
-          unset($params);
-
-          // count
-          if(isset($main_business['count']) and 0 == $main_business['count']){
-            //$this->set_error(ts('Business with name ') . $business['display_name'] . (' has no main business !'), ts('set_main_businesses'));
-            unset($main_business);
-            continue; 
-          }
-
-          // error
-          if(isset($main_business['is_error']) and $main_business['is_error']){
-            $this->set_eror(ts('Error result Relationship get main business ! Error message: ') . $main_business['error_message'], ts('set_main_businesses'));
-            unset($main_business);
-            continue;
-          }
-
-          foreach($main_business['values'] as $key => $main_business){
-            $params = array(
-              'version' => 3,
-              'sequential' => 1,
-              'id' => $main_business['contact_id_b'],
-              'is_deleted' => 0,
-            );
-            $contact = civicrm_api('Contact', 'getsingle', $params);
-            unset($params);
-
-            // sometimes a contact does not exist, but the relationship does
-            if(isset($contact['count']) and 0 == $contact['count']){
-              //$this->set_error(ts('Main business with contact id ') . $main_business['contact_id_b'] . (' does not exists !'), ts('set_main_businesses'));
-              unset($contact);
-              continue;
-            }
-
-            // error
-            if(isset($contact['is_error']) and $contact['is_error']){
-              $this->set_eror(ts('Error result Contact getsingle main business ! Error message: ') . $contact['error_message'], ts('set_main_businesses'));
-              unset($contact);
-              continue;
-            }
-
-            $this->main_businesses[$cid][$main_business['contact_id_b']] = array();
-            $this->main_businesses[$cid][$main_business['contact_id_b']]['id'] = $main_business['contact_id_b'];
-            $this->main_businesses[$cid][$main_business['contact_id_b']]['contact_type'] = $business['contact_type'];
-            $this->main_businesses[$cid][$main_business['contact_id_b']]['contact_sub_type'] = $business['contact_sub_type'];
-            $this->main_businesses[$cid][$main_business['contact_id_b']]['display_name'] = $business['display_name'];
-            $this->main_businesses[$cid][$main_business['contact_id_b']]['email'] = $business['email'];
-
-            $this->businesses[$cid][$bid]['main_businesses'][$main_business['contact_id_b']] = $main_business['contact_id_b'];
-
-            $this->employees[$cid]['main_businesses'][$main_business['contact_id_b']] = $main_business['contact_id_b'];
-
-            unset($contact);
-          }
-          unset($main_business);
-        }
-        //$this->cache_set($cid . '_main_businesses', $this->main_businesses[$cid]);
-        //$this->cache_set($cid . '_businesses', $this->businesses[$cid]);
-        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
-      //}
+      foreach($businesses as $bid => $business){
+        $this->businesses[$cid][$bid]['main_businesses'] = array();
+        
+        $where .= " OR civicrm_relationship.contact_id_a = '" . $bid . "'";
+      }
     }
+        
+    $query .= substr($where, 3) . ")";
+        
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      
+      foreach($this->businesses as $cid => $businesses){ 
+        foreach($businesses as $bid => $business){
+          if($dao->contact_id_a == $bid){
+            $this->main_businesses[$cid][$dao->contact_id_b] = array();
+            $this->main_businesses[$cid][$dao->contact_id_b]['id'] = $dao->contact_id_b;
+            $this->main_businesses[$cid][$dao->contact_id_b]['contact_type'] = $dao->contact_type;
+            $this->main_businesses[$cid][$dao->contact_id_b]['contact_sub_type'] = $dao->contact_sub_type;
+            $this->main_businesses[$cid][$dao->contact_id_b]['display_name'] = $dao->display_name;
+            $this->main_businesses[$cid][$dao->contact_id_b]['email'] = $dao->email;
+
+            $this->businesses[$cid][$dao->contact_id_a]['main_businesses'][$dao->contact_id_b] = $dao->contact_id_b;
+
+            $this->employees[$cid]['main_businesses'][$dao->contact_id_b] = $dao->contact_id_b;
+          }
+        }
+      }
+    }
+    
+    unset($query);
+    unset($where);
+    unset($dao);
     
     if($this->isset_error()){
       return false;
@@ -1422,84 +1185,51 @@ class leaveregistration {
       $this->set_error(ts('No departments !'), ts('set_department_head'));
       return false;
     }
+        
+    $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email, civicrm_relationship.contact_id_a, civicrm_relationship.contact_id_b";
+    $query .= " FROM `civicrm_contact`";
+    $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
+    $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
+    $query .= " WHERE";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_head']['id'] . "' AND"; 
+    $query .= " is_deleted = '0' AND (";
     
+    $where = "";
     foreach($this->departments as $cid => $departments){
-      //$this->department_heads[$cid] = $this->cache_get($cid . '_department_heads');
-      
-      //if($this->cache['do'] or empty($this->department_heads[$cid])){
-        $this->department_heads[$cid] = array();
-        $this->employees[$cid]['department_heads'] = array();
+      $this->department_heads[$cid] = array();
+      $this->employees[$cid]['department_heads'] = array();
 
-        foreach($departments as $did => $department){
-          $this->departments[$cid][$did]['department_heads'] = array();
-
-          $params = array(
-            'version' => 3,
-            'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['department_head']['id'],
-            'contact_id_a' => $did,
-          );
-          $department_heads = civicrm_api('Relationship', 'get', $params);
-          unset($params);
-
-          // count
-          if(isset($department_heads['count']) and 0 == $department_heads['count']){
-            $this->set_error(ts('Department with name ') . $department['display_name'] . (' has no department head !'), ts('set_department_head'));
-            unset($department_heads);
-            continue;
-          }
-
-          // error
-          if(isset($department_heads['is_error']) and $department_heads['is_error']){
-            $this->set_eror(ts('Error result Relationship get business ! Error message: ') . $department_heads['error_message'], ts('set_department_head'));
-            unset($department_heads);
-            continue;
-          }
-
-          foreach($department_heads['values'] as $key => $department_head){
-            $params = array(
-              'version' => 3,
-              'sequential' => 1,
-              'id' => $department_head['contact_id_b'],
-              'is_deleted' => 0,
-            );
-            $contact = civicrm_api('Contact', 'getsingle', $params);
-            unset($params);
-
-            // sometimes a contact does not exist but the ralationship does
-            if(isset($contact['count']) and 0 == $contact['count']){
-              //$this->set_error(ts('Department head with contact id ') . $department_head['contact_id_b'] . (' does not exists !'), ts('set_department_head'));
-              unset($contact);
-              continue;
-            }
-
-            // error
-            if(isset($contact['is_error']) and $contact['is_error']){
-              $this->set_eror(ts('Error result Contact getsingle department head ! Error message: ') . $contact['error_message'], ts('set_department_head'));
-              unset($contact);
-              continue;
-            }
-
-            $this->department_heads[$cid][$department_head['contact_id_b']] = array();
-            $this->department_heads[$cid][$department_head['contact_id_b']]['id'] = $department_head['contact_id_b'];
-            $this->department_heads[$cid][$department_head['contact_id_b']]['contact_type'] = $contact['contact_type'];
-            $this->department_heads[$cid][$department_head['contact_id_b']]['contact_sub_type'] = $contact['contact_sub_type'];
-            $this->department_heads[$cid][$department_head['contact_id_b']]['display_name'] = $contact['display_name'];
-            $this->department_heads[$cid][$department_head['contact_id_b']]['email'] = $contact['email'];
-
-            $this->departments[$cid][$did]['department_heads'][$department_head['contact_id_b']] = $department_head['contact_id_b'];
-
-            $this->employees[$cid]['department_heads'][$department_head['contact_id_b']] = $department_head['contact_id_b'];
-
-            unset($contact);
-          }
-          unset($department_heads);
-        }
-        //$this->cache_set($cid . '_department_heads', $this->department_heads[$cid]);
-        //$this->cache_set($cid . '_departments', $this->departments[$cid]);
-        //$this->cache_set($cid . '_employees', $this->employees[$cid]);
-      //}
+      foreach($departments as $did => $department){
+        $this->departments[$cid][$did]['department_heads'] = array();
+        
+        $where .= " OR civicrm_relationship.contact_id_a = '" . $did . "'";
+      }
     }
+        
+    $query .= substr($where, 3) . ")";
+        
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      foreach($this->departments as $cid => $departments){
+        foreach($departments as $did => $department){
+          if($dao->contact_id_a == $did)
+          $this->department_heads[$cid][$dao->contact_id_b] = array();
+          $this->department_heads[$cid][$dao->contact_id_b]['id'] = $dao->contact_id_b;
+          $this->department_heads[$cid][$dao->contact_id_b]['contact_type'] = $contact['contact_type'];
+          $this->department_heads[$cid][$dao->contact_id_b]['contact_sub_type'] = $contact['contact_sub_type'];
+          $this->department_heads[$cid][$dao->contact_id_b]['display_name'] = $contact['display_name'];
+          $this->department_heads[$cid][$dao->contact_id_b]['email'] = $contact['email'];
+
+          $this->departments[$cid][$dao->contact_id_a]['department_heads'][$dao->contact_id_b] = $dao->contact_id_b;
+
+          $this->employees[$cid]['department_heads'][$dao->contact_id_b] = $dao->contact_id_b;
+        }
+      }
+    }
+    
+    unset($query);
+    unset($where);
+    unset($dao);
     
     // check if employee has a department head
     foreach($this->employees as $cid => $employee){
@@ -1507,6 +1237,8 @@ class leaveregistration {
         $this->set_error( ts('Employee with the name ') . $employee['display_name'] . ts(' has no departmen head !'), ts('set_department_head'));
       }
     }
+    
+    unset($employee);
     
     // check if the departments has a departmen head
     foreach($this->departments as $cid => $departments){
@@ -1516,6 +1248,8 @@ class leaveregistration {
         }
       }
     }
+    
+    unset($departments);
     
     if($this->isset_error()){
       return false;
@@ -1537,49 +1271,33 @@ class leaveregistration {
       return false;
     }
     
-    // loop throught all the businesses and get the administration employee
+    $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email, civicrm_relationship.contact_id_a, civicrm_relationship.contact_id_b";
+    $query .= " FROM `civicrm_contact`";
+    $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
+    $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
+    $query .= " WHERE";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['administration_of']['id'] . "' AND"; 
+    $query .= " is_active = '1' AND ";
+    $query .= " is_deleted = '0' AND (";
+    
+    $where = "";
     foreach($this->businesses as $bid => $business){
-      $params = array(
-        'version' => 3,
-        'sequential' => 1,
-        'relationship_type_id' => $this->relationship_types['administration_of']['id'],
-        'contact_id_b' => $bid,
-        'is_active' => 1,
-      );
-      $administrations = civicrm_api('Relationship', 'get', $params);
-      unset($params);
-         
-      // administraion does not have to exists
-      if(isset($administrations['count']) and 0 == $administrations['count']){
-        continue;
-      }
-      
-      // error
-      if(isset($administrations['is_error']) and $administrations['is_error']){
-        $this->set_error(ts('Error result relationship get administrations ! Error message: ') . $administrations['error_message'], ts('Administration'));
-        continue;
-      }
-      
-      foreach($administrations['values'] as $key => $administration){
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'id' => $administration['contact_id_a'],
-          'is_deleted' => 0,
-        );
-        $contact = civicrm_api('Contact', 'getsingle', $params);
-        
-        if(isset($contact['is_error']) and $contact['is_error']){
-          $this->set_error(ts('Error result contact getsingle contacts ! Error message: ') . $contact['error_message'], ts('Administration'));
-          
-        }else {
-          $this->administrations[$administration['contact_id_a']] = array();
-          $this->administrations[$administration['contact_id_a']]['id'] = $administration['contact_id_a'];
-          $this->administrations[$administration['contact_id_a']]['display_name'] = $contact['display_name'];
-          $this->administrations[$administration['contact_id_a']]['email'] = $contact['email'];
-        }        
-      }
+      $where .= " OR civicrm_relationship.contact_id_b = '" . $bid . "'";
     }
+        
+    $query .= substr($where, 3) . ")";
+        
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      $this->administrations[$dao->contact_id_a] = array();
+      $this->administrations[$dao->contact_id_a]['id'] = $dao->contact_id_a;
+      $this->administrations[$dao->contact_id_a]['display_name'] = $contact['display_name'];
+      $this->administrations[$dao->contact_id_a]['email'] = $contact['email'];
+    }
+    
+    unset($query);
+    unset($where);
+    unset($dao);
     
     if($this->isset_error()){
       return false;
@@ -1603,117 +1321,47 @@ class leaveregistration {
       return false;
     }
     
-    // get all the departments where the employee is department head of
+    $query = "SELECT 
+      contact.id, contact.contact_type, contact.display_name, contact_emial.email,
+      department_head.contact_id_b AS cid, department_head.contact_id_b AS department_id
+
+
+      FROM `civicrm_contact` AS contact
+
+      LEFT JOIN civicrm_email AS contact_emial ON contact_emial.contact_id = contact.id 
+      LEFT JOIN civicrm_relationship AS contact_relationship ON contact_relationship.contact_id_a = contact.id 
+		
+      INNER JOIN civicrm_relationship AS department_head ON department_head.contact_id_a = contact_relationship.contact_id_b
+
+      WHERE 
+      contact_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND 
+      contact_relationship.is_active = '1' AND
+
+      department_head.relationship_type_id = '" . $this->relationship_types['department_head']['id'] . "' AND
+      department_head.is_active = '1' AND (
+      ";
+
+    $where = "";
     foreach($this->cids as $cid){
-      //$this->department_heads_colleages_ids[$cid] = $this->cache_get($cid . '_department_heads_colleages_ids');
-      
-      //if($this->cache['do'] or empty($this->department_heads_colleages_ids[$cid])){
-        $this->is_department_head[$cid] = false;
-
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['department_head']['id'],
-          'contact_id_b' => $cid,
-          'is_active' => 1,
-        );
-        $departments = civicrm_api('Relationship', 'get', $params);
-        unset($params);
-
-        // no department
-        if(isset($departments['count']) and 0 == $departments['count']){
-          $this->is_department_head[$cid] = false;
-          unset($departments);
-          continue;
-        }
-
-        // error
-        if(isset($departments['is_error']) and $departments['is_error']){ 
-          $this->set_error(ts('Error result relationship get department of ! Error message: ') . $departments['error_message'], ts('set_department_heads_colleages_ids'));
-          $this->is_department_head[$cid] = false;
-          unset($departments);
-          continue;
-        }
-
-        $this->is_department_head[$cid] = true;
-        $this->department_heads_colleages_ids[$cid] = array();
-
-        // loop throught the departments (departments is contact_id_a), and get the employee ids
-        foreach ($departments['values'] as $key => $department){
-
-          // add the department to $department_heads_colleages_ids
-          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']] = array();
-          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['id'] = $department['contact_id_a'];
-          $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'] = array();
-
-          $params = array(
-            'version' => 3,
-            'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-            'contact_id_b' => $department['contact_id_a'],
-            'is_active' => 1,
-          );
-          $employees = civicrm_api('Relationship', 'get', $params);
-          unset($params);
-
-          // count
-          if(isset($employees['count']) and 0 == $employees['count']){
-            $this->set_error( ts('The department with name ') . $this->departments[$department['contact_id_a']]['display_name'] . ts(' has no employees !'), ts('set_department_heads_colleages_ids'));
-            // let the script run and let it generate multiple errors
-            unset($employees);
-            continue;
-          }
-
-          // error
-          if(isset($employees['is_error']) and $employees['is_error']){
-            $this->set_error(ts('Error result relationship get employee of ! Error message: ') . $employees['error_message'], ts('set_department_heads_colleages_ids'));
-            unset($employees);
-            continue;
-          }
-
-          // loop thought the employees and save the id in $department_heads_colleages_ids
-          foreach($employees['values'] as $key => $employee){   
-
-            // there are some relationships with contacts that not exists, so
-            // we have to check if the contact exists
-            $params = array(
-              'version' => 3,
-              'sequential' => 1,
-              'id' => $employee['contact_id_a'],
-              'contact_sub_type' => $this->contact_sub_types['employee']['contact_sub_type'],
-              'is_deleted' => 0,
-            );
-            $contact = civicrm_api('Contact', 'getsingle', $params);
-            unset($params);
-
-            // sometimes a contact does not exists, but the relationship does
-            if(isset($contact['count']) and 0 == $contact['count']){
-              // the employee does not exsist
-              unset($contact);
-              continue;
-            }
-
-            // error
-            if(isset($contact['is_error']) and $contact['is_error']){
-              $this->set_error(ts('Error result contact get ! Error message: ') . $contact['error_message'], ts('set_department_heads_colleages_ids'));
-              unset($contact);
-              continue;
-            }
-
-            $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']] = array();
-            $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
-            $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
-            $this->department_heads_colleages_ids[$cid][$department['contact_id_a']]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
-
-          }
-          unset($employees);
-        }
-        unset($departments);
-        
-        //$this->cache_set($cid . '_department_heads_colleages_ids', $this->department_heads_colleages_ids[$cid]);
-        //$this->cache_set($cid . '_is_department_head', $this->is_department_head[$cid]);
-      //}
+      $this->is_department_head[$cid] = false;
+      $where .= " OR department_head.contact_id_b = '" . $cid . "'";
     }
+
+    $query .= substr($where, 3) . ")";
+    
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){   
+      $this->is_department_head[$dao->cid] = true;
+      
+      $this->department_heads_colleages_ids[$dao->cid][$dao->department_id]['employees'][$dao->id] = array();
+      $this->department_heads_colleages_ids[$dao->cid][$dao->department_id]['employees'][$dao->id]['id'] = $dao->id;
+      $this->department_heads_colleages_ids[$dao->cid][$dao->department_id]['employees'][$dao->id]['display_name'] = $dao->display_name;
+      $this->department_heads_colleages_ids[$dao->cid][$dao->department_id]['employees'][$dao->id]['email'] = $dao->email;
+    }    
+    
+    unset($query);
+    unset($where);
+    unset($dao);    
     
     // if $department_heads_colleages_ids is not empty check if all the departments have employees
     foreach($this->department_heads_colleages_ids as $cid => $departments){
@@ -1723,6 +1371,9 @@ class leaveregistration {
         }
       }
     }
+    
+    unset($departments);
+    unset($department);
     
     if($this->isset_error()){
       return false;
@@ -1746,148 +1397,48 @@ class leaveregistration {
       return false;
     }
     
-    // get all the business of where he is administration of
+    $query = "SELECT 
+      contact.id, contact.contact_type, contact.display_name, contact_emial.email,
+      department.contact_id_a AS department_id, business.contact_id_b AS business_id, business.contact_id_a AS cid
+
+
+      FROM `civicrm_contact` AS contact
+
+      LEFT JOIN civicrm_email AS contact_emial ON contact_emial.contact_id = contact.id 
+      LEFT JOIN civicrm_relationship AS contact_relationship ON contact_relationship.contact_id_a = contact.id 
+
+      INNER JOIN civicrm_relationship AS department ON department.contact_id_a = contact_relationship.contact_id_b
+      INNER JOIN civicrm_relationship AS business ON business.contact_id_b = department.contact_id_b
+
+      WHERE 
+      contact_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND 
+      contact_relationship.is_active = '1' AND
+
+      department.relationship_type_id = '" . $this->relationship_types['department_of']['id'] . "' AND 
+      department.is_active = '1' AND 
+
+      business.relationship_type_id = '" . $this->relationship_types['administration_of']['id'] . "' AND
+      business.is_active = '1' AND (
+      ";
+
+    $where = "";
     foreach($this->cids as $cid){
-      //$this->administration_colleages_ids[$cid] = $this->cache_get($cid . '_administration_colleages_ids');
-      
-      //if($this->cache['do'] or empty($this->administration_colleages_ids[$cid])){
-        $this->is_administration[$cid] = false;
-
-        $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'relationship_type_id' => $this->relationship_types['administration_of']['id'],
-          'contact_id_a' => $cid,
-          'is_active' => 1,
-        );
-        $businesses = civicrm_api('Relationship', 'get', $params);
-        unset($params);
-
-        // if there is no result (count is zero), the employee is not a administration
-        if(isset($businesses['count']) and 0 == $businesses['count']){
-          $this->is_administration[$cid] = false;
-          unset($businesses);
-          continue;
-        }
-
-        // if there is a error (a error occure also if there is no business)
-        if(isset($businesses['is_error']) and $businesses['is_error']){
-          $this->set_error(ts('Error result relationship get business ! Error message: ') . $businesses['error_message'], ts('set_administration_colleages_ids'));
-          unset($businesses);
-          continue;
-        }
-
-        $this->is_administration[$cid] = true;
-        $this->administration_colleages_ids[$cid] = array();
-
-        // loop throught the businesses (business id is contact_id_b) and get all the departments
-        foreach($businesses['values'] as $key => $business){
-
-          // add the business to the $administration_colleages_ids
-          $this->administration_colleages_ids[$cid][$business['contact_id_b']] = array();
-          $this->administration_colleages_ids[$cid][$business['contact_id_b']]['id'] = $business['contact_id_b'];
-          $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'] = array();
-
-          // get all the departments
-          $params = array(
-            'version' => 3,
-            'sequential' => 1,
-            'relationship_type_id' => $this->relationship_types['department_of']['id'],
-            'contact_id_b' => $business['contact_id_b'],
-            'is_active' => 1,
-          );
-          $departments = civicrm_api('Relationship', 'get', $params);
-          unset($params);
-
-          // count 
-          if(isset($departments['count']) and 0 == $departments['count']){
-            $this->set_error( ts('The business with name ') . $this->businesses[$business['contact_id_b']]['display_name'] . ts(' has no departments !'), ts('set_administration_colleages_ids'));
-            unset($departments);
-            continue;
-          }
-
-          // error
-          if(isset($departments['is_error']) and $departments['is_error']){
-            $this->set_error(ts('Error result relationship get department of ! Error message: ') . $departments['error_message'], ts('set_administration_colleages_ids'));
-            unset($departments);
-            continue;
-          }
-
-          // loop through all the departments (department id is contact_id_a) and get all the employees
-          foreach ($departments['values'] as $key => $department){
-            $params = array(
-              'version' => 3,
-              'sequential' => 1,
-              'relationship_type_id' => $this->relationship_types['employee_of']['id'],
-              'contact_id_b' => $department['contact_id_a'],
-              'is_active' => 1,
-            );
-            $employees = civicrm_api('Relationship', 'get', $params);
-            unset($params);
-
-            // count
-            if(isset($employees['count']) and 0 == $employees['count']){
-              $this->set_error( ts('The department with name ') . $this->departments[$department['contact_id_a']]['display_name'] . ts(' has no employees !'), ts('set_administration_colleages_ids'));
-              // let the script run and let it generate multiple errors
-              unset($employees);
-              continue;
-            }
-
-            // error
-            if(isset($employees['is_error']) and $employees['is_error']){
-              $this->set_error(ts('Error result relationship get employee of ! Error message: ') . $employees['error_message'], ts('set_administration_colleages_ids'));
-              unset($employees);
-              continue;
-            }
-
-            // loop thought the employees and save the id in $administration_colleages_ids
-            foreach($employees['values'] as $key => $employee){   
-
-              // there are some relationships with contacts that not exists, so
-              // we have to check if the contact exists
-              $params = array(
-                'version' => 3,
-                'sequential' => 1,
-                'id' => $employee['contact_id_a'],
-                'contact_sub_type' => $this->contact_sub_types['employee']['contact_sub_type'],
-                'is_deleted' => 0,
-              );
-              $contact = civicrm_api('Contact', 'getsingle', $params);
-              unset($params);
-
-              // sometimes a contact does not exists, but the realtionship does
-              if(isset($contact['count']) and 0 == $contact['count']){
-                // the employee does not exsist
-                unset($contact);
-                continue;
-              }
-
-              // error
-              if(isset($contact['is_error']) and $contact['is_error']){
-                $this->set_error(ts('Error result contact get ! Error message: ') . $contact['error_message'], ts('set_administration_colleages_ids'));
-                unset($contact);
-                continue;
-              }
-
-              $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']] = array();
-              $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['id'] = $employee['contact_id_a'];
-              $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['display_name'] = $contact['display_name'];
-              $this->administration_colleages_ids[$cid][$business['contact_id_b']]['employees'][$employee['contact_id_a']]['email'] = $contact['email'];
-
-              unset($contact);
-            }
-
-            unset($employees);
-          }
-
-          unset($departments);
-        }
-
-        unset($businesses);
-        
-        //$this->cache_set($cid . '_administration_colleages_ids', $this->administration_colleages_ids[$cid]);
-      //}
+      $where .= " OR business.contact_id_a = '" . $cid . "'";
     }
+
+    $query .= substr($where, 3) . ")";
+    
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()){
+      $this->administration_colleages_ids[$dao->cid][$dao->business_id]['employees'][$dao->id] = array();
+      $this->administration_colleages_ids[$dao->cid][$dao->business_id]['employees'][$dao->id]['id'] = $dao->id;
+      $this->administration_colleages_ids[$dao->cid][$dao->business_id]['employees'][$dao->id]['display_name'] = $dao->display_name;
+      $this->administration_colleages_ids[$dao->cid][$dao->business_id]['employees'][$dao->id]['email'] = $dao->email;
+    }
+    
+    unset($query);
+    unset($where);
+    unset($dao);    
     
     // if $administration_colleages_ids is not empty check if all the business have employees
     foreach($this->administration_colleages_ids as $cid => $businessess){
@@ -1897,6 +1448,9 @@ class leaveregistration {
         }
       }
     }
+    
+    unset($businessess);
+    unset($business);
     
     if($this->isset_error()){
       return false;
@@ -1938,6 +1492,10 @@ class leaveregistration {
       $this->settings[$dao->entity_id]['show_department_head'] = $dao->{$this->custom_fields['leave_settings_show_department_head_to']['column_name']};
     }
     
+    unset($query);
+    unset($where);
+    unset($dao); 
+    
     // set to default if not exists
     foreach($this->cids as $cid){
       
@@ -1978,106 +1536,82 @@ class leaveregistration {
       return false;
     }
     
-    /*foreach($this->cids as $cid){
-      foreach($years as $year){
-        $this->data[$year] = $this->cache_get($cid . '_data_' . $year);
-        if(empty($this->data[$cid])){
-          $this->cache['do'] = true;
-        }
-      }
-    }*/
-        
-    //if($this->cache['do']){
-      if(empty($this->departments)){
-        $this->set_error(ts('No departments !'), ts('set_data'));
-      }
+    if(empty($this->departments)){
+      $this->set_error(ts('No departments !'), ts('set_data'));
+    }
 
-      if(empty($this->businesses)){
-        $this->set_error(ts('No business !'), ts('set_data'));
-      }
+    if(empty($this->businesses)){
+      $this->set_error(ts('No business !'), ts('set_data'));
+    }
 
-      if(empty($this->department_heads)){
-        $this->set_error(ts('No department heads !'), ts('set_data'));
-      }
+    if(empty($this->department_heads)){
+      $this->set_error(ts('No department heads !'), ts('set_data'));
+    }
 
-      if($this->isset_error()){
-        return false;
-      }
+    if($this->isset_error()){
+      return false;
+    }
 
-      $this->data = array();
-      foreach($this->cids as $cid){
-        $this->data[$cid] = array();
-      }
+    $this->data = array();
+    foreach($this->cids as $cid){
+      $this->data[$cid] = array();
+    }
 
-      if(!$this->set_years($years)){
-        $this->set_error( ts('An error occur in years !'), ts('set_data'));
-        return false;
-      }
+    if(!$this->set_years($years)){
+      $this->set_error( ts('An error occur in years !'), ts('set_data'));
+      return false;
+    }
 
-      if(!$this->set_months($months)){
-        $this->set_error( ts('An error occur in months !'), ts('set_data'));
-        return false;
-      }
+    if(!$this->set_months($months)){
+      $this->set_error( ts('An error occur in months !'), ts('set_data'));
+      return false;
+    }
 
-      if(!$this->set_days()){
-        $this->set_error( ts('An error occur in days !'), ts('set_data'));
-        return false;
-      }
+    if(!$this->set_days()){
+      $this->set_error( ts('An error occur in days !'), ts('set_data'));
+      return false;
+    }
 
-      if(!$this->set_holidays()){
-        $this->set_error( ts('An error occur in holidays !'), ts('set_data'));
-        return false;
-      }
+    if(!$this->set_holidays()){
+      $this->set_error( ts('An error occur in holidays !'), ts('set_data'));
+      return false;
+    }
 
-      if(!$this->set_general()){
-        $this->set_error( ts('An error occur in general !'), ts('set_data'));
-        return false;
-      }
+    if(!$this->set_general()){
+      $this->set_error( ts('An error occur in general !'), ts('set_data'));
+      return false;
+    }
 
-      if(!$this->set_overall_adjustments()){
-        $this->set_error( ts('An error occur in overall adjustments !'), ts('set_data'));
-        return false;
-      }
+    if(!$this->set_overall_adjustments()){
+      $this->set_error( ts('An error occur in overall adjustments !'), ts('set_data'));
+      return false;
+    }
 
-      if(!$this->set_overall_credit()){
-        $this->set_error( ts('An error occur in overall credits!'), ts('set_data'));
-        return false;
-      }
+    if(!$this->set_overall_credit()){
+      $this->set_error( ts('An error occur in overall credits!'), ts('set_data'));
+      return false;
+    }
 
-      if(!$this->set_adjustments()){
-        $this->set_error( ts('An error occur in adjustments !'), ts('set_data'));
-        return false;
-      }    
+    if(!$this->set_adjustments()){
+      $this->set_error( ts('An error occur in adjustments !'), ts('set_data'));
+      return false;
+    }    
 
-      if(!$this->set_credit()){
-        $this->set_error( ts('An error occur in credits !'), ts('set_data'));
-        return false;
-      }  
+    if(!$this->set_credit()){
+      $this->set_error( ts('An error occur in credits !'), ts('set_data'));
+      return false;
+    }  
 
-      if(!$this->set_request()){
-        $this->set_error( ts('An error occur in request !'), ts('set_data'));
-        return false;
-      }  
+    if(!$this->set_request()){
+      $this->set_error( ts('An error occur in request !'), ts('set_data'));
+      return false;
+    }  
 
-      if(!$this->set_total()){
-        $this->set_error( ts('An error occur in total !'), ts('set_data'));
-        return false;
-      }
-      
-      /*foreach($this->cids as $cid){
-        foreach($years as $year){
-          $this->cache_set($cid . '_data_' . $year, $this->data[$year]);
-        }
-      }*/
+    if(!$this->set_total()){
+      $this->set_error( ts('An error occur in total !'), ts('set_data'));
+      return false;
+    }
     
-    //}
-    
-    /*foreach($this->data as $cid => $years){
-      echo('$cid: ' . $cid) . '<br/>' . PHP_EOL;
-      foreach($years as $year => $months){
-        echo('$year: ' . $year) . '<br/>' . PHP_EOL;
-      }
-    }*/
     return true;
   }
       
@@ -2244,6 +1778,10 @@ class leaveregistration {
       );
     }
 
+    unset($query);
+    unset($where);
+    unset($dao);
+    
     if(empty($datas)){
       $this->set_error(ts('No data !'), ts('set_holidays'));
     }
@@ -2408,6 +1946,10 @@ class leaveregistration {
         'total' => $dao->{$this->custom_fields['leave_general_total_leave']['column_name']}
       );
     }
+    
+    unset($query);
+    unset($where);
+    unset($dao); 
     
     // check if empty
     if(empty($datas)){
@@ -2615,6 +2157,10 @@ class leaveregistration {
         '7' => $dao->{$this->custom_fields['leave_overall_adjustments_sunday']['column_name']}, // Sunday
       );
     }
+    
+    unset($query);
+    unset($where);
+    unset($dao); 
      
     // whe don have to check if empty or exists
     
@@ -2777,6 +2323,10 @@ class leaveregistration {
       );
     }
         
+    unset($query);
+    unset($where);
+    unset($dao);     
+    
     // whe don have to check if empty or exists
   
     $overall_credit = array();
@@ -2952,11 +2502,14 @@ class leaveregistration {
         'on' => $dao->{$this->custom_fields['leave_adjustments_on']['column_name']},
         'day_of_the_week' => $dao->{$this->custom_fields['leave_adjustments_day_of_the_week']['column_name']},
         'duration' => $dao->{$this->custom_fields['leave_adjustments_duration']['column_name']},
-      );
-      
-           
+      ); 
     }
-        
+    
+    unset($query);
+    unset($where);
+    unset($dao); 
+
+    // we do not check if datas is empty, a new year is always empty
     /*if(empty($datas)){
       $this->set_error(ts('No adjustments !'), ts('Adjustments'));
     }
@@ -3067,6 +2620,10 @@ class leaveregistration {
         'total_leave_over' => $dao->{$this->custom_fields['leave_credit_total_leave_per_year_over']['column_name']},
       );
     }
+    
+    unset($query);
+    unset($where);
+    unset($dao); 
     
     // whe don have to check if empty or exists
     
@@ -3303,6 +2860,10 @@ class leaveregistration {
         'duration' => $dao->{$this->custom_fields['leave_request_duration']['column_name']}
       );
     }
+    
+    unset($query);
+    unset($where);
+    unset($dao);     
     
     // this is removed, beacause if there is no request in that year there be also no datas    
     /*if(empty($datas)){
@@ -4315,6 +3876,10 @@ class leaveregistration {
       );
     }
     
+    unset($query);
+    unset($where);
+    unset($dao); 
+    
     return $data;
   }
   
@@ -4465,6 +4030,10 @@ class leaveregistration {
         'duration' => $dao->{$this->custom_fields['leave_request_duration']['column_name']}
       );
     }
+    
+    unset($query);
+    unset($where);
+    unset($dao); 
     
     /*
     // first mom_dad_day
@@ -4679,6 +4248,10 @@ class leaveregistration {
         'duration' => $dao->{$this->custom_fields['leave_request_duration']['column_name']}
       );
     }
+    
+    unset($query);
+    unset($where);
+    unset($dao); 
     
     return $data;
   }
