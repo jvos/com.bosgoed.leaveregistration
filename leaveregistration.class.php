@@ -1215,10 +1215,10 @@ class leaveregistration {
           if($dao->contact_id_a == $did)
           $this->department_heads[$cid][$dao->contact_id_b] = array();
           $this->department_heads[$cid][$dao->contact_id_b]['id'] = $dao->contact_id_b;
-          $this->department_heads[$cid][$dao->contact_id_b]['contact_type'] = $contact['contact_type'];
-          $this->department_heads[$cid][$dao->contact_id_b]['contact_sub_type'] = $contact['contact_sub_type'];
-          $this->department_heads[$cid][$dao->contact_id_b]['display_name'] = $contact['display_name'];
-          $this->department_heads[$cid][$dao->contact_id_b]['email'] = $contact['email'];
+          $this->department_heads[$cid][$dao->contact_id_b]['contact_type'] = $dao->contact_type;
+          $this->department_heads[$cid][$dao->contact_id_b]['contact_sub_type'] = $dao->contact_sub_type;
+          $this->department_heads[$cid][$dao->contact_id_b]['display_name'] = $dao->display_name;
+          $this->department_heads[$cid][$dao->contact_id_b]['email'] = $dao->email;
 
           $this->departments[$cid][$dao->contact_id_a]['department_heads'][$dao->contact_id_b] = $dao->contact_id_b;
 
@@ -1226,7 +1226,7 @@ class leaveregistration {
         }
       }
     }
-    
+        
     unset($query);
     unset($where);
     unset($dao);
@@ -1291,8 +1291,8 @@ class leaveregistration {
     while($dao->fetch()){
       $this->administrations[$dao->contact_id_a] = array();
       $this->administrations[$dao->contact_id_a]['id'] = $dao->contact_id_a;
-      $this->administrations[$dao->contact_id_a]['display_name'] = $contact['display_name'];
-      $this->administrations[$dao->contact_id_a]['email'] = $contact['email'];
+      $this->administrations[$dao->contact_id_a]['display_name'] = $dao->display_name;
+      $this->administrations[$dao->contact_id_a]['email'] = $dao->email;
     }
     
     unset($query);
