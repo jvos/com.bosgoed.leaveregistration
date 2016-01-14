@@ -823,7 +823,7 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND (";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND (";
     
     $where = "";
     foreach($this->cids as $cid){ 
@@ -890,7 +890,7 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND"; 
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
     $query .= " is_deleted = '0' AND (";
     
     $where = "";
@@ -957,7 +957,7 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_of']['id'] . "' AND"; 
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
     $query .= " is_deleted = '0' AND (";
     
     $where = "";
@@ -1122,7 +1122,7 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['main_organization']['id'] . "' AND"; 
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['main_organization']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
     $query .= " is_deleted = '0' AND (";
     
     $where = "";
@@ -1191,7 +1191,7 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_head']['id'] . "' AND"; 
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_head']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
     $query .= " is_deleted = '0' AND (";
     
     $where = "";
@@ -1277,7 +1277,7 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
     $query .= " WHERE";
     $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['administration_of']['id'] . "' AND"; 
-    $query .= " is_active = '1' AND ";
+    $query .= " civicrm_relationship.is_active = '1' AND ";
     $query .= " is_deleted = '0' AND (";
     
     $where = "";
