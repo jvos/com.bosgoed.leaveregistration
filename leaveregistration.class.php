@@ -1287,6 +1287,9 @@ class leaveregistration {
         
     $query .= substr($where, 3) . ")";
         
+    echo('$query: ' . $query) . '<br/>' . PHP_EOL;
+    
+    
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()){
       $this->administrations[$dao->contact_id_a] = array();
@@ -1423,6 +1426,7 @@ class leaveregistration {
 
     $where = "";
     foreach($this->cids as $cid){
+      $this->is_administration[$cid] = false;
       $where .= " OR business.contact_id_a = '" . $cid . "'";
     }
 
@@ -1430,6 +1434,8 @@ class leaveregistration {
     
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()){
+      $this->is_administration[$dao->cid] = true;
+      
       $this->administration_colleages_ids[$dao->cid][$dao->business_id]['employees'][$dao->id] = array();
       $this->administration_colleages_ids[$dao->cid][$dao->business_id]['employees'][$dao->id]['id'] = $dao->id;
       $this->administration_colleages_ids[$dao->cid][$dao->business_id]['employees'][$dao->id]['display_name'] = $dao->display_name;
