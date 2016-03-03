@@ -955,7 +955,7 @@ class leaveregistration {
     $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email, civicrm_relationship.contact_id_a, civicrm_relationship.contact_id_b";
     $query .= " FROM `civicrm_contact`";
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
-    $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
+    $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
     $query .= " WHERE";
     $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
     $query .= " is_deleted = '0' AND (";
@@ -973,7 +973,7 @@ class leaveregistration {
     }
         
     $query .= substr($where, 3) . ")";
-            
+        
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()){
       foreach($this->departments as $cid => $departments){ 
@@ -1699,7 +1699,7 @@ class leaveregistration {
     if($this->isset_error()){
       return false;
     }
-        
+    
     if(empty($this->data)){
       $this->set_error(ts('No data !'), ts('set_holidays'));
     }
@@ -1785,15 +1785,19 @@ class leaveregistration {
     unset($where);
     unset($dao);
     
-    if(empty($datas)){
+    // comment out, because if the request is not a whole year i get a error no data
+    /*if(empty($datas)){
       $this->set_error(ts('No data !'), ts('set_holidays'));
-    }
+    }*/
         
     if($this->isset_error()){
       unset($datas);
       return false;
     }
     
+    // I disabled the check, get a error if the request is only for one month
+    /*
+    // check
     foreach($this->employees as $cid => $employee){
       $mbid = 0;
       $bid = 0;
@@ -1839,7 +1843,7 @@ class leaveregistration {
       }
     }
     
-    unset($datas);
+    unset($datas);*/
     
     if($this->isset_error()){
       return false;

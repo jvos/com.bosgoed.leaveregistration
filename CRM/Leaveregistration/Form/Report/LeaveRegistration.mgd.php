@@ -12,7 +12,7 @@ return array (
     array (
       'version' => 3,
       'label' => 'LeaveRegistration',
-      'description' => 'LeaveRegistration (com.bosgoed.leaveregistration)',
+      'description' => 'Leave Registration (com.bosgoed.leaveregistration)',
       'class_name' => 'CRM_Leaveregistration_Form_Report_LeaveRegistration',
       'report_url' => 'com.bosgoed.leaveregistration/leaveregistration',
       'component' => '',

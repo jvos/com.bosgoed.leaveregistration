@@ -101,6 +101,10 @@ class CRM_Leaveregistration_Config {
     $this->employees = $employees;
   }
   
+  public function getEmployees(){
+    return $this->employees;
+  }
+  
   private function setDepartments(){
     try {
       $result = civicrm_api3('Contact', 'get', array(
@@ -143,6 +147,28 @@ class CRM_Leaveregistration_Config {
     }
     
     $this->business = $business;
+  }
+  
+  public function getEmployeesIds(){
+    try {
+      $result = civicrm_api3('Contact', 'get', array(
+        'sequential' => 1,
+        'contact_type' => "Individual",
+        'contact_sub_type' => "Employee",
+        'options' => array('limit' => 0, 'sort' => "display_name ASC"),
+        'is_deleted' => 0,
+      ));
+    } catch (CiviCRM_API3_Exception $ex) {
+      throw new Exception('Could not get all the employees '.
+        ', error from API Contact get : '.$ex->getMessage());
+    }
+    
+    $employees = [];
+    foreach ($result['values'] as $contact){
+      $employees[] = $contact['contact_id'];
+    }
+    
+    return $employees;
   }
   
   public function getDepartmentEmployeesIds($departments_ids, $fields = []){

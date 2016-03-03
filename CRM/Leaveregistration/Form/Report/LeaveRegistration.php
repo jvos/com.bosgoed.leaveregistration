@@ -58,22 +58,44 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         ),
       ),
       'department' => array(
+        'fields' => array(
+          'department' => array(
+            'title' => ts('Department'),
+            'default' => TRUE,
+          ),
+        ),
         'filters' => array(
           'department' => array(
             'title' => ts('Department'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $leaveregistrationConfig->departments,
-          )
-        )
+          ),
+        ),
+        'order_bys' => array(
+          'department' => array(
+            'title' => ts('Department'),
+          ),
+        ),
       ),
       'business' => array(
+        'fields' => array(
+          'business' => array(
+            'title' => ts('Business'),
+            'default' => TRUE,
+          ),
+        ),
         'filters' => array(
           'business' => array(
             'title' => ts('Business'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $leaveregistrationConfig->business,
-          )
-        )
+          ),
+        ),
+        'order_bys' => array(
+          'business' => array(
+            'title' => ts('Business'),
+          ),
+        ),
       ),
       'leaveregistration' => array(
         'filters' => array(
@@ -130,7 +152,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         }
       }
     }
-
+    
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -146,6 +168,12 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     
     $leaveregistrationConfig = CRM_Leaveregistration_Config::singleton();
         
+    if(!isset($this->_params['id_value']) or empty($this->_params['id_value'])){
+      $ids = $leaveregistrationConfig->getEmployeesIds();
+      $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
+      $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
+    }
+    
     // deparment emplyees ids
     if(isset($this->_params['department_value'][0]) and !empty($this->_params['department_value'][0])){
       $this->_params['id_op'] = 'in';
@@ -196,6 +224,9 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
       }
     }
     
+    $clauses[] = " contact_civireport.contact_type = 'Individual' ";
+    $clauses[] = " contact_civireport.contact_sub_type = 'Employee' ";
+    
     if (empty($clauses)) {
       $this->_where = "WHERE ( 1 ) ";
     }
@@ -215,11 +246,13 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
   function orderBy() {
     //$this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
     $orderby = [];
-    foreach($this->_formValues['order_bys'] as $key => $orderby){
-       $orderby[] = " ORDER BY {$this->_aliases['civicrm_contact']}_" . $orderby['column'] . " " . $orderby['ASC'];
+    foreach($this->_params['order_bys'] as $key => $order){
+      if('department' != $order['column'] and 'business' != $order['column']){
+        $orderby[] = $this->_aliases['civicrm_contact']. "." . $order['column'] . " " . $order['order'];
+      }
     }
-    
-    $this->_orderBy = implode(', ', $orderby);
+        
+    $this->_orderBy = " ORDER BY " . implode(', ', $orderby);
   }
 
   function postProcess() {
@@ -239,21 +272,13 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     $this->endPostProcess($rows);
   }
       
-  function buildRows($sql, &$rows) {
-    echo('$sql: ' . $sql) . '<br/>' . PHP_EOL;
-    
-    echo('<pre>');
-    print_r($rows);
-    print_r($this->_formValues);
-    print_r($this->_columns);
-    print_r($this->_formValues['id_value']);
-    echo('</pre>');
-    //CRM_Utils_System::civiExit();
-    
-     // set days, months and years to empty
+  function buildRows($sql, &$rows) {       
+    // set days, months and years to empty
     $days = array();
     $months = array();
     $years = array();
+    
+    $year = $this->_formValues['year_value'];
     $week = $this->_formValues['week_value'];
     
     switch($this->_formValues['period_value']){
@@ -273,14 +298,16 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         $last_day = date('Y-m-t', strtotime($this->_formValues['year_value'] . '-' . $this->_formValues['month_value'] . '-02'));
         break;
       case 'week':
+        $dayrange  = array(1,2,3,4,5,6,7);
+                
         // calculate the days in the week
         for($count=0; $count<=6; $count++) {
           $week = ($count == 7)?($week + 1): ($week);
           $week = str_pad($week,2,'0',STR_PAD_LEFT);
 
-          $days[] = date('d-m-Y', strtotime($year."W".$week.($dayrange[$count]))); 
+          $days[] = date('Y-m-d', strtotime($year."W".$week.($dayrange[$count]))); 
         }
-
+        
         // calculate months and years from date
         // calculate years from days
         foreach($days as $date){
@@ -291,14 +318,128 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         }
         
         $first_day = date('Y-m-d', strtotime($days[0]));
-        $last_day = date('Y-m-t', strtotime(end($days)));
+        $last_day = date('Y-m-d', strtotime(end($days)));
         break;
     }
     
     $start_date_totime = strtotime($first_day);
-    $end_date_totime = strtotime($last_day);
+    $end_date_totime = strtotime($last_day);    
     
+    $lr = new leaveregistration('civicrm', 'CRM_Leaveregistration_Form_Report_LeaveRegistration');
+    $lr->set_fields();
+    $lr->set_contacts($this->_formValues['id_value']);
+    $lr->set_data($years, $months);
+        
+    // create a array with all the employees, add department en business to the array, this
+    // is also needed for order by department or business
+    $datas = [];
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $data = [];
+      foreach($this->_columnHeaders as $id => $columnheader){
+        $data[$id] = $dao->$id;
+      }
+      
+      foreach($lr->employees[$dao->civicrm_contact_id]['departments'] as $did => $department_id){
+        $data['department'] = [];
+        $data['department']['id'] = $did;
+        $data['departments'][$did] = [];
+        $data['departments'][$did]['id'] = $lr->departments[$dao->civicrm_contact_id][$did]['id'];
+        $data['departments'][$did]['display_name'] = $lr->departments[$dao->civicrm_contact_id][$did]['display_name'];
+      }
+
+      foreach($lr->employees[$dao->civicrm_contact_id]['businesses'] as $bid => $business_id){
+        $data['business'] = [];
+        $data['business']['id'] = $bid;
+        $data['businesses'][$bid] = [];
+        $data['businesses'][$bid]['id'] = $lr->businesses[$dao->civicrm_contact_id][$bid]['id'];
+        $data['businesses'][$bid]['display_name'] = $lr->businesses[$dao->civicrm_contact_id][$bid]['display_name'];
+      }
+      
+      $datas[$dao->civicrm_contact_id] = $data;
+    }
+        
+    // order department and business
+    if(isset($this->_formValues['order_bys'])){
+      foreach($this->_formValues['order_bys'] as $key => $orderby){
+        
+        if('department' == $orderby['column']){          
+          $orderby_department_name = [];
+          $orderby_department_id = [];
+          foreach($datas as $cid => $data){
+            $orderby_department_name[$data['department']['id']] = $data['departments'][$data['department']['id']]['display_name'];
+            $orderby_department_id[$data['departments'][$data['department']['id']]['display_name']] = $data['department']['id'];
+          }
+
+          sort($orderby_department_name);
+          if('DESC' == $orderby['order']){
+            rsort($orderby_department_name);
+          }
+                    
+          $orderby_department = [];
+          foreach($datas as $cid => $data){
+            if(!isset($orderby_department[$data['department']['id']])){
+              $orderby_department[$data['department']['id']] = [];
+            }
+            $orderby_department[$data['department']['id']][$cid] = $cid;
+          }
+                    
+          $orderby_datas = $datas; // copy datas
+          
+          $datas = [];
+          foreach($orderby_department_name as $key => $display_name){
+            $did = $orderby_department_id[$display_name];
+            
+            foreach($orderby_department[$did] as $cid => $employee){
+              $datas[$cid] = $orderby_datas[$cid];
+            }
+          }
+        }
+        
+        if('business' == $orderby['column']){          
+          $orderby_business_name = [];
+          $orderby_business_id = [];
+          foreach($datas as $cid => $data){
+            $orderby_business_name[$data['business']['id']] = $data['businesses'][$data['business']['id']]['display_name'];
+            $orderby_business_id[$data['businesses'][$data['business']['id']]['display_name']] = $data['business']['id'];
+          }
+
+          sort($orderby_business_name);
+          if('DESC' == $orderby['order']){
+            rsort($orderby_business_name);
+          }
+                    
+          $orderby_business = [];
+          foreach($datas as $cid => $data){
+            if(!isset($orderby_business[$data['business']['id']])){
+              $orderby_business[$data['business']['id']] = [];
+            }
+            $orderby_business[$data['business']['id']][$cid] = $cid;
+          }
+                    
+          $orderby_datas = $datas; // copy datas
+
+          $datas = [];
+          foreach($orderby_business_name as $key => $display_name){
+            $bid = $orderby_business_id[$display_name];
+            
+            foreach($orderby_business[$bid] as $cid => $employee){
+              $datas[$cid] = $orderby_datas[$cid];
+            }
+          }
+        }
+      }
+    }
+            
     // set column header
+    if(isset($this->_formValues['fields']['department']) and $this->_formValues['fields']['department']){
+      $this->_columnHeaders['department'] = array('title' => ts('Department'));
+    }
+    
+    if(isset($this->_formValues['fields']['business']) and $this->_formValues['fields']['business']){
+      $this->_columnHeaders['business'] = array('title' => ts('Business'));
+    }
+    
     for($timestamp = $start_date_totime; $timestamp <= $end_date_totime; $timestamp = strtotime( '+1 day' , $timestamp )){
       $day = date('d', $timestamp);  
       $month = date('m', $timestamp);  
@@ -312,33 +453,46 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
           $this->_columnHeaders[date('d', $timestamp)] = array('title' => date('d', $timestamp));
           break;
         case 'week':
-          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => date('d', $timestamp));
+          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => date('m-d', $timestamp));
           break;
       }
-    }   
-        
-    $lr = new leaveregistration('civicrm', 'CRM_Leaveregistration_Form_Report_LeaveRegistration');
-    $lr->set_fields();
-    $lr->set_contacts($this->_formValues['id_value']);
-    $lr->set_data($years, $months);
+    }
     
     $rows = [];
-    
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
+    foreach ($datas as $cid => $data) {
       $row = [];
-      
+            
+      // must before department and business
       foreach($this->_columnHeaders as $id => $columnheader){
-        $row[$id] = $dao->$id;
+        $row[$id] = $data[$id];
       }
+      
+      // department and business fields
+      if(isset($this->_formValues['fields']['department']) and $this->_formValues['fields']['department']){
+        $departments = [];
+        foreach($data['departments'] as $did => $department){
+          $departments[] = $department['display_name'];
+        }
+                
+        $row['department'] = implode(', ', $departments);
+      }
+
+      if(isset($this->_formValues['fields']['business']) and $this->_formValues['fields']['business']){
+        $businesses = [];
+        foreach($data['businesses'] as $bid => $business){
+          $businesses[] = $business['display_name'];
+        }
+        
+        $row['business'] = implode(', ', $businesses);
+      }     
       
       for($timestamp = $start_date_totime; $timestamp <= $end_date_totime; $timestamp = strtotime( '+1 day' , $timestamp )){
         $day = date('d', $timestamp);  
         $month = date('m', $timestamp);  
         $year = date('Y', $timestamp);
         
-        // get the data from the contact, year, month and day
-        $data = $lr->data[$dao->civicrm_contact_id][$year][$month][$day];
+        // get the request from the contact, year, month and day
+        $request = $lr->data[$data['civicrm_contact_id']][$year][$month][$day];
         
         // empty content
         $content = [];
@@ -347,14 +501,14 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         $sick = 0;
         $time_for_time = 0;
 
-        if(isset($data['adjustments']['duration']) and 0 == $data['adjustments']['duration']){
-          $content[] = 'Vrij';
+        if(isset($request['adjustments']['duration']) and 0 == $request['adjustments']['duration']){
+          $content[] = 'vrij';
         }
 
         // switch between the leave types
         // and add the duration to the right counter (work, time for time, leave or sick)
-        if(isset($data['request']['is_request']) and 1 == $data['request']['is_request'] and 'approved' == $data['request']['status']){
-          switch($data['request']['leave_type']){
+        if(isset($request['request']['is_request']) and 1 == $request['request']['is_request'] and 'approved' == $request['request']['status']){
+          switch($request['request']['leave_type']){
             case 'mom_dad_day':
             case 'mom_dad_day_contiguous':
             case 'doctor_visit':
@@ -362,37 +516,37 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
             case 'care':   
             case 'special_leave':
             case 'maternity':
-              $paid_leave += $data['request']['duration'];
+              $paid_leave += $request['request']['duration'];
               break;
             case 'sick_less_one_day': 
             case 'sick':
-              $sick += $data['request']['duration'];
+              $sick += $request['request']['duration'];
               break;
           }
         }
 
         // time_for_time
-        if(isset($data['time_for_time']['is_time_for_time']) and 1 == $data['time_for_time']['is_time_for_time'] and 'approved' == $data['time_for_time']['status']){
-          $time_for_time = $data['time_for_time']['duration'];
+        if(isset($request['time_for_time']['is_time_for_time']) and 1 == $request['time_for_time']['is_time_for_time'] and 'approved' == $request['time_for_time']['status']){
+          $time_for_time += $request['time_for_time']['duration'];
         }
 
         // normal_leave
         // leave type is normal_leave_less_one_day and normal_leave
-        if(isset($data['normal_leave']['is_normal_leave']) and 1 == $data['normal_leave']['is_normal_leave'] and 'approved' == $data['normal_leave']['status']){
-          $leave += $data['normal_leave']['duration'];
+        if(isset($request['normal_leave']['is_normal_leave']) and 1 == $request['normal_leave']['is_normal_leave'] and 'approved' == $request['normal_leave']['status']){
+          $leave += $request['normal_leave']['duration'];
         }
 
         // calculate the leave hours and the minutes from the duration (in minutes)
         if($leave > 0){
           $hours = floor($leave / 60);
           $minutes = $leave - ($hours * 60);
-          $content[] = 'Onb. v: ' . $hours . ':' . sprintf("%02s", $minutes);
+          $content[] = 'ov: ' . $hours . ':' . sprintf("%02s", $minutes);
         }
         
         if($paid_leave > 0){
           $hours = floor($paid_leave / 60);
-          $minutes = $leave - ($hours * 60);
-          $content[] = 'b. v: ' . $hours . ':' . sprintf("%02s", $minutes);
+          $minutes = $paid_leave - ($hours * 60);
+          $content[] = 'bv: ' . $hours . ':' . sprintf("%02s", $minutes);
         }
 
         if($sick > 0){
@@ -423,5 +577,30 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
       
       $rows[] = $row;
     }
+  }
+  
+  function alterDisplay(&$rows){
+    /*echo('<pre>');
+    print_r($this->_columnHeaders);
+    echo('</pre>');
+    
+    // add columnheader after 10 rows
+    $column_header = [];
+    foreach($this->_columnHeaders as $id => $columnheader){
+      $column_header[$id] = $columnheader['title'];
+    }
+    
+    
+    $i = 1;
+    $datas = [];
+    foreach($rows as $key => $row){
+      $datas[] = $row;
+      if(10 == $i){
+        $datas[] = $column_header;
+        $i = 0;
+      }
+      $i++;
+    }
+    $rows = $datas;*/
   }
 }
