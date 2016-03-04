@@ -1,6 +1,10 @@
 <?php
-
-class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_Form {
+/**
+ * This is a copy of the LeaveRegistration Report, with small 
+ * changes in the __contstruct and where and the biggest in
+ * the buildRow function.
+ */
+class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Report_Form {
 
   protected $_formValues = array();
   
@@ -113,13 +117,13 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
           ),
           'month' => array(
             'title' => ts('Month'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $leaveregistrationConfig->months,
             'default' => date('m'),
           ),
           'week' => array(
             'title' => ts('Week'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $leaveregistrationConfig->weeks,
             'default' => date('W'),
           ),
@@ -186,13 +190,31 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
       $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
     }
     
-    // need to be after department and business, if id_value is still empty
+    // need to be after department and business, if id_value is still empty, set to all emplyees ids
     if(!isset($this->_params['id_value']) or empty($this->_params['id_value'])){
       $ids = $leaveregistrationConfig->getEmployeesIds();
       $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
       $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
-    }    
+    }
     
+    // if month_value is empty set to all months in a year
+    if('month' == $this->_params['period_value']){
+      if(!isset($this->_params['month_value']) or empty($this->_params['month_value'])){
+        $months = $leaveregistrationConfig->months;
+        $this->_params['month_value'] = array_merge($this->_params['month_value'], $months);
+        $this->_formValues['month_value'] = array_merge($this->_params['month_value'], $months);
+      }
+    }
+    
+    // if week_value is empty set to all weeks in a year
+    if('week' == $this->_params['period_value']){
+      if(!isset($this->_params['week_value']) or empty($this->_params['week_value'])){
+        $weeks = $leaveregistrationConfig->weeks;
+        $this->_params['week_value'] = array_merge($this->_params['week_value'], $weeks);
+        $this->_formValues['week_value'] = array_merge($this->_params['week_value'], $weeks);
+      }
+    }
+        
     foreach ($this->_columns as $tableName => $table) {
       if('civicrm_contact' == $tableName){
         if (array_key_exists('filters', $table)) {
@@ -273,7 +295,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     $this->endPostProcess($rows);
   }
       
-  function buildRows($sql, &$rows) {       
+  function buildRows($sql, &$rows) {    
     // set days, months and years to empty
     $days = array();
     $months = array();
@@ -293,33 +315,44 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         break;
       case 'month':
         $years = [$this->_formValues['year_value']];
-        $months = [$this->_formValues['month_value']];
+        $months = $this->_formValues['month_value'];
         
-        $first_day = date('Y-m-d', strtotime($this->_formValues['year_value'] . '-' . $this->_formValues['month_value'] . '-01'));
-        $last_day = date('Y-m-t', strtotime($this->_formValues['year_value'] . '-' . $this->_formValues['month_value'] . '-02'));
+        $first_last_days = [];
+        foreach($months as $month){
+          $first_last_days[$month] = [];
+          $first_last_days[$month]['first'] = date('Y-m-d', strtotime($this->_formValues['year_value'] . '-' . $month . '-01'));
+          $first_last_days[$month]['last'] = date('Y-m-t', strtotime($this->_formValues['year_value'] . '-' . $month . '-02'));
+        }
         break;
       case 'week':
         $dayrange  = array(1,2,3,4,5,6,7);
-                
-        // calculate the days in the week
-        for($count=0; $count<=6; $count++) {
-          $week = ($count == 7)?($week + 1): ($week);
-          $week = str_pad($week,2,'0',STR_PAD_LEFT);
+               
+        $years = [$this->_formValues['year_value']];
+        $months = [];
+        
+        $first_last_days = [];
+        foreach($this->_formValues['week_value'] as $week){
+          // calculate the days in the week
+          for($count=0; $count<=6; $count++) {
+            $week = ($count == 7)?($week + 1): ($week);
+            $week = str_pad($week,2,'0',STR_PAD_LEFT);
 
-          $days[] = date('Y-m-d', strtotime($year."W".$week.($dayrange[$count]))); 
+            $days[] = date('Y-m-d', strtotime($year."W".$week.($dayrange[$count]))); 
+          }
+
+          // calculate months and years from date
+          // calculate years from days
+          foreach($days as $date){
+            $year = date('Y', strtotime($date));
+            $years[$year] = $year;
+            $month = date('m', strtotime($date));
+            $months[$month] = $month;
+          }
+
+          $first_last_days[$week] = [];
+          $first_last_days[$week]['first'] = date('Y-m-d', strtotime($days[0]));
+          $first_last_days[$week]['last'] = date('Y-m-d', strtotime(end($days)));
         }
-        
-        // calculate months and years from date
-        // calculate years from days
-        foreach($days as $date){
-          $year = date('Y', strtotime($date));
-          $years[$year] = $year;
-          $month = date('m', strtotime($date));
-          $months[$month] = $month;
-        }
-        
-        $first_day = date('Y-m-d', strtotime($days[0]));
-        $last_day = date('Y-m-d', strtotime(end($days)));
         break;
     }
     
@@ -440,25 +473,28 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     if(isset($this->_formValues['fields']['business']) and $this->_formValues['fields']['business']){
       $this->_columnHeaders['business'] = array('title' => ts('Business'));
     }
-    
-    for($timestamp = $start_date_totime; $timestamp <= $end_date_totime; $timestamp = strtotime( '+1 day' , $timestamp )){
-      $day = date('d', $timestamp);  
-      $month = date('m', $timestamp);  
-      $year = date('Y', $timestamp);
-      
+        
+    foreach($first_last_days as $month_week => $first_last){
+      $timestamp = strtotime($first_last['first']);
+
       switch($this->_formValues['period_value']){
         case 'year':
-          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => ts('Year') . ' ' . date('Y') . ' ' . date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
+          $this->_columnHeaders[date('Y', $timestamp)] = array('title' => ts('Year') . ' ' . date('Y'));
+          $this->_columnHeaders[date('Y', $timestamp) . '_sub_total'] = array('title' => ts('Sub total') . ' ' . ts('Year') . ' ' . date('Y'));
           break;
         case 'month':
-          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => ts('Month') . ' ' . ts(date('F', $timestamp)) . ' ' . date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
+          $this->_columnHeaders[date('m', $timestamp)] = array('title' => ts('Month') . ' ' . ts(date('F', $timestamp)) . ' ' . date('m', $timestamp));
+          $this->_columnHeaders[date('m', $timestamp) . '_sub_total'] = array('title' => ts('Sub total') . ' ' . ts('Month') . ' ' . ts(date('F', $timestamp)) . ' ' . date('m', $timestamp));
           break;
         case 'week':
-          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => ts('Week') . ' ' . date('W', $timestamp) . ' ' . date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
+          $this->_columnHeaders[date('W', $timestamp)] = array('title' => ts('Week') . ' ' . date('W', $timestamp));
+          $this->_columnHeaders[date('W', $timestamp) . '_sub_total'] = array('title' => ts('Sub total') . ' ' . ts('Week') . ' ' . date('W', $timestamp));
           break;
       }
     }
     
+    $this->_columnHeaders['total'] = array('title' => ts('Total'));
+        
     $rows = [];
     foreach ($datas as $cid => $data) {
       $row = [];
@@ -485,97 +521,111 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         }
         
         $row['business'] = implode(', ', $businesses);
-      }     
+      }
       
-      for($timestamp = $start_date_totime; $timestamp <= $end_date_totime; $timestamp = strtotime( '+1 day' , $timestamp )){
-        $day = date('d', $timestamp);  
-        $month = date('m', $timestamp);  
-        $year = date('Y', $timestamp);
-        
-        // get the request from the contact, year, month and day
-        $request = $lr->data[$data['civicrm_contact_id']][$year][$month][$day];
-        
+      $total = 0;
+      
+      foreach($first_last_days as $month_week => $first_last){
+        $start_date_totime = strtotime($first_last['first']);
+        $end_date_totime = strtotime($first_last['last']);
+      
         // empty content
         $content = [];
         $leave = 0;
         $paid_leave = 0;
         $sick = 0;
         $time_for_time = 0;
+        
+        for($timestamp = $start_date_totime; $timestamp <= $end_date_totime; $timestamp = strtotime( '+1 day' , $timestamp )){
+          $day = date('d', $timestamp);  
+          $month = date('m', $timestamp);  
+          $year = date('Y', $timestamp);
 
-        if(isset($request['adjustments']['duration']) and 0 == $request['adjustments']['duration']){
-          $content[] = 'rv';    
-        }
+          // get the request from the contact, year, month and day
+          $request = $lr->data[$data['civicrm_contact_id']][$year][$month][$day];
 
-        // switch between the leave types
-        // and add the duration to the right counter (work, time for time, leave or sick)
-        if(isset($request['request']['is_request']) and 1 == $request['request']['is_request'] and 'approved' == $request['request']['status']){
-          switch($request['request']['leave_type']){
-            case 'mom_dad_day':
-            case 'mom_dad_day_contiguous':
-            case 'doctor_visit':
-            case 'study_leave':
-            case 'care':   
-            case 'special_leave':
-            case 'maternity':
-              $paid_leave += $request['request']['duration'];
-              break;
-            case 'sick_less_one_day': 
-            case 'sick':
-              $sick += $request['request']['duration'];
-              break;
+          /*if(isset($request['adjustments']['duration']) and 0 == $request['adjustments']['duration']){
+            $content[] = 'rv';    
+          }*/
+
+          // switch between the leave types
+          // and add the duration to the right counter (work, time for time, leave or sick)
+          if(isset($request['request']['is_request']) and 1 == $request['request']['is_request'] and 'approved' == $request['request']['status']){
+            switch($request['request']['leave_type']){
+              case 'mom_dad_day':
+              case 'mom_dad_day_contiguous':
+              case 'doctor_visit':
+              case 'study_leave':
+              case 'care':   
+              case 'special_leave':
+              case 'maternity':
+                $paid_leave += $request['request']['duration'];
+                break;
+              case 'sick_less_one_day': 
+              case 'sick':
+                $sick += $request['request']['duration'];
+                break;
+            }
+          }
+
+          // time_for_time
+          if(isset($request['time_for_time']['is_time_for_time']) and 1 == $request['time_for_time']['is_time_for_time'] and 'approved' == $request['time_for_time']['status']){
+            $time_for_time += $request['time_for_time']['duration'];
+          }
+
+          // normal_leave
+          // leave type is normal_leave_less_one_day and normal_leave
+          if(isset($request['normal_leave']['is_normal_leave']) and 1 == $request['normal_leave']['is_normal_leave'] and 'approved' == $request['normal_leave']['status']){
+            $leave += $request['normal_leave']['duration'];
           }
         }
-
-        // time_for_time
-        if(isset($request['time_for_time']['is_time_for_time']) and 1 == $request['time_for_time']['is_time_for_time'] and 'approved' == $request['time_for_time']['status']){
-          $time_for_time += $request['time_for_time']['duration'];
-        }
-
-        // normal_leave
-        // leave type is normal_leave_less_one_day and normal_leave
-        if(isset($request['normal_leave']['is_normal_leave']) and 1 == $request['normal_leave']['is_normal_leave'] and 'approved' == $request['normal_leave']['status']){
-          $leave += $request['normal_leave']['duration'];
-        }
-
+        
         // calculate the leave hours and the minutes from the duration (in minutes)
-        if($leave > 0){
-          $hours = floor($leave / 60);
-          $minutes = $leave - ($hours * 60);
-          $content[] = 'v: ' . $hours . ':' . sprintf("%02s", $minutes);
-        }
-        
-        if($paid_leave > 0){
-          $hours = floor($paid_leave / 60);
-          $minutes = $paid_leave - ($hours * 60);
-          $content[] = 'bv: ' . $hours . ':' . sprintf("%02s", $minutes);
-        }
+        $hours = floor($leave / 60);
+        $minutes = $leave - ($hours * 60);
+        $content[] = 'v: ' . $hours . ':' . sprintf("%02s", $minutes);
 
-        if($sick > 0){
-          $hours = floor($sick / 60);
-          $minutes = $sick - ($hours * 60);
-          $content[] = 'z: ' . $hours . ':' . sprintf("%02s", $minutes);
-        }
+        $hours = floor($paid_leave / 60);
+        $minutes = $paid_leave - ($hours * 60);
+        $content[] = 'bv: ' . $hours . ':' . sprintf("%02s", $minutes);
+
+        $hours = floor($sick / 60);
+        $minutes = $sick - ($hours * 60);
+        $content[] = 'z: ' . $hours . ':' . sprintf("%02s", $minutes);
         
-        if($time_for_time > 0){
-          $hours = floor($time_for_time / 60);
-          $minutes = $time_for_time - ($hours * 60);
-          $content[] = 't: ' . $hours . ':' . sprintf("%02s", $minutes);
-        }
+        $hours = floor($time_for_time / 60);
+        $minutes = $time_for_time - ($hours * 60);
+        $content[] = 't: ' . $hours . ':' . sprintf("%02s", $minutes);
+                
+        $sub_total = ($leave + $paid_leave + $sick) - $time_for_time;
+        $total += $sub_total;
+        
+        $hours = floor($sub_total / 60);
+        $minutes = $sub_total - ($hours * 60);
+        $sub_total = $hours . ':' . sprintf("%02s", $minutes);
         
         switch($this->_formValues['period_value']){
           case 'year':
-            $row[date('Y-m-d', $timestamp)] = implode(' ', $content);
+            $row[date('Y', $start_date_totime)] = implode(' ', $content);
+            $row[date('Y', $start_date_totime) . '_sub_total'] = $sub_total;
             break;
           case 'month':
-            $row[date('Y-m-d', $timestamp)] = implode(' ', $content);
+            $row[date('m', $start_date_totime)] = implode(' ', $content);
+            $row[date('m', $start_date_totime) . '_sub_total'] = $sub_total;
             break;
           case 'week':
-            $row[date('Y-m-d', $timestamp)] = implode(' ', $content);
+            $row[date('W', $start_date_totime)] = implode(' ', $content);
+            $row[date('W', $start_date_totime) . '_sub_total'] = $sub_total;
             break;
         }
       }
       
+      $hours = floor($total / 60);
+      $minutes = $total - ($hours * 60);
+      $total = $hours . ':' . sprintf("%02s", $minutes);
+        
+      $row['total'] = $total;
       $rows[] = $row;
-    }
+    }    
   }
 }
