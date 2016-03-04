@@ -581,28 +581,36 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
         }
         
         // calculate the leave hours and the minutes from the duration (in minutes)
-        $hours = floor($leave / 60);
-        $minutes = $leave - ($hours * 60);
+        $hours = floor(round($leave) / 60);
+        $minutes = round($leave) - ($hours * 60);
         $content[] = 'v: ' . $hours . ':' . sprintf("%02s", $minutes);
 
-        $hours = floor($paid_leave / 60);
-        $minutes = $paid_leave - ($hours * 60);
+        $hours = floor(round($paid_leave) / 60);
+        $minutes = round($paid_leave) - ($hours * 60);
         $content[] = 'bv: ' . $hours . ':' . sprintf("%02s", $minutes);
 
-        $hours = floor($sick / 60);
-        $minutes = $sick - ($hours * 60);
+        $hours = floor(round($sick) / 60);
+        $minutes = round($sick) - ($hours * 60);
         $content[] = 'z: ' . $hours . ':' . sprintf("%02s", $minutes);
         
-        $hours = floor($time_for_time / 60);
-        $minutes = $time_for_time - ($hours * 60);
+        $hours = floor(round($time_for_time) / 60);
+        $minutes = round($time_for_time) - ($hours * 60);
         $content[] = 't: ' . $hours . ':' . sprintf("%02s", $minutes);
                 
         $sub_total = ($leave + $paid_leave + $sick) - $time_for_time;
         $total += $sub_total;
         
-        $hours = floor($sub_total / 60);
-        $minutes = $sub_total - ($hours * 60);
-        $sub_total = $hours . ':' . sprintf("%02s", $minutes);
+        if('-' == substr($sub_total, 0, 1)){
+          $sub_total = substr($sub_total, 1); 
+          $hours = floor(round($sub_total) / 60);
+          $minutes = round($sub_total) - ($hours * 60);
+          $sub_total = '-' . $hours . ':' . sprintf("%02s", $minutes);
+
+        }else {
+          $hours = floor(round($sub_total) / 60);
+          $minutes = round($sub_total) - ($hours * 60);
+          $sub_total = $hours . ':' . sprintf("%02s", $minutes);
+        }
         
         switch($this->_formValues['period_value']){
           case 'year':
@@ -620,10 +628,18 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
         }
       }
       
-      $hours = floor($total / 60);
-      $minutes = $total - ($hours * 60);
-      $total = $hours . ':' . sprintf("%02s", $minutes);
-        
+      if('-' == substr($total, 0, 1)){
+        $total = substr($total, 1); 
+        $hours = floor(round($total) / 60);
+        $minutes = round($total) - ($hours * 60);
+        $total = '-' . $hours . ':' . sprintf("%02s", $minutes);
+
+      }else {
+        $hours = floor(round($total) / 60);
+        $minutes = round($total) - ($hours * 60);
+        $total = $hours . ':' . sprintf("%02s", $minutes);
+      }
+      
       $row['total'] = $total;
       $rows[] = $row;
     }    
