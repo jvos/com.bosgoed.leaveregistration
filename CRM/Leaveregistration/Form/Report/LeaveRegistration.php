@@ -451,7 +451,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
           $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
           break;
         case 'month':
-          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => ts('Month') . ' ' . date('F', $timestamp) . ' ' . date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
+          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => ts('Month') . ' ' . ts(date('F', $timestamp)) . ' ' . date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
           break;
         case 'week':
           $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => ts('Week') . ' ' . date('W', $timestamp) . ' ' . date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
