@@ -194,7 +194,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
     if(!isset($this->_params['id_value']) or empty($this->_params['id_value'])){
       $ids = $leaveregistrationConfig->getEmployeesIds();
       $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
-      $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
+      $this->_formValues['id_value'] = array_merge($this->_formValues['id_value'], $ids);
     }
     
     // if month_value is empty set to all months in a year
@@ -202,7 +202,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
       if(!isset($this->_params['month_value']) or empty($this->_params['month_value'])){
         $months = $leaveregistrationConfig->months;
         $this->_params['month_value'] = array_merge($this->_params['month_value'], $months);
-        $this->_formValues['month_value'] = array_merge($this->_params['month_value'], $months);
+        $this->_formValues['month_value'] = array_merge($this->_formValues['month_value'], $months);
       }
     }
     
@@ -211,7 +211,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
       if(!isset($this->_params['week_value']) or empty($this->_params['week_value'])){
         $weeks = $leaveregistrationConfig->weeks;
         $this->_params['week_value'] = array_merge($this->_params['week_value'], $weeks);
-        $this->_formValues['week_value'] = array_merge($this->_params['week_value'], $weeks);
+        $this->_formValues['week_value'] = array_merge($this->_formValues['week_value'], $weeks);
       }
     }
         
@@ -295,15 +295,12 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
     $this->endPostProcess($rows);
   }
       
-  function buildRows($sql, &$rows) {    
+  function buildRows($sql, &$rows) {        
     // set days, months and years to empty
     $days = array();
     $months = array();
     $years = array();
-    
-    $year = $this->_formValues['year_value'];
-    $week = $this->_formValues['week_value'];
-    
+        
     switch($this->_formValues['period_value']){
       case 'year':
         $years = [$this->_formValues['year_value']];
@@ -327,17 +324,19 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
       case 'week':
         $dayrange  = array(1,2,3,4,5,6,7);
                
-        $years = [$this->_formValues['year_value']];
+        $years = [];
         $months = [];
         
         $first_last_days = [];
         foreach($this->_formValues['week_value'] as $week){
+          $days = [];          
+          
           // calculate the days in the week
           for($count=0; $count<=6; $count++) {
             $week = ($count == 7)?($week + 1): ($week);
             $week = str_pad($week,2,'0',STR_PAD_LEFT);
 
-            $days[] = date('Y-m-d', strtotime($year."W".$week.($dayrange[$count]))); 
+            $days[] = date('Y-m-d', strtotime($this->_formValues['year_value']."W".$week.($dayrange[$count]))); 
           }
 
           // calculate months and years from date
@@ -355,7 +354,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
         }
         break;
     }
-    
+        
     $start_date_totime = strtotime($first_day);
     $end_date_totime = strtotime($last_day);    
     
@@ -476,6 +475,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
         
     foreach($first_last_days as $month_week => $first_last){
       $timestamp = strtotime($first_last['first']);
+      $timestamp_last = strtotime($first_last['last']);
 
       switch($this->_formValues['period_value']){
         case 'year':
@@ -487,7 +487,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
           $this->_columnHeaders[date('m', $timestamp) . '_sub_total'] = array('title' => ts('Sub total') . ' ' . ts('Month') . ' ' . ts(date('F', $timestamp)) . ' ' . date('m', $timestamp));
           break;
         case 'week':
-          $this->_columnHeaders[date('W', $timestamp)] = array('title' => ts('Week') . ' ' . date('W', $timestamp));
+          $this->_columnHeaders[date('W', $timestamp)] = array('title' => ts('Week') . ' ' . date('W', $timestamp) . ' ' . date('m-d', $timestamp) . '/' . date('m-d', $timestamp_last));
           $this->_columnHeaders[date('W', $timestamp) . '_sub_total'] = array('title' => ts('Sub total') . ' ' . ts('Week') . ' ' . date('W', $timestamp));
           break;
       }

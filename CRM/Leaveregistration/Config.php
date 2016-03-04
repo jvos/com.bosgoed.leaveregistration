@@ -20,6 +20,7 @@ class CRM_Leaveregistration_Config {
   public $years = [];
   public $months = [];
   public $weeks = [];
+  public $weeksKey = [];
   
   public $employees = [];
   public $departments = [];
@@ -37,6 +38,7 @@ class CRM_Leaveregistration_Config {
     $this->setYears();
     $this->setMonths();
     $this->setWeeks();
+    $this->setWeeksKey();
     
     $this->setEmployees();
     $this->setDepartments();
@@ -77,6 +79,19 @@ class CRM_Leaveregistration_Config {
     }
         
     $this->weeks = $weeks;
+  }
+  
+  private function setWeeksKey(){
+    $weeks = [];
+    for($i=1; $i <= 52; $i++){
+      if(1 == strlen($i)){
+        $weeks[$i] = '0' . $i;
+      }else {
+        $weeks[$i] = $i;
+      }
+    }
+        
+    $this->weeksKey = $weeks;
   }
   
   private function setEmployees(){
