@@ -167,12 +167,6 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     $clauses = array();
     
     $leaveregistrationConfig = CRM_Leaveregistration_Config::singleton();
-        
-    if(!isset($this->_params['id_value']) or empty($this->_params['id_value'])){
-      $ids = $leaveregistrationConfig->getEmployeesIds();
-      $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
-      $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
-    }
     
     // deparment emplyees ids
     if(isset($this->_params['department_value'][0]) and !empty($this->_params['department_value'][0])){
@@ -191,6 +185,13 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
       $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
       $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
     }
+    
+    // need to be after department and business, if id_value is still empty
+    if(!isset($this->_params['id_value']) or empty($this->_params['id_value'])){
+      $ids = $leaveregistrationConfig->getEmployeesIds();
+      $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
+      $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
+    }    
     
     foreach ($this->_columns as $tableName => $table) {
       if('civicrm_contact' == $tableName){
@@ -447,13 +448,13 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
       
       switch($this->_formValues['period_value']){
         case 'year':
-          $this->_columnHeaders[date('m-d', $timestamp)] = array('title' => date('m-d', $timestamp));
+          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
           break;
         case 'month':
-          $this->_columnHeaders[date('d', $timestamp)] = array('title' => date('d', $timestamp));
+          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => ts('Month') . ' ' . date('F', $timestamp) . ' ' . date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
           break;
         case 'week':
-          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => date('m-d', $timestamp));
+          $this->_columnHeaders[date('Y-m-d', $timestamp)] = array('title' => ts('Week') . ' ' . date('W', $timestamp) . ' ' . date('m-d', $timestamp) . ' ' .  ts(date('l', $timestamp)));
           break;
       }
     }
@@ -564,10 +565,10 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         
         switch($this->_formValues['period_value']){
           case 'year':
-            $row[date('m-d', $timestamp)] = implode(' ', $content);
+            $row[date('Y-m-d', $timestamp)] = implode(' ', $content);
             break;
           case 'month':
-            $row[date('d', $timestamp)] = implode(' ', $content);
+            $row[date('Y-m-d', $timestamp)] = implode(' ', $content);
             break;
           case 'week':
             $row[date('Y-m-d', $timestamp)] = implode(' ', $content);
