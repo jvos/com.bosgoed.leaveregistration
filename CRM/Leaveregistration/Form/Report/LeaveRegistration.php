@@ -58,10 +58,12 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
         ),
       ),
       'department' => array(
+        'alias' => 'department',
         'fields' => array(
           'department' => array(
             'title' => ts('Department'),
             'default' => TRUE,
+            'dbAlias' => 'department_civireport.display_name',
           ),
         ),
         'filters' => array(
@@ -69,19 +71,23 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
             'title' => ts('Department'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $leaveregistrationConfig->departments,
+            'dbAlias' => 'department_civireport_relationship.contact_id_b',
           ),
         ),
         'order_bys' => array(
           'department' => array(
             'title' => ts('Department'),
+            'name' => 'department_department',
           ),
         ),
       ),
       'business' => array(
+        'alias' => 'business',
         'fields' => array(
           'business' => array(
             'title' => ts('Business'),
             'default' => TRUE,
+            'dbAlias' => 'business_civireport.display_name',
           ),
         ),
         'filters' => array(
@@ -89,11 +95,13 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
             'title' => ts('Business'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $leaveregistrationConfig->business,
+            'dbAlias' => 'business_civireport_relationship.contact_id_b',
           ),
         ),
         'order_bys' => array(
           'business' => array(
             'title' => ts('Business'),
+            'name' => 'business_business',
           ),
         ),
       ),
@@ -139,14 +147,14 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     $select = $this->_columnHeaders = array();
     
     foreach ($this->_columns as $tableName => $table) {
-      if('civicrm_contact' == $tableName){
+      if('leaveregistration' != $tableName){
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
             if (CRM_Utils_Array::value('required', $field) ||
               CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["civicrm_contact_{$fieldName}"]['title'] = $field['title'];
-              $this->_columnHeaders["civicrm_contact_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
             }
           }
         }
@@ -158,43 +166,24 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
 
   function from() {
     $this->_from = NULL;
-
-    $this->_from = "
-         FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
+    
+    $this->_from = " FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
+    
+    $this->_from .= " LEFT JOIN civicrm_relationship AS {$this->_aliases['department']}_relationship ON {$this->_aliases['department']}{$this->_aclFrom}_relationship.contact_id_a = {$this->_aliases['civicrm_contact']}.id";
+    $this->_from .= " LEFT JOIN civicrm_contact AS {$this->_aliases['department']} ON {$this->_aliases['department']}.id = {$this->_aliases['department']}_relationship.contact_id_b";
+    
+    $this->_from .= " LEFT JOIN civicrm_relationship AS {$this->_aliases['business']}_department_relationship ON {$this->_aliases['business']}_department_relationship.contact_id_a = {$this->_aliases['civicrm_contact']}.id";		
+    $this->_from .= " INNER JOIN civicrm_relationship AS {$this->_aliases['business']}_relationship ON {$this->_aliases['business']}_relationship.contact_id_a = {$this->_aliases['business']}_department_relationship.contact_id_b ";
+    $this->_from .= " LEFT JOIN civicrm_contact AS {$this->_aliases['business']} ON {$this->_aliases['business']}.id = {$this->_aliases['business']}_relationship.contact_id_b";
   }
 
   function where() {
-    $clauses = array();
-    
     $leaveregistrationConfig = CRM_Leaveregistration_Config::singleton();
     
-    // deparment emplyees ids
-    if(isset($this->_params['department_value'][0]) and !empty($this->_params['department_value'][0])){
-      $this->_params['id_op'] = 'in';
-      
-      $ids = $leaveregistrationConfig->getDepartmentEmployeesIds($this->_params['department_value']);
-      $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
-      $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
-    }
-    
-    // busniess emplyees ids
-    if(isset($this->_params['business_value'][0]) and !empty($this->_params['business_value'][0])){
-      $this->_params['id_op'] = 'in';
-      
-      $ids = $leaveregistrationConfig->getBusinessEmployeesIds($this->_params['business_value']);
-      $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
-      $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
-    }
-    
-    // need to be after department and business, if id_value is still empty
-    if(!isset($this->_params['id_value']) or empty($this->_params['id_value'])){
-      $ids = $leaveregistrationConfig->getEmployeesIds();
-      $this->_params['id_value'] = array_merge($this->_params['id_value'], $ids);
-      $this->_formValues['id_value'] = array_merge($this->_params['id_value'], $ids);
-    }    
+    $clauses = array();
     
     foreach ($this->_columns as $tableName => $table) {
-      if('civicrm_contact' == $tableName){
+      if('leaveregistration' != $tableName){
         if (array_key_exists('filters', $table)) {
           foreach ($table['filters'] as $fieldName => $field) {
             $clause = NULL;
@@ -225,9 +214,15 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
       }
     }
     
-    $clauses[] = " contact_civireport.contact_type = 'Individual' ";
-    $clauses[] = " contact_civireport.contact_sub_type = 'Employee' ";
+    $clauses[] = " {$this->_aliases['civicrm_contact']}.contact_type = 'Individual' ";
+    $clauses[] = " {$this->_aliases['civicrm_contact']}.contact_sub_type = 'Employee' ";
     
+    
+    $clauses[] = " {$this->_aliases['department']}_relationship.relationship_type_id = '{$leaveregistrationConfig->lr->relationship_types['employee_of']['id']}' ";
+    
+    $clauses[] = " {$this->_aliases['business']}_department_relationship.relationship_type_id = '{$leaveregistrationConfig->lr->relationship_types['employee_of']['id']}' ";
+    $clauses[] = " {$this->_aliases['business']}_relationship.relationship_type_id = '{$leaveregistrationConfig->lr->relationship_types['department_of']['id']}' ";
+        
     if (empty($clauses)) {
       $this->_where = "WHERE ( 1 ) ";
     }
@@ -246,11 +241,18 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
 
   function orderBy() {
     //$this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
+        
     $orderby = [];
     foreach($this->_params['order_bys'] as $key => $order){
-      if('department' != $order['column'] and 'business' != $order['column']){
-        $orderby[] = $this->_aliases['civicrm_contact']. "." . $order['column'] . " " . $order['order'];
+      if('department' == $order['column']){
+        $prefix = 'department';
+      }else if('business' == $order['column']){
+        $prefix = 'business';
+      }else {
+        $prefix = 'civicrm_contact';
       }
+      
+      $orderby[] = $prefix . "_" . $order['column'] . " " . $order['order'];
     }
         
     $this->_orderBy = " ORDER BY " . implode(', ', $orderby);
@@ -324,122 +326,27 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     }
     
     $start_date_totime = strtotime($first_day);
-    $end_date_totime = strtotime($last_day);    
+    $end_date_totime = strtotime($last_day);        
     
-    $lr = new leaveregistration('civicrm', 'CRM_Leaveregistration_Form_Report_LeaveRegistration');
-    $lr->set_fields();
-    $lr->set_contacts($this->_formValues['id_value']);
-    $lr->set_data($years, $months);
-        
     // create a array with all the employees, add department en business to the array, this
-    // is also needed for order by department or business
     $datas = [];
+    $cids = [];
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $data = [];
       foreach($this->_columnHeaders as $id => $columnheader){
         $data[$id] = $dao->$id;
-      }
-      
-      foreach($lr->employees[$dao->civicrm_contact_id]['departments'] as $did => $department_id){
-        $data['department'] = [];
-        $data['department']['id'] = $did;
-        $data['departments'][$did] = [];
-        $data['departments'][$did]['id'] = $lr->departments[$dao->civicrm_contact_id][$did]['id'];
-        $data['departments'][$did]['display_name'] = $lr->departments[$dao->civicrm_contact_id][$did]['display_name'];
-      }
-
-      foreach($lr->employees[$dao->civicrm_contact_id]['businesses'] as $bid => $business_id){
-        $data['business'] = [];
-        $data['business']['id'] = $bid;
-        $data['businesses'][$bid] = [];
-        $data['businesses'][$bid]['id'] = $lr->businesses[$dao->civicrm_contact_id][$bid]['id'];
-        $data['businesses'][$bid]['display_name'] = $lr->businesses[$dao->civicrm_contact_id][$bid]['display_name'];
+        
       }
       
       $datas[$dao->civicrm_contact_id] = $data;
-    }
-        
-    // order department and business
-    if(isset($this->_formValues['order_bys'])){
-      foreach($this->_formValues['order_bys'] as $key => $orderby){
-        
-        if('department' == $orderby['column']){          
-          $orderby_department_name = [];
-          $orderby_department_id = [];
-          foreach($datas as $cid => $data){
-            $orderby_department_name[$data['department']['id']] = $data['departments'][$data['department']['id']]['display_name'];
-            $orderby_department_id[$data['departments'][$data['department']['id']]['display_name']] = $data['department']['id'];
-          }
-
-          sort($orderby_department_name);
-          if('DESC' == $orderby['order']){
-            rsort($orderby_department_name);
-          }
-                    
-          $orderby_department = [];
-          foreach($datas as $cid => $data){
-            if(!isset($orderby_department[$data['department']['id']])){
-              $orderby_department[$data['department']['id']] = [];
-            }
-            $orderby_department[$data['department']['id']][$cid] = $cid;
-          }
-                    
-          $orderby_datas = $datas; // copy datas
-          
-          $datas = [];
-          foreach($orderby_department_name as $key => $display_name){
-            $did = $orderby_department_id[$display_name];
-            
-            foreach($orderby_department[$did] as $cid => $employee){
-              $datas[$cid] = $orderby_datas[$cid];
-            }
-          }
-        }
-        
-        if('business' == $orderby['column']){          
-          $orderby_business_name = [];
-          $orderby_business_id = [];
-          foreach($datas as $cid => $data){
-            $orderby_business_name[$data['business']['id']] = $data['businesses'][$data['business']['id']]['display_name'];
-            $orderby_business_id[$data['businesses'][$data['business']['id']]['display_name']] = $data['business']['id'];
-          }
-
-          sort($orderby_business_name);
-          if('DESC' == $orderby['order']){
-            rsort($orderby_business_name);
-          }
-                    
-          $orderby_business = [];
-          foreach($datas as $cid => $data){
-            if(!isset($orderby_business[$data['business']['id']])){
-              $orderby_business[$data['business']['id']] = [];
-            }
-            $orderby_business[$data['business']['id']][$cid] = $cid;
-          }
-                    
-          $orderby_datas = $datas; // copy datas
-
-          $datas = [];
-          foreach($orderby_business_name as $key => $display_name){
-            $bid = $orderby_business_id[$display_name];
-            
-            foreach($orderby_business[$bid] as $cid => $employee){
-              $datas[$cid] = $orderby_datas[$cid];
-            }
-          }
-        }
-      }
-    }
-            
-    // set column header
-    if(isset($this->_formValues['fields']['department']) and $this->_formValues['fields']['department']){
-      $this->_columnHeaders['department'] = array('title' => ts('Department'));
+      $cids[] = $dao->civicrm_contact_id;
     }
     
-    if(isset($this->_formValues['fields']['business']) and $this->_formValues['fields']['business']){
-      $this->_columnHeaders['business'] = array('title' => ts('Business'));
-    }
+    $lr = new leaveregistration('civicrm', 'CRM_Leaveregistration_Form_Report_LeaveRegistration');
+    $lr->set_fields();
+    $lr->set_contacts($cids);
+    $lr->set_data($years, $months);
     
     for($timestamp = $start_date_totime; $timestamp <= $end_date_totime; $timestamp = strtotime( '+1 day' , $timestamp )){
       $day = date('d', $timestamp);  
@@ -467,25 +374,6 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
       foreach($this->_columnHeaders as $id => $columnheader){
         $row[$id] = $data[$id];
       }
-      
-      // department and business fields
-      if(isset($this->_formValues['fields']['department']) and $this->_formValues['fields']['department']){
-        $departments = [];
-        foreach($data['departments'] as $did => $department){
-          $departments[] = $department['display_name'];
-        }
-                
-        $row['department'] = implode(', ', $departments);
-      }
-
-      if(isset($this->_formValues['fields']['business']) and $this->_formValues['fields']['business']){
-        $businesses = [];
-        foreach($data['businesses'] as $bid => $business){
-          $businesses[] = $business['display_name'];
-        }
-        
-        $row['business'] = implode(', ', $businesses);
-      }     
       
       for($timestamp = $start_date_totime; $timestamp <= $end_date_totime; $timestamp = strtotime( '+1 day' , $timestamp )){
         $day = date('d', $timestamp);  
