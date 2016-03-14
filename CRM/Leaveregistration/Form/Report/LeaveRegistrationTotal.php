@@ -279,6 +279,36 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
     $this->endPostProcess($rows);
   }
       
+  function countStat(&$statistics, $count) {
+    echo('$statistics: <pre>');
+    print_r($statistics);
+    echo('</pre>');
+    
+    echo('$count: ' . $count) . '<br/>' . PHP_EOL;
+    
+    $statistics['counts']['rowCount'] = array(
+      'title' => ts('Row(s) Listed'),
+      'value' => $count,
+    );
+
+    echo('$statistics2: <pre>');
+    print_r($statistics);
+    echo('</pre>');
+    
+    echo('$this->_rowsFound: ' . $this->_rowsFound) . '<br/>' . PHP_EOL;
+    
+    /*if ($this->_rowsFound && ($this->_rowsFound > $count)) {
+      $statistics['counts']['rowsFound'] = array(
+        'title' => ts('Total Row(s)'),
+        'value' => $this->_rowsFound,
+      );*/
+      
+      echo('$statistics3: <pre>');
+    print_r($statistics);
+    echo('</pre>');
+    }
+  }
+  
   function buildRows($sql, &$rows) {
     $leaveregistrationConfig = CRM_Leaveregistration_Config::singleton();
     

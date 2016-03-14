@@ -1796,7 +1796,7 @@ class leaveregistration {
     }
     
     // I disabled the check, get a error if the request is only for one month
-    /*
+    
     // check
     foreach($this->employees as $cid => $employee){
       $mbid = 0;
@@ -1834,16 +1834,16 @@ class leaveregistration {
       }
     }
       
-    // check of all employee has a holiday set for each year
+    /*// check of all employee has a holiday set for each year
     foreach($this->employees as $cid => $employee){
       foreach($this->years as $year){
         if(!isset($check[$cid][$year]) or true != $check[$cid][$year]){
           $this->set_error( ts('In function holidays, ') . $this->employees[$cid]['display_name'] .  ts(' has no holidays in ') . $year . ts(' !'), ts('set_holidays'));
         }
       }
-    }
+    }*/
     
-    unset($datas);*/
+    unset($datas);
     
     if($this->isset_error()){
       return false;
