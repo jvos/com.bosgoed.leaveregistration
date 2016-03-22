@@ -760,6 +760,7 @@ class leaveregistration {
     $query = "SELECT civicrm_contact.id, civicrm_contact.contact_type, civicrm_contact.contact_sub_type, civicrm_contact.display_name, civicrm_email.email FROM `civicrm_contact`";
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " WHERE";
+    $query .= " civicrm_contact.is_deleted = '0' AND civicrm_contact.is_deceased = '0' AND ";
     
     $where = "";
     foreach($this->cids as $cid){ 
@@ -823,6 +824,7 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
     $query .= " WHERE";
+    $query .= " civicrm_contact.is_deleted = '0' AND ";
     $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND (";
     
     $where = "";
@@ -890,8 +892,8 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
-    $query .= " is_deleted = '0' AND (";
+    $query .= " civicrm_contact.is_deleted = '0' AND civicrm_contact.is_deceased = '0' AND ";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND (";
     
     $where = "";
     foreach($this->departments as $cid => $departments){
@@ -957,8 +959,8 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
-    $query .= " is_deleted = '0' AND (";
+    $query .= " civicrm_contact.is_deleted = '0' AND  ";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_of']['id'] . "' AND civicrm_relationship.is_active = '1' AND (";
     
     $where = "";
     foreach($this->departments as $cid => $departments){ 
@@ -1043,7 +1045,6 @@ class leaveregistration {
       contact.id, contact.contact_type, contact.display_name, contact_emial.email,
       business.contact_id_b AS business_id
 
-
       FROM `civicrm_contact` AS contact
 
       LEFT JOIN civicrm_email AS contact_emial ON contact_emial.contact_id = contact.id 
@@ -1052,6 +1053,8 @@ class leaveregistration {
       INNER JOIN civicrm_relationship AS business ON business.contact_id_a = contact_relationship.contact_id_b
 
       WHERE 
+      contact.is_deleted = '0' AND contact.is_deceased = '0' AND 
+      
       contact_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND 
       contact_relationship.is_active = '1' AND
 
@@ -1122,8 +1125,8 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['main_organization']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
-    $query .= " is_deleted = '0' AND (";
+    $query .= " civicrm_contact.is_deleted = '0' AND civicrm_contact.is_deceased = '0' AND ";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['main_organization']['id'] . "' AND civicrm_relationship.is_active = '1' AND (";
     
     $where = "";
     foreach($this->businesses as $cid => $businesses){ 
@@ -1191,8 +1194,8 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_b = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_head']['id'] . "' AND civicrm_relationship.is_active = '1' AND"; 
-    $query .= " is_deleted = '0' AND (";
+    $query .= " civicrm_contact.is_deleted = '0' AND civicrm_contact.is_deceased = '0' AND ";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['department_head']['id'] . "' AND civicrm_relationship.is_active = '1' AND (";
     
     $where = "";
     foreach($this->departments as $cid => $departments){
@@ -1276,9 +1279,8 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id";
     $query .= " LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_a = civicrm_contact.id";
     $query .= " WHERE";
-    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['administration_of']['id'] . "' AND"; 
-    $query .= " civicrm_relationship.is_active = '1' AND ";
-    $query .= " is_deleted = '0' AND (";
+    $query .= " civicrm_contact.is_deleted = '0' AND civicrm_contact.is_deceased = '0' AND ";
+    $query .= " civicrm_relationship.relationship_type_id = '" . $this->relationship_types['administration_of']['id'] . "' AND (";
     
     $where = "";
     foreach($this->businesses as $bid => $business){
@@ -1325,7 +1327,6 @@ class leaveregistration {
       contact.id, contact.contact_type, contact.display_name, contact_emial.email,
       department_head.contact_id_b AS cid, department_head.contact_id_b AS department_id
 
-
       FROM `civicrm_contact` AS contact
 
       LEFT JOIN civicrm_email AS contact_emial ON contact_emial.contact_id = contact.id 
@@ -1334,6 +1335,8 @@ class leaveregistration {
       INNER JOIN civicrm_relationship AS department_head ON department_head.contact_id_a = contact_relationship.contact_id_b
 
       WHERE 
+      contact.is_deleted = '0' AND contact.is_deceased = '0' AND 
+        
       contact_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND 
       contact_relationship.is_active = '1' AND
 
@@ -1401,7 +1404,6 @@ class leaveregistration {
       contact.id, contact.contact_type, contact.display_name, contact_emial.email,
       department.contact_id_a AS department_id, business.contact_id_b AS business_id, business.contact_id_a AS cid
 
-
       FROM `civicrm_contact` AS contact
 
       LEFT JOIN civicrm_email AS contact_emial ON contact_emial.contact_id = contact.id 
@@ -1411,6 +1413,8 @@ class leaveregistration {
       INNER JOIN civicrm_relationship AS business ON business.contact_id_b = department.contact_id_b
 
       WHERE 
+      contact.is_deleted = '0' AND contact.is_deceased = '0' AND 
+
       contact_relationship.relationship_type_id = '" . $this->relationship_types['employee_of']['id'] . "' AND 
       contact_relationship.is_active = '1' AND
 
@@ -2769,7 +2773,7 @@ class leaveregistration {
       $this->set_error(ts('No contact ids !'), ts('set_request'));
     }
     
-    $query = "SELECT civicrm_activity.source_record_id, " . $this->custom_groups['leave_request']['table_name'] . ".id, " . $this->custom_groups['leave_request']['table_name'] . ".entity_id";
+    $query = "SELECT civicrm_activity.source_record_id, " . $this->custom_groups['leave_request']['table_name'] . ".id, " . $this->custom_groups['leave_request']['table_name'] . ".entity_id, civicrm_activity_contact.contact_id";
     
     $query .= ", " . $this->custom_fields['leave_request_leave_type']['column_name'];
     $query .= ", " . $this->custom_fields['leave_request_reason']['column_name'];
@@ -2803,12 +2807,13 @@ class leaveregistration {
     $query .= ", " . $this->custom_fields['leave_request_duration']['column_name'];
         
     $query .= " FROM " . $this->custom_groups['leave_request']['table_name'];
-    $query .= " LEFT JOIN civicrm_activity ON " . $this->custom_groups['leave_request']['table_name'] . ".entity_id = civicrm_activity.id";
-    $query .= " WHERE civicrm_activity.activity_type_id = '" . trim($this->custom_groups['leave_request']['extends_entity_column_value']) . "'";
+    $query .= " LEFT JOIN civicrm_activity ON " . $this->custom_groups['leave_request']['table_name'] . ".entity_id = civicrm_activity.id ";
+    $query .= " LEFT JOIN civicrm_activity_contact ON civicrm_activity_contact.activity_id = civicrm_activity.id ";
+    $query .= " WHERE civicrm_activity.activity_type_id = '" . trim($this->custom_groups['leave_request']['extends_entity_column_value']) . "' ";
     
     $where = "";
     foreach($this->cids as $cid){
-      $where .= " OR civicrm_activity.source_record_id = '" . $cid . "'";
+      $where .= " OR civicrm_activity_contact.contact_id = '" . $cid . "'";
     }
     
     $query .= " AND (" . substr($where, 3) . ")";
@@ -2826,15 +2831,15 @@ class leaveregistration {
     $query .= " ORDER BY " . $this->custom_fields['leave_request_from_date']['column_name'] . ", " . $this->custom_fields['leave_request_date']['column_name'] . " ASC";
         
     $datas = array();   
-    
+        
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()){
       
-      $datas[$dao->id] = array
+      $datas[$dao->id . $dao->contact_id] = array
       (
         'id' => $dao->id,
         'entity_id' => $dao->entity_id,
-        'cid' => $dao->source_record_id,
+        'cid' => $dao->contact_id,
         'leave_type' => $dao->{$this->custom_fields['leave_request_leave_type']['column_name']},
         'reason' => $dao->{$this->custom_fields['leave_request_reason']['column_name']},
         'status' => $dao->{$this->custom_fields['leave_request_status']['column_name']},
@@ -3823,7 +3828,7 @@ class leaveregistration {
   }
   
   public function overview($cid, $from_date, $to_date){
-    $query = "SELECT civicrm_activity.source_record_id, " . $this->custom_groups['leave_request']['table_name'] . ".id, " . $this->custom_groups['leave_request']['table_name'] . ".entity_id";
+    $query = "SELECT civicrm_activity.source_record_id, civicrm_activity_contact.contact_id, " . $this->custom_groups['leave_request']['table_name'] . ".id, " . $this->custom_groups['leave_request']['table_name'] . ".entity_id";
     
     $query .= ", " . $this->custom_fields['leave_request_leave_type']['column_name'];
     $query .= ", " . $this->custom_fields['leave_request_reason']['column_name'];
@@ -3839,10 +3844,11 @@ class leaveregistration {
         
     $query .= " FROM " . $this->custom_groups['leave_request']['table_name'];
     $query .= " LEFT JOIN civicrm_activity ON " . $this->custom_groups['leave_request']['table_name'] . ".entity_id = civicrm_activity.id";
+    $query .= " LEFT JOIN civicrm_activity_contact ON civicrm_activity_contact.activity_id = civicrm_activity.id ";
     $query .= " WHERE civicrm_activity.activity_type_id = '" . trim($this->custom_groups['leave_request']['extends_entity_column_value']) . "'";
     
-    $query .= " AND civicrm_activity.source_record_id = '" . $cid . "'";
-        
+    $query .= " AND civicrm_activity_contact.contact_id = '" . $cid . "'";
+    
     if('' !== $from_date and '' !== $to_date){
       $query .= " AND (";
       
@@ -3864,11 +3870,11 @@ class leaveregistration {
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()){
       
-      $data[$dao->id] = array
+      $data[$dao->id . $dao->contact_id] = array
       (
         'id' => $dao->id,
         'entity_id' => $dao->entity_id,
-        'cid' => $dao->source_record_id,
+        'cid' => $dao->contact_id,
         'leave_type' => $dao->{$this->custom_fields['leave_request_leave_type']['column_name']},
         'reason' => $dao->{$this->custom_fields['leave_request_reason']['column_name']},
         'status' => $dao->{$this->custom_fields['leave_request_status']['column_name']},
@@ -3891,7 +3897,7 @@ class leaveregistration {
   }
   
   public function check($cids, $leave_type, $id = '', $from_date = '', $to_date = '', $date = '', $do_not_time_for_time = true, $limit = true){
-    $query = "SELECT civicrm_activity.source_record_id, " . $this->custom_groups['leave_request']['table_name'] . ".id, " . $this->custom_groups['leave_request']['table_name'] . ".entity_id";
+    $query = "SELECT civicrm_activity.source_record_id, civicrm_activity_contact.contact_id, " . $this->custom_groups['leave_request']['table_name'] . ".id, " . $this->custom_groups['leave_request']['table_name'] . ".entity_id";
     
     $query .= ", " . $this->custom_fields['leave_request_leave_type']['column_name'];
     $query .= ", " . $this->custom_fields['leave_request_reason']['column_name'];
@@ -3909,70 +3915,16 @@ class leaveregistration {
     
     $query .= " FROM " . $this->custom_groups['leave_request']['table_name'];
     $query .= " LEFT JOIN civicrm_activity ON " . $this->custom_groups['leave_request']['table_name'] . ".entity_id = civicrm_activity.id";
-    $query .= " LEFT JOIN civicrm_contact ON civicrm_activity.source_record_id = civicrm_contact.id";
-    $query .= " WHERE civicrm_activity.activity_type_id = '" . trim($this->custom_groups['leave_request']['extends_entity_column_value']) . "'";
-            
+    $query .= " LEFT JOIN civicrm_activity_contact ON civicrm_activity_contact.activity_id = civicrm_activity.id ";
+    $query .= " WHERE civicrm_activity.activity_type_id = '" . trim($this->custom_groups['leave_request']['extends_entity_column_value']) . "'";   
+    
     $query .= " AND (";
     foreach($cids as $key => $cid){
-      $query .= " civicrm_activity.source_record_id = '" . $cid . "' OR";
+      $query .= " civicrm_activity_contact.contact_id = '" . $cid . "' OR";
     }
     
     $query = substr($query, 0, -2) . ")";
-                
-    /*'atv' => 'ATV', //
-    'special_leave' => 'Special leave', // buitengewoon verlof
-    'doctor_visit' => 'Doctor visit', // dokter bezoek
-    'normal_leave' => 'Normal leave', // normaal verlof
-    'normal_leave_less_one_day' => 'Normal leave < 1 DAY', // normaal verlof < 1 dag
-    //'mom_dad_day' => 'Mom/Dad day',
-    'mom_dad_day' => 'Parental', // ouderschapsverlof
-    //'parental' => 'Parental', // ouderschapsverlof
-    'study_leave' => 'Study leave', // studieverlof
-    'time_for_time' => 'Time for time', // tijd voor tijd
-    'care' => 'Care', // zorgverlof
-    'maternity' => 'Maternity', // zwangerschapsverlof
-    'sick' => 'Sick', // ziek
-    'sick_less_one_day' => 'Sick < 1 day', // ziek < 1 dag*/
     
-    /*switch($leave_type)
-    {
-      case 'sick':
-      case 'sick_less_one_day':
-      case 'doctor_visit':
-        $query .= " AND " . $this->custom_fields['leave_request_leave_type']['column_name'] . " = '" . $leave_type . "'";
-        break;
-      
-      case 'maternity':
-      case 'care':  
-      case 'study_leave':
-      case 'mom_dad_day':
-        $options = array('maternity', 'care', 'study_leave', 'mom_dad_day');
-        $query .= " AND (";
-        foreach($options as $key => $value){
-          $query .= " " . $this->custom_fields['leave_request_leave_type']['column_name'] . " = '" . $key . "' OR";
-        }
-        $query = substr($query, 0, -2) . ")";
-        break;
-        
-      case 'time_for_time':
-        $query .= " AND (";
-        foreach($this->option_group['leave_request_leave_type']['options'] as $key => $value){ // everything
-          $query .= " " . $this->custom_fields['leave_request_leave_type']['column_name'] . " = '" . $key . "' OR";
-        }
-        $query = substr($query, 0, -2) . ")";
-        break;
-        
-      case 'normal_leave':
-      case 'special_leave':
-      case 'atv':
-        $options = array('normal_leave', 'special_leave', 'atv');
-        $query .= " AND (";
-        foreach($options as $key => $value){
-          $query .= " " . $this->custom_fields['leave_request_leave_type']['column_name'] . " = '" . $key . "' OR";
-        }
-        $query = substr($query, 0, -2) . ")";
-        break;
-    } */  
     if($do_not_time_for_time){
       $query .= " AND " . $this->custom_fields['leave_request_leave_type']['column_name'] . " != 'time_for_time'";
     }
@@ -4018,11 +3970,11 @@ class leaveregistration {
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()){
       
-      $datas[$dao->id] = array
+      $datas[$dao->id . $dao->contact_id] = array
       (
         'id' => $dao->id,
         'entity_id' => $dao->entity_id,
-        'cid' => $dao->source_record_id,
+        'cid' => $dao->contact_id,
         'display_name' => $dao->display_name,
         'leave_type' => $dao->{$this->custom_fields['leave_request_leave_type']['column_name']},
         'reason' => $dao->{$this->custom_fields['leave_request_reason']['column_name']},
@@ -4042,139 +3994,11 @@ class leaveregistration {
     unset($where);
     unset($dao); 
     
-    /*
-    // first mom_dad_day
-    foreach($datas as $id => $data){
-      switch($data['leave_type']){
-        case 'mom_dad_day':
-        case 'study_leave':
-        case 'care':
-          $this->set_pattern($data, 'check');
-          break;
-      }
-    }
-        
-    // second the rest
-    foreach($datas as $id => $data){
-                 
-      switch($data['leave_type']){
-        case 'time_for_time': // always add time for time
-          $timestamp = strtotime($data['date']);
-          
-          $year = date('Y', $timestamp);
-          $month = date('m', $timestamp);
-          $day = date('d', $timestamp);
-          
-          list($hours, $minutes) = explode(':', $data['duration']);
-          $duration = ($hours * 60) + $minutes;
-          
-          $this->data[$data['cid']][$year][$month][$day]['time_for_time']['is_time_for_time'] = true;
-          $this->data[$data['cid']][$year][$month][$day]['time_for_time']['leave_type'] = 'time_for_time';
-          $this->data[$data['cid']][$year][$month][$day]['time_for_time']['reason'] = $data['reason'];
-          $this->data[$data['cid']][$year][$month][$day]['time_for_time']['status'] = $data['status'];
-          $this->data[$data['cid']][$year][$month][$day]['time_for_time']['duration'] = $duration;
-          
-          break;
-        
-        case 'doctor_visit':  
-        case 'normal_leave_less_one_day': 
-        case 'sick_less_one_day': 
-          $timestamp = strtotime($data['date']);
-          
-          $year = date('Y', $timestamp);
-          $month = date('m', $timestamp);
-          $day = date('d', $timestamp);
-          
-          list($hours, $minutes) = explode(':', $data['duration']);
-          $duration = ($hours * 60) + $minutes;
-             
-          // is holiday
-          if(isset($this->data[$data['cid']][$year][$month][$day]['holiday']['is_holiday']) and ($this->data[$data['cid']][$year][$month][$day]['holiday']['is_holiday'])){
-            $duration = 0;
-          }
-          
-          if(!isset($this->data[$data['cid']][$year][$month][$day]['request'])){
-            $this->data[$data['cid']][$year][$month][$day]['request'] = array();
-          }
-          
-          if(!isset($this->data[$data['cid']][$year][$month][$day]['request']['leave_type'])){ // if leave_type don exists
-            $this->data[$data['cid']][$year][$month][$day]['request']['is_request'] = true;
-            $this->data[$data['cid']][$year][$month][$day]['request']['leave_type'] = $data['leave_type'];
-            $this->data[$data['cid']][$year][$month][$day]['request']['reason'] = $data['reason'];
-            $this->data[$data['cid']][$year][$month][$day]['request']['status'] = $data['status'];
-            $this->data[$data['cid']][$year][$month][$day]['request']['duration'] = $duration;
-            
-          }else { // check weight
-            if($this->weight[$data['leave_type']] < $this->weight[$this->data[$data['cid']][$year][$month][$day]['request']['leave_type']]){ // if weight is lower
-              $this->data[$data['cid']][$year][$month][$day]['request']['is_request'] = true;
-              $this->data[$data['cid']][$year][$month][$day]['request']['leave_type'] = $data['leave_type'];
-              $this->data[$data['cid']][$year][$month][$day]['request']['reason'] = $data['reason'];
-              $this->data[$data['cid']][$year][$month][$day]['request']['status'] = $data['status'];
-              $this->data[$data['cid']][$year][$month][$day]['request']['duration'] = $duration;
-            }
-          }
-          break;
-                  
-        case 'mom_dad_day':
-        case 'study_leave':
-        case 'care':
-          //$this->set_pattern($data, 'request');
-          break;
-        
-        default:
-          $from_date_totime = strtotime($data['from_date']);
-          $to_date_totime = strtotime($data['to_date']);
-          
-          for($timestamp = $from_date_totime; $timestamp <= $to_date_totime; $timestamp = strtotime( '+1 day' , $timestamp )){            
-            $year = date('Y', $timestamp);
-            $month = date('m', $timestamp);
-            $day = date('d', $timestamp);
-                    
-            if(!isset($this->data[$data['cid']][$year][$month][$day]['request'])){
-              $this->data[$data['cid']][$year][$month][$day]['request'] = array();
-            }
-            
-            $duration = 0;
-            if(isset($this->data[$data['cid']][$year][$month][$day]['adjustments']['duration']) and '' !== $this->data[$data['cid']][$year][$month][$day]['adjustments']['duration']){
-              $duration = $this->data[$data['cid']][$year][$month][$day]['adjustments']['duration'];
-                  
-            }else if(isset($this->data[$data['cid']][$year][$month][$day]['overall_adjustments']['duration']) and '' !== $this->data[$data['cid']][$year][$month][$day]['overall_adjustments']['duration']){
-              $duration = $this->data[$data['cid']][$year][$month][$day]['overall_adjustments']['duration'];
-              
-            }else if(isset($this->data[$data['cid']][$year][$month][$day]['general']['duration']) and '' !== $this->data[$data['cid']][$year][$month][$day]['general']['duration']){
-              $duration = $this->data[$data['cid']][$year][$month][$day]['general']['duration'];
-            }
-            
-            // is holiday
-            if(isset($this->data[$data['cid']][$year][$month][$day]['holiday']['is_holiday']) and ($this->data[$data['cid']][$year][$month][$day]['holiday']['is_holiday'])){
-              $duration = 0;
-            }
-            
-            if(!isset($this->data[$data['cid']][$year][$month][$day]['request']['leave_type'])){ // if leave_type don exists
-              $this->data[$data['cid']][$year][$month][$day]['request']['is_request'] = true;
-              $this->data[$data['cid']][$year][$month][$day]['request']['leave_type'] = $data['leave_type'];
-              $this->data[$data['cid']][$year][$month][$day]['request']['reason'] = $data['reason'];
-              $this->data[$data['cid']][$year][$month][$day]['request']['status'] = $data['status'];
-              $this->data[$data['cid']][$year][$month][$day]['request']['duration'] = $duration;
-
-            }else { // check weight
-              if($this->weight[$data['leave_type']] < $this->weight[$this->data[$data['cid']][$year][$month][$day]['request']['leave_type']]){ // if weight is lower
-                $this->data[$data['cid']][$year][$month][$day]['request']['is_request'] = true;
-                $this->data[$data['cid']][$year][$month][$day]['request']['leave_type'] = $data['leave_type'];
-                $this->data[$data['cid']][$year][$month][$day]['request']['reason'] = $data['reason'];
-                $this->data[$data['cid']][$year][$month][$day]['request']['status'] = $data['status'];
-                $this->data[$data['cid']][$year][$month][$day]['request']['duration'] = $duration;
-              }
-            }
-          }
-        }
-    }*/
-    
     return $datas;
   }
   
   public function get($id){
-    $query = "SELECT civicrm_activity.source_record_id, " . $this->custom_groups['leave_request']['table_name'] . ".id, " . $this->custom_groups['leave_request']['table_name'] . ".entity_id";
+    $query = "SELECT civicrm_activity.source_record_id, civicrm_activity_contact.contact_id, " . $this->custom_groups['leave_request']['table_name'] . ".id, " . $this->custom_groups['leave_request']['table_name'] . ".entity_id";
         
     $query .= ", " . $this->custom_fields['leave_request_leave_type']['column_name'];
     $query .= ", " . $this->custom_fields['leave_request_reason']['column_name'];
@@ -4209,6 +4033,7 @@ class leaveregistration {
     
     $query .= " FROM " . $this->custom_groups['leave_request']['table_name'];
     $query .= " LEFT JOIN civicrm_activity ON " . $this->custom_groups['leave_request']['table_name'] . ".entity_id = civicrm_activity.id";
+    $query .= " LEFT JOIN civicrm_activity_contact ON civicrm_activity_contact.activity_id = civicrm_activity.id ";
     $query .= " WHERE civicrm_activity.activity_type_id = '" . trim($this->custom_groups['leave_request']['extends_entity_column_value']) . "'";
         
     $query .= " AND civicrm_activity.id = '" . $id . "'";
@@ -4222,7 +4047,7 @@ class leaveregistration {
       (
         'id' => $dao->id,
         'entity_id' => $dao->entity_id,
-        'cid' => $dao->source_record_id,
+        'cid' => $dao->contact_id,
         'leave_type' => $dao->{$this->custom_fields['leave_request_leave_type']['column_name']},
         'reason' => $dao->{$this->custom_fields['leave_request_reason']['column_name']},
         'status' => $dao->{$this->custom_fields['leave_request_status']['column_name']},
@@ -4389,9 +4214,9 @@ class leaveregistration {
       'version' => 3,
       'sequential' => 1,
       'id' => $id,
-      'source_record_id' => $values['source_record_id'], // contact_id of the request
-      'activity_type_id' => $this->custom_groups['leave_request']['extends_entity_column_value'],
-      'subject' => ts('Leave request from ') . $values['display_name'] . ts(', leave type ') . ts($this->option_groups['leave_request_leave_type']['options'][$values['leave_type']]),
+      //'source_record_id' => $values['source_record_id'], // contact_id of the request
+      //'activity_type_id' => $this->custom_groups['leave_request']['extends_entity_column_value'],
+      //'subject' => ts('Leave request from ') . $values['display_name'] . ts(', leave type ') . ts($this->option_groups['leave_request_leave_type']['options'][$values['leave_type']]),
       //'activity_date_time' => date('Y-m-d H:i:s'),
       //'duration' => $values['duration'], // can not be 0:00
       'status_id' => $values['status_id'],
@@ -4401,9 +4226,10 @@ class leaveregistration {
       'is_current_revision' => '1',
       'is_deleted' => '0',
       //'source_contact_id' => $values['source_contact_id'], // Toegevoegd door
-      'target_contact_id' => $values['target_contact_id'], // Op welke naam
+      //'target_contact_id' => $values['target_contact_id'], // Op welke naam
     );
-    $activity = civicrm_api('Activity', 'create', $params);   
+    
+    $activity = civicrm_api('Activity', 'create', $params);
     
     if(isset($activity['is_error']) and $activity['is_error']){
       $return['is_error'] = true;

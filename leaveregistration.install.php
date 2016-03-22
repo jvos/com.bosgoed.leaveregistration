@@ -90,7 +90,7 @@ function leaveregistration_civicrm_install() {
   }
   
   // custom groups
-  $custom_groups = $lr->__get('custom_groups');
+  /*$custom_groups = $lr->__get('custom_groups');
      
   foreach($custom_groups as $custom_group => $array){   
     // first create group with title as name
@@ -315,7 +315,7 @@ function leaveregistration_civicrm_install() {
         }
       }
     }
-  }
+  }*/
   
   return TRUE;
 }

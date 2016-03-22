@@ -165,13 +165,14 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
       }
     }
     
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    //$this->_select = " SELECT " . implode(', ', $select) . " ";
+    $this->_select = " " . implode(', ', $select) . " ";
   }
 
   function from() {
     $this->_from = NULL;
     
-    $this->_from = " FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
+    $this->_from = " FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
     
     $this->_from .= " LEFT JOIN civicrm_relationship AS {$this->_aliases['department']}_relationship ON {$this->_aliases['department']}{$this->_aclFrom}_relationship.contact_id_a = {$this->_aliases['civicrm_contact']}.id";
     $this->_from .= " LEFT JOIN civicrm_contact AS {$this->_aliases['department']} ON {$this->_aliases['department']}.id = {$this->_aliases['department']}_relationship.contact_id_b";
@@ -259,9 +260,32 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
       $orderby[] = $prefix . "_" . $order['column'] . " " . $order['order'];
     }
         
-    $this->_orderBy = " ORDER BY " . implode(', ', $orderby);
+    $this->_orderBy = " ORDER BY " . implode(', ', $orderby) . " ";
   }
 
+  function buildQuery($applyLimit = TRUE) {
+    $this->select();
+    $this->from();
+    $this->customDataFrom();
+    $this->where();
+    $this->groupBy();
+    $this->orderBy();
+
+    // order_by columns not selected for display need to be included in SELECT
+    $unselectedSectionColumns = $this->unselectedSectionColumns();
+    foreach ($unselectedSectionColumns as $alias => $section) {
+      $this->_select .= ", {$section['dbAlias']} as {$alias}";
+    }
+
+    if ($applyLimit && empty($this->_params['charts'])) {
+      $this->limit();
+    }
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
+
+    $sql = "SELECT * FROM (SELECT {$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit} ) as CC";
+    return $sql;
+  }
+  
   function postProcess() {
 
     $this->beginPostProcess();
@@ -278,34 +302,34 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
   }
-      
-  function countStat(&$statistics, $count) {
-    echo('$statistics: <pre>');
-    print_r($statistics);
-    echo('</pre>');
     
-    echo('$count: ' . $count) . '<br/>' . PHP_EOL;
-    
-    $statistics['counts']['rowCount'] = array(
-      'title' => ts('Row(s) Listed'),
-      'value' => $count,
-    );
+  function setPager($rowCount = self::ROW_COUNT_LIMIT) {
 
-    echo('$statistics2: <pre>');
-    print_r($statistics);
-    echo('</pre>');
-    
-    echo('$this->_rowsFound: ' . $this->_rowsFound) . '<br/>' . PHP_EOL;
-    
-    /*if ($this->_rowsFound && ($this->_rowsFound > $count)) {
-      $statistics['counts']['rowsFound'] = array(
-        'title' => ts('Total Row(s)'),
-        'value' => $this->_rowsFound,
-      );*/
+    // CRM-14115, over-ride row count if rowCount is specified in URL
+    if ($this->_dashBoardRowCount) {
+      $rowCount = $this->_dashBoardRowCount;
+    }
+
+    if ($this->_limit && ($this->_limit != '')) {
+      //$sql = "SELECT FOUND_ROWS();";
+      //$this->_rowsFound = CRM_Core_DAO::singleValueQuery($sql);
       
-      echo('$statistics3: <pre>');
-    print_r($statistics);
-    echo('</pre>');
+      $sql = "SELECT COUNT(*) FROM (SELECT {$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy}  ) as CC";
+      $this->_rowsFound = CRM_Core_DAO::singleValueQuery($sql);
+      
+      
+      $params = array(
+        'total' => $this->_rowsFound,
+        'rowCount' => $rowCount,
+        'status' => ts('Records') . ' %%StatusMessage%%',
+        'buttonBottom' => 'PagerBottomButton',
+        'buttonTop' => 'PagerTopButton',
+        'pageID' => $this->get(CRM_Utils_Pager::PAGE_ID),
+      );
+
+      $pager = new CRM_Utils_Pager($params);
+      $this->assign_by_ref('pager', $pager);
+      $this->ajaxResponse['totalRows'] = $this->_rowsFound;
     }
   }
   
@@ -413,6 +437,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
     // is also needed for order by department or business
     $datas = [];
     $cids = [];
+    
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $data = [];

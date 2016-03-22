@@ -275,7 +275,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     $this->endPostProcess($rows);
   }
   
-  function countStat(&$statistics, $count) {
+  /*function countStat(&$statistics, $count) {
     echo('$statistics: <pre>');
     print_r($statistics);
     echo('</pre>');
@@ -303,7 +303,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     print_r($statistics);
     echo('</pre>');
     }
-  }
+  }*/
       
   function buildRows($sql, &$rows) {       
     // set days, months and years to empty
