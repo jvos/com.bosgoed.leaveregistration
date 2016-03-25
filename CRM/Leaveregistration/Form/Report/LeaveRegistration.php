@@ -385,12 +385,12 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistration extends CRM_Report_For
     // create a array with all the employees, add department en business to the array, this
     $datas = [];
     $cids = [];
+    
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $data = [];
       foreach($this->_columnHeaders as $id => $columnheader){
         $data[$id] = $dao->$id;
-        
       }
       
       $datas[$dao->civicrm_contact_id] = $data;

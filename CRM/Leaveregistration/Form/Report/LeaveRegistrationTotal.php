@@ -157,8 +157,8 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
             if (CRM_Utils_Array::value('required', $field) ||
               CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["civicrm_contact_{$fieldName}"]['title'] = $field['title'];
-              $this->_columnHeaders["civicrm_contact_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
             }
           }
         }
@@ -437,7 +437,7 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
     // is also needed for order by department or business
     $datas = [];
     $cids = [];
-    
+        
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $data = [];
@@ -461,15 +461,15 @@ class CRM_Leaveregistration_Form_Report_LeaveRegistrationTotal extends CRM_Repor
       switch($this->_formValues['period_value']){
         case 'year':
           $this->_columnHeaders[date('Y', $timestamp)] = array('title' => ts('Year') . ' ' . date('Y'));
-          $this->_columnHeaders[date('Y', $timestamp) . '_sub_total'] = array('title' => ts('Sub total') . ' ' . ts('Year') . ' ' . date('Y'));
+          $this->_columnHeaders[date('Y', $timestamp) . '_sub_total'] = array('title' => ts('Total') . ' ' . ts('Year') . ' ' . date('Y'));
           break;
         case 'month':
           $this->_columnHeaders[date('m', $timestamp)] = array('title' => ts('Month') . ' ' . ts(date('F', $timestamp)) . ' ' . date('m', $timestamp));
-          $this->_columnHeaders[date('m', $timestamp) . '_sub_total'] = array('title' => ts('Sub total') . ' ' . ts('Month') . ' ' . ts(date('F', $timestamp)) . ' ' . date('m', $timestamp));
+          $this->_columnHeaders[date('m', $timestamp) . '_sub_total'] = array('title' => ts('Total') . ' ' . ts('Month') . ' ' . ts(date('F', $timestamp)) . ' ' . date('m', $timestamp));
           break;
         case 'week':
           $this->_columnHeaders[date('W', $timestamp)] = array('title' => ts('Week') . ' ' . date('W', $timestamp) . ' ' . date('m-d', $timestamp) . '/' . date('m-d', $timestamp_last));
-          $this->_columnHeaders[date('W', $timestamp) . '_sub_total'] = array('title' => ts('Sub total') . ' ' . ts('Week') . ' ' . date('W', $timestamp));
+          $this->_columnHeaders[date('W', $timestamp) . '_sub_total'] = array('title' => ts('Total') . ' ' . ts('Week') . ' ' . date('W', $timestamp));
           break;
       }
     }
