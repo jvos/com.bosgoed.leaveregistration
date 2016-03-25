@@ -2810,6 +2810,7 @@ class leaveregistration {
     $query .= " LEFT JOIN civicrm_activity ON " . $this->custom_groups['leave_request']['table_name'] . ".entity_id = civicrm_activity.id ";
     $query .= " LEFT JOIN civicrm_activity_contact ON civicrm_activity_contact.activity_id = civicrm_activity.id ";
     $query .= " WHERE civicrm_activity.activity_type_id = '" . trim($this->custom_groups['leave_request']['extends_entity_column_value']) . "' ";
+    $query .= " AND civicrm_activity_contact.record_type_id = '3' ";
     
     $where = "";
     foreach($this->cids as $cid){
